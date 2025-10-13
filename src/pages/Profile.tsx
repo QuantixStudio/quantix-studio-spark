@@ -155,17 +155,7 @@ export default function Profile() {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label>
-                <Shield className="inline h-4 w-4 mr-2" />
-                Role
-              </Label>
-              <Input
-                value={profile?.role || "customer"}
-                disabled
-                className="bg-muted"
-              />
-            </div>
+          {/* Role field removed for security - roles now managed via user_roles table */}
 
             <Button type="submit" disabled={saving}>
               {saving ? (
