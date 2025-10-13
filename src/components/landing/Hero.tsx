@@ -30,8 +30,11 @@ export default function Hero() {
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold mb-6">
-            Building the Future with{" "}
-            <span className="gradient-text">AI & Automation</span>
+            <span className="gradient-text animate-gradient">
+              Building Tomorrow's
+            </span>
+            <br />
+            Digital Solutions Today
           </h1>
 
           <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto">
@@ -41,7 +44,7 @@ export default function Hero() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" onClick={scrollToContact} className="text-lg">
-              Book a Call
+              Let's Build Together
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button
@@ -50,7 +53,7 @@ export default function Hero() {
               onClick={scrollToPortfolio}
               className="text-lg"
             >
-              View Portfolio
+              View Our Work
             </Button>
           </div>
         </div>

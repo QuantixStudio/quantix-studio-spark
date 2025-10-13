@@ -38,14 +38,18 @@ export default function Services() {
           {services?.map((service) => (
             <Card key={service.id} className="hover-lift border-border/50">
               <CardContent className="pt-6">
-                {service.icon_url ? (
+                {service.service_icon?.icon_url ? (
                   <img
-                    src={service.icon_url}
-                    alt=""
+                    src={service.service_icon.icon_url}
+                    alt={service.service_icon.name}
                     className="h-12 w-12 mb-4 object-contain"
                   />
+                ) : service.service_icon?.name ? (
+                  <div className="mb-4">{getIcon(service.service_icon.name)}</div>
                 ) : (
-                  <div className="mb-4">{getIcon(service.icon_name)}</div>
+                  <div className="h-12 w-12 mb-4 bg-primary/10 rounded-lg flex items-center justify-center">
+                    <span className="text-2xl">🔧</span>
+                  </div>
                 )}
                 <h3 className="text-xl font-semibold mb-3">{service.title}</h3>
                 <p className="text-muted-foreground leading-relaxed">

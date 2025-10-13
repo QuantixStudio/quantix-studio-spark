@@ -1,56 +1,17 @@
-import { useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ExternalLink, Github, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-
-interface Project {
-  id: string;
-  title: string;
-  slug: string;
-  short_description: string;
-  full_description: string;
-  cover_url: string | null;
-  category: string | null;
-  technologies: any;
-  demo_url: string | null;
-  github_url: string | null;
-}
+import { ExternalLink, Github, ArrowLeft } from "lucide-react";
+import { useProjectDetail } from "@/hooks/useProjectDetail";
 
 export default function ProjectDetail() {
   const { slug } = useParams<{ slug: string }>();
-  const [project, setProject] = useState<Project | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: project, isLoading } = useProjectDetail(slug || "");
 
-  useEffect(() => {
-    const fetchProject = async () => {
-      if (!slug) return;
-
-      const { data, error } = await supabase
-        .from("projects")
-        .select("*")
-        .eq("slug", slug)
-        .eq("published", true)
-        .maybeSingle();
-
-      if (error) {
-        console.error("Error fetching project:", error);
-        setProject(null);
-      } else {
-        setProject(data);
-      }
-      setLoading(false);
-    };
-
-    fetchProject();
-  }, [slug]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
@@ -115,30 +76,29 @@ export default function ProjectDetail() {
         )}
 
         <div className="mb-6">
-          {project.category && (
-            <span className="text-primary font-medium">{project.category}</span>
+          {project.project_category && (
+            <Badge variant="secondary" className="text-sm mb-3">
+              {project.project_category.name}
+            </Badge>
           )}
-          <h1 className="text-4xl font-bold mt-2 mb-4">{project.title}</h1>
-          <p className="text-xl text-muted-foreground">
-            {project.short_description}
-          </p>
+          <h1 className="text-4xl md:text-5xl font-bold">{project.title}</h1>
         </div>
 
-        {project.technologies && Array.isArray(project.technologies) && project.technologies.length > 0 && (
+        {project.project_technologies && project.project_technologies.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-8">
-            {project.technologies.map((tech: string, idx: number) => (
-              <Badge key={idx} variant="outline">
-                {tech}
+            {project.project_technologies.map((pt) => (
+              <Badge key={pt.technologies.id} variant="outline">
+                {pt.technologies.name}
               </Badge>
             ))}
           </div>
         )}
 
-        {project.full_description && (
-          <div className="prose dark:prose-invert max-w-none mb-8">
-            <p className="text-lg leading-relaxed">{project.full_description}</p>
-          </div>
-        )}
+        <div className="prose dark:prose-invert max-w-none mb-8">
+          <p className="text-lg text-muted-foreground leading-relaxed">
+            {project.full_description || project.short_description}
+          </p>
+        </div>
 
         <div className="flex gap-4">
           {project.demo_url && (

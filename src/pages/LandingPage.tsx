@@ -1,5 +1,6 @@
 import Navbar from "@/components/landing/Navbar";
 import Hero from "@/components/landing/Hero";
+import About from "@/components/landing/About";
 import Services from "@/components/landing/Services";
 import WhyChooseUs from "@/components/landing/WhyChooseUs";
 import Portfolio from "@/components/landing/Portfolio";
@@ -12,6 +13,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <Hero />
+      <About />
       <Services />
       <WhyChooseUs />
       <Portfolio />

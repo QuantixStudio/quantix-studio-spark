@@ -12,28 +12,27 @@ interface Technology {
   name: string;
 }
 
-interface Project {
+interface ProjectDetail {
   id: string;
   title: string;
   slug: string;
   short_description: string;
+  full_description: string | null;
   cover_url: string | null;
+  demo_url: string | null;
+  github_url: string | null;
   project_category: ProjectCategory | null;
   project_technologies: Array<{ technologies: Technology }>;
 }
 
-export function useProjects() {
+export function useProjectDetail(slug: string) {
   return useQuery({
-    queryKey: ["projects"],
+    queryKey: ["project", slug],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("projects")
         .select(`
-          id,
-          title,
-          slug,
-          short_description,
-          cover_url,
+          *,
           project_category:category_id (
             id,
             name,
@@ -46,12 +45,13 @@ export function useProjects() {
             )
           )
         `)
+        .eq("slug", slug)
         .eq("published", true)
-        .order("order_index", { ascending: true })
-        .limit(6);
+        .maybeSingle();
 
       if (error) throw error;
-      return data as Project[];
+      return data as ProjectDetail | null;
     },
+    enabled: !!slug,
   });
 }
