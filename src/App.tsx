@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { AdminRoute } from "@/components/AdminRoute";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -14,6 +15,7 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/LandingPage";
 import ProjectDetail from "./pages/ProjectDetail";
+import ProjectsManagement from "./pages/admin/ProjectsManagement";
 
 const queryClient = new QueryClient();
 
@@ -35,11 +37,21 @@ const App = () => (
               <Route
                 path="/admin"
                 element={
-                  <ProtectedRoute>
+                  <AdminRoute>
                     <DashboardLayout>
                       <Dashboard />
                     </DashboardLayout>
-                  </ProtectedRoute>
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/projects"
+                element={
+                  <AdminRoute>
+                    <DashboardLayout>
+                      <ProjectsManagement />
+                    </DashboardLayout>
+                  </AdminRoute>
                 }
               />
               <Route

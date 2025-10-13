@@ -1,4 +1,4 @@
-import { Home, User, Settings, LogOut } from "lucide-react";
+import { Home, User, Settings, LogOut, Folder } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 
 const menuItems = [
   { title: "Dashboard", url: "/admin", icon: Home },
+  { title: "Projects", url: "/admin/projects", icon: Folder },
   { title: "Profile", url: "/admin/profile", icon: User },
   { title: "Settings", url: "/admin/settings", icon: Settings },
 ];

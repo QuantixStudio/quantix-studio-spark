@@ -18,15 +18,18 @@ interface Project {
   slug: string;
   short_description: string;
   cover_url: string | null;
+  published: boolean;
+  created_at: string;
+  category_id: string | null;
   project_category: ProjectCategory | null;
   project_technologies: Array<{ technologies: Technology }>;
 }
 
-export function useProjects() {
+export function useProjects(adminMode = false) {
   return useQuery({
-    queryKey: ["projects"],
+    queryKey: ["projects", adminMode ? "all" : "published"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("projects")
         .select(`
           id,
@@ -34,6 +37,9 @@ export function useProjects() {
           slug,
           short_description,
           cover_url,
+          published,
+          created_at,
+          category_id,
           project_category:category_id (
             id,
             name,
@@ -46,10 +52,13 @@ export function useProjects() {
             )
           )
         `)
-        .eq("published", true)
-        .order("order_index", { ascending: true })
-        .limit(6);
+        .order("order_index", { ascending: true });
 
+      if (!adminMode) {
+        query = query.eq("published", true).limit(6);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       return data as Project[];
     },

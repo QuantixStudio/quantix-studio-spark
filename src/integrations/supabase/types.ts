@@ -72,18 +72,24 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
+          bio: string | null
           created_at: string | null
           email: string | null
           full_name: string | null
           id: string
         }
         Insert: {
+          avatar_url?: string | null
+          bio?: string | null
           created_at?: string | null
           email?: string | null
           full_name?: string | null
           id?: string
         }
         Update: {
+          avatar_url?: string | null
+          bio?: string | null
           created_at?: string | null
           email?: string | null
           full_name?: string | null
@@ -339,6 +345,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_admin: {
+        Args: Record<PropertyKey, never>
         Returns: boolean
       }
     }
