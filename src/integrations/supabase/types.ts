@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      inquiries: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          message: string
+          name: string
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          message: string
+          name: string
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          status?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -32,6 +59,132 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+        }
+        Relationships: []
+      }
+      projects: {
+        Row: {
+          category: string | null
+          cover_url: string | null
+          created_at: string | null
+          demo_url: string | null
+          full_description: string | null
+          github_url: string | null
+          id: string
+          order_index: number | null
+          published: boolean | null
+          short_description: string
+          slug: string
+          technologies: Json | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          cover_url?: string | null
+          created_at?: string | null
+          demo_url?: string | null
+          full_description?: string | null
+          github_url?: string | null
+          id?: string
+          order_index?: number | null
+          published?: boolean | null
+          short_description: string
+          slug: string
+          technologies?: Json | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          cover_url?: string | null
+          created_at?: string | null
+          demo_url?: string | null
+          full_description?: string | null
+          github_url?: string | null
+          id?: string
+          order_index?: number | null
+          published?: boolean | null
+          short_description?: string
+          slug?: string
+          technologies?: Json | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      services: {
+        Row: {
+          created_at: string | null
+          description: string
+          icon_name: string | null
+          icon_url: string | null
+          id: string
+          order_index: number | null
+          published: boolean | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          icon_name?: string | null
+          icon_url?: string | null
+          id?: string
+          order_index?: number | null
+          published?: boolean | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          icon_name?: string | null
+          icon_url?: string | null
+          id?: string
+          order_index?: number | null
+          published?: boolean | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      testimonials: {
+        Row: {
+          avatar_url: string | null
+          company: string | null
+          created_at: string | null
+          feedback: string
+          id: string
+          name: string
+          order_index: number | null
+          position: string | null
+          published: boolean | null
+          rating: number | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          company?: string | null
+          created_at?: string | null
+          feedback: string
+          id?: string
+          name: string
+          order_index?: number | null
+          position?: string | null
+          published?: boolean | null
+          rating?: number | null
+        }
+        Update: {
+          avatar_url?: string | null
+          company?: string | null
+          created_at?: string | null
+          feedback?: string
+          id?: string
+          name?: string
+          order_index?: number | null
+          position?: string | null
+          published?: boolean | null
+          rating?: number | null
         }
         Relationships: []
       }

@@ -12,6 +12,8 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import LandingPage from "./pages/LandingPage";
+import ProjectDetail from "./pages/ProjectDetail";
 
 const queryClient = new QueryClient();
 
@@ -24,9 +26,14 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/project/:slug" element={<ProjectDetail />} />
               <Route path="/auth" element={<Auth />} />
+              
+              {/* Protected Admin Routes */}
               <Route
-                path="/"
+                path="/admin"
                 element={
                   <ProtectedRoute>
                     <DashboardLayout>
@@ -36,7 +43,7 @@ const App = () => (
                 }
               />
               <Route
-                path="/profile"
+                path="/admin/profile"
                 element={
                   <ProtectedRoute>
                     <DashboardLayout>
@@ -46,7 +53,7 @@ const App = () => (
                 }
               />
               <Route
-                path="/settings"
+                path="/admin/settings"
                 element={
                   <ProtectedRoute>
                     <DashboardLayout>
@@ -55,6 +62,8 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
+              
+              {/* 404 */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
