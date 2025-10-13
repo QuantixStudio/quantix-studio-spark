@@ -39,6 +39,35 @@ export type Database = {
           name?: string
           status?: string | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "inquiries_status_fkey"
+            columns: ["status"]
+            isOneToOne: false
+            referencedRelation: "inquiry_status"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inquiry_status: {
+        Row: {
+          color: string | null
+          id: string
+          label: string | null
+          order_index: number | null
+        }
+        Insert: {
+          color?: string | null
+          id: string
+          label?: string | null
+          order_index?: number | null
+        }
+        Update: {
+          color?: string | null
+          id?: string
+          label?: string | null
+          order_index?: number | null
+        }
         Relationships: []
       }
       profiles: {
@@ -62,9 +91,60 @@ export type Database = {
         }
         Relationships: []
       }
+      project_category: {
+        Row: {
+          description: string | null
+          id: string
+          name: string
+          order_index: number | null
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          name: string
+          order_index?: number | null
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          name?: string
+          order_index?: number | null
+        }
+        Relationships: []
+      }
+      project_technologies: {
+        Row: {
+          project_id: string
+          technology_id: string
+        }
+        Insert: {
+          project_id: string
+          technology_id: string
+        }
+        Update: {
+          project_id?: string
+          technology_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_technologies_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_technologies_technology_id_fkey"
+            columns: ["technology_id"]
+            isOneToOne: false
+            referencedRelation: "technologies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projects: {
         Row: {
-          category: string | null
+          category_id: string | null
           cover_url: string | null
           created_at: string | null
           demo_url: string | null
@@ -75,12 +155,11 @@ export type Database = {
           published: boolean | null
           short_description: string
           slug: string
-          technologies: Json | null
           title: string
           updated_at: string | null
         }
         Insert: {
-          category?: string | null
+          category_id?: string | null
           cover_url?: string | null
           created_at?: string | null
           demo_url?: string | null
@@ -91,12 +170,11 @@ export type Database = {
           published?: boolean | null
           short_description: string
           slug: string
-          technologies?: Json | null
           title: string
           updated_at?: string | null
         }
         Update: {
-          category?: string | null
+          category_id?: string | null
           cover_url?: string | null
           created_at?: string | null
           demo_url?: string | null
@@ -107,9 +185,34 @@ export type Database = {
           published?: boolean | null
           short_description?: string
           slug?: string
-          technologies?: Json | null
           title?: string
           updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projects_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "project_category"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_icon: {
+        Row: {
+          icon_url: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          icon_url?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          icon_url?: string | null
+          id?: string
+          name?: string
         }
         Relationships: []
       }
@@ -117,8 +220,7 @@ export type Database = {
         Row: {
           created_at: string | null
           description: string
-          icon_name: string | null
-          icon_url: string | null
+          icon_id: string | null
           id: string
           order_index: number | null
           published: boolean | null
@@ -128,8 +230,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           description: string
-          icon_name?: string | null
-          icon_url?: string | null
+          icon_id?: string | null
           id?: string
           order_index?: number | null
           published?: boolean | null
@@ -139,13 +240,35 @@ export type Database = {
         Update: {
           created_at?: string | null
           description?: string
-          icon_name?: string | null
-          icon_url?: string | null
+          icon_id?: string | null
           id?: string
           order_index?: number | null
           published?: boolean | null
           title?: string
           updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "services_icon_id_fkey"
+            columns: ["icon_id"]
+            isOneToOne: false
+            referencedRelation: "service_icon"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      technologies: {
+        Row: {
+          id: string
+          name: string
+        }
+        Insert: {
+          id?: string
+          name: string
+        }
+        Update: {
+          id?: string
+          name?: string
         }
         Relationships: []
       }
