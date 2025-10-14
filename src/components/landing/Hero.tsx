@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function Hero() {
   const scrollToPortfolio = () => {
@@ -17,24 +17,12 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
-      {/* Gradient Background */}
-      <div className="absolute inset-0 bg-[var(--gradient-accent)]" />
-
+    <section className="relative py-32 flex items-center justify-center overflow-hidden">
       {/* Content */}
       <div className="container mx-auto px-4 py-20 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-8">
-            <Sparkles className="h-4 w-4" />
-            <span className="text-sm font-medium">AI-Powered Development Studio</span>
-          </div>
-
           <h1 className="text-5xl md:text-7xl font-bold mb-6">
-            <span className="gradient-text animate-gradient">
-              Building Tomorrow's
-            </span>
-            <br />
-            Digital Solutions Today
+            Building Tomorrow's <span className="text-accent">Digital Solutions</span> Today
           </h1>
 
           <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto">
@@ -57,12 +45,6 @@ export default function Hero() {
             </Button>
           </div>
         </div>
-      </div>
-
-      {/* Decorative Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 -left-24 w-96 h-96 bg-primary/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 -right-24 w-96 h-96 bg-accent/20 rounded-full blur-3xl" />
       </div>
     </section>
   );

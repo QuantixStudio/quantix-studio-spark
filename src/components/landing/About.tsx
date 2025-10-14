@@ -16,8 +16,8 @@ export default function About() {
 
         <div className="grid md:grid-cols-3 gap-8">
           <div className="text-center space-y-4">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10">
-              <Zap className="h-8 w-8 text-primary" />
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-accent">
+              <Zap className="h-8 w-8 text-accent" />
             </div>
             <h3 className="text-xl font-semibold">Lightning Fast</h3>
             <p className="text-muted-foreground">
@@ -26,8 +26,8 @@ export default function About() {
           </div>
 
           <div className="text-center space-y-4">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10">
-              <Target className="h-8 w-8 text-primary" />
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-accent">
+              <Target className="h-8 w-8 text-accent" />
             </div>
             <h3 className="text-xl font-semibold">AI-Powered</h3>
             <p className="text-muted-foreground">
@@ -36,8 +36,8 @@ export default function About() {
           </div>
 
           <div className="text-center space-y-4">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10">
-              <Shield className="h-8 w-8 text-primary" />
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-accent">
+              <Shield className="h-8 w-8 text-accent" />
             </div>
             <h3 className="text-xl font-semibold">Enterprise-Grade</h3>
             <p className="text-muted-foreground">

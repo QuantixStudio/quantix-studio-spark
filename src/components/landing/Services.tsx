@@ -36,7 +36,7 @@ export default function Services() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {services?.map((service) => (
-            <Card key={service.id} className="hover-lift border-border/50">
+            <Card key={service.id} className="border transition-colors hover:border-accent">
               <CardContent className="pt-6">
                 {service.service_icon?.icon_url ? (
                   <img

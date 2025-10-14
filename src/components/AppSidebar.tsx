@@ -27,19 +27,18 @@ export function AppSidebar() {
   const { signOut } = useAuth();
   const isCollapsed = state === "collapsed";
 
-  const getNavCls = ({ isActive }: { isActive: boolean }) =>
-    isActive
-      ? "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
-      : "hover:bg-accent hover:text-accent-foreground";
-
   return (
-    <Sidebar collapsible="icon">
-      <SidebarContent>
+    <Sidebar collapsible="icon" className="border-r">
+      <SidebarContent className="bg-background">
         <div className="p-6">
-          <h2 className={`font-bold text-xl gradient-text ${isCollapsed ? "hidden" : ""}`}>
-            Quantix Studio
+          <h2 className={`font-bold text-xl ${isCollapsed ? "hidden" : ""}`}>
+            QUANTIX STUDIO
           </h2>
-          {isCollapsed && <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-accent" />}
+          {isCollapsed && (
+            <div className="h-8 w-8 rounded-lg border border-accent flex items-center justify-center text-accent font-bold">
+              Q
+            </div>
+          )}
         </div>
 
         <SidebarGroup>
@@ -51,7 +50,15 @@ export function AppSidebar() {
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink to={item.url} end className={getNavCls}>
+                    <NavLink
+                      to={item.url}
+                      end
+                      className={({ isActive }) =>
+                        isActive
+                          ? "border-l-4 border-accent bg-accent/10 hover:bg-accent/10"
+                          : "border-l-4 border-transparent hover:bg-accent/5"
+                      }
+                    >
                       <item.icon className="h-5 w-5" />
                       {!isCollapsed && <span>{item.title}</span>}
                     </NavLink>
@@ -63,11 +70,11 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-4">
+      <SidebarFooter className="p-4 border-t">
         <Button
           variant="ghost"
           onClick={signOut}
-          className="w-full justify-start"
+          className="w-full justify-start hover:bg-accent/10"
         >
           <LogOut className="h-5 w-5" />
           {!isCollapsed && <span>Sign Out</span>}

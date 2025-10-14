@@ -98,14 +98,13 @@ export default function Auth() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,hsl(var(--primary)/0.1),transparent)]" />
-      
-      <Card className="w-full max-w-md glass relative z-10">
+    <div className="flex min-h-screen items-center justify-center p-4 bg-muted/30">
+      <Card className="w-full max-w-md border">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
-            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-accent" />
+            <div className="h-12 w-12 rounded-xl border-2 border-accent flex items-center justify-center text-accent font-bold text-xl">
+              Q
+            </div>
           </div>
           <CardTitle className="text-2xl text-center">
             {mode === "signin" && "Welcome Back"}

@@ -22,9 +22,9 @@ export default function FilterBar({ activeFilter, onFilterChange }: FilterBarPro
             key={filter.id}
             onClick={() => onFilterChange(filter.id)}
             className={cn(
-              "px-6 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap border-2",
+              "px-6 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap border",
               activeFilter === filter.id
-                ? "bg-accent text-accent-foreground border-accent"
+                ? "bg-accent/10 text-accent border-accent"
                 : "bg-background text-muted-foreground border-border hover:border-accent"
             )}
           >

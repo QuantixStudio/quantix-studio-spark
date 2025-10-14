@@ -40,7 +40,7 @@ export default function Testimonials() {
           <CarouselContent>
             {testimonials?.map((testimonial) => (
               <CarouselItem key={testimonial.id} className="md:basis-1/2 lg:basis-1/2">
-                <Card className="h-full border-border/50">
+                <Card className="h-full border">
                   <CardContent className="pt-6">
                     {testimonial.rating && (
                       <div className="flex gap-1 mb-4">

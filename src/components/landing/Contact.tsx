@@ -68,7 +68,7 @@ export default function Contact() {
 
       <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
         {/* Contact Info Card */}
-        <Card className="border-border/50">
+        <Card className="border">
           <CardContent className="pt-6">
             <div className="space-y-6">
               <div>
@@ -101,7 +101,7 @@ export default function Contact() {
         </Card>
 
         {/* Contact Form Card */}
-        <Card className="border-border/50">
+        <Card className="border">
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>

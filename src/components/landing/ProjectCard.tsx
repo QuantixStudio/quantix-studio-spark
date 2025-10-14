@@ -49,13 +49,13 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       rel="noopener noreferrer"
       className="block"
     >
-      <Card className="overflow-hidden hover-lift group border-border/50">
+      <Card className="overflow-hidden group border transition-colors hover:border-accent">
         <div className="relative overflow-hidden aspect-video bg-muted">
           {mainImage ? (
             <img
               src={mainImage}
               alt={project.title}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              className="w-full h-full object-cover"
               loading="lazy"
             />
           ) : (
@@ -63,12 +63,6 @@ export default function ProjectCard({ project }: ProjectCardProps) {
               No Image
             </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4">
-            <div className="text-white flex items-center gap-2">
-              <span className="text-sm font-medium">View Details</span>
-              <ExternalLink className="h-4 w-4" />
-            </div>
-          </div>
         </div>
 
         <CardContent className="pt-6">

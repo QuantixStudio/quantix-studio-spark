@@ -8,8 +8,8 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
-            <Link to="/" className="text-xl font-bold gradient-text inline-block mb-4">
-              Quantix Studio
+            <Link to="/" className="text-xl font-bold inline-block mb-4">
+              QUANTIX STUDIO
             </Link>
             <p className="text-muted-foreground mb-4 max-w-md">
               Investor-ready products built with Bubble, WeWeb, and AI.

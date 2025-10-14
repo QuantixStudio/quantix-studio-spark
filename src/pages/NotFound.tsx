@@ -14,9 +14,9 @@ const NotFound = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md glass">
+      <Card className="w-full max-w-md border">
         <CardHeader className="text-center space-y-4">
-          <CardTitle className="text-7xl font-bold gradient-text">404</CardTitle>
+          <CardTitle className="text-7xl font-bold text-accent">404</CardTitle>
           <CardDescription className="text-xl">
             Oops! Page not found
           </CardDescription>

@@ -50,10 +50,10 @@ export default function Dashboard() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="glass">
+        <Card className="border">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Projects</CardTitle>
-            <Sparkles className="h-4 w-4 text-primary" />
+            <Sparkles className="h-4 w-4 text-accent" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">12</div>
@@ -61,7 +61,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="glass">
+        <Card className="border">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Active Tasks</CardTitle>
             <Activity className="h-4 w-4 text-accent" />
@@ -72,10 +72,10 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="glass">
+        <Card className="border">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Team Members</CardTitle>
-            <Users className="h-4 w-4 text-primary" />
+            <Users className="h-4 w-4 text-accent" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">8</div>
@@ -83,7 +83,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="glass">
+        <Card className="border">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Growth</CardTitle>
             <TrendingUp className="h-4 w-4 text-accent" />
@@ -96,28 +96,28 @@ export default function Dashboard() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <Card className="glass">
+        <Card className="border">
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
             <CardDescription>Get started with common tasks</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            <button className="w-full p-3 text-left rounded-lg border hover:bg-accent transition-colors">
+            <button className="w-full p-3 text-left rounded-lg border hover:border-accent transition-colors">
               <div className="font-medium">Create New Project</div>
               <div className="text-sm text-muted-foreground">Start a fresh project</div>
             </button>
-            <button className="w-full p-3 text-left rounded-lg border hover:bg-accent transition-colors">
+            <button className="w-full p-3 text-left rounded-lg border hover:border-accent transition-colors">
               <div className="font-medium">Invite Team Member</div>
               <div className="text-sm text-muted-foreground">Collaborate with others</div>
             </button>
-            <button className="w-full p-3 text-left rounded-lg border hover:bg-accent transition-colors">
+            <button className="w-full p-3 text-left rounded-lg border hover:border-accent transition-colors">
               <div className="font-medium">View Analytics</div>
               <div className="text-sm text-muted-foreground">Check your progress</div>
             </button>
           </CardContent>
         </Card>
 
-        <Card className="glass">
+        <Card className="border">
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
             <CardDescription>Your latest actions</CardDescription>

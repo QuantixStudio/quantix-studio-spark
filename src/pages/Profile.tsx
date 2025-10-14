@@ -112,11 +112,11 @@ export default function Profile() {
         </p>
       </div>
 
-      <Card className="glass">
+      <Card className="border">
         <CardHeader>
           <div className="flex items-center gap-4">
             <Avatar className="h-20 w-20">
-              <AvatarFallback className="text-2xl bg-gradient-to-br from-primary to-accent text-white">
+              <AvatarFallback className="text-2xl bg-accent text-background">
                 {initials}
               </AvatarFallback>
             </Avatar>
