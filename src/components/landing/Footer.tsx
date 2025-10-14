@@ -84,10 +84,10 @@ export default function Footer() {
             <ul className="space-y-2">
               <li>
                 <a
-                  href="mailto:hello@quantixstudio.com"
+                  href="mailto:support@quantixstudio.com"
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  hello@quantixstudio.com
+                  support@quantixstudio.com
                 </a>
               </li>
               <li>
@@ -101,26 +101,6 @@ export default function Footer() {
 
         <div className="pt-8 border-t border-border text-center text-sm text-muted-foreground">
           <p>© 2025 Quantix Studio. All rights reserved.</p>
-          <p className="mt-2">
-            Built with ❤️ using{" "}
-            <a
-              href="https://supabase.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline"
-            >
-              Supabase
-            </a>{" "}
-            &{" "}
-            <a
-              href="https://lovable.dev"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline"
-            >
-              Lovable
-            </a>
-          </p>
         </div>
       </div>
     </footer>

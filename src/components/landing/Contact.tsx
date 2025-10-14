@@ -93,7 +93,7 @@ export default function Contact() {
               <div className="pt-6 border-t border-border">
                 <div className="flex items-center gap-3 text-muted-foreground">
                   <Mail className="h-5 w-5" />
-                  <span>contact@quantixstudio.com</span>
+                  <span>support@quantixstudio.com</span>
                 </div>
               </div>
             </div>
