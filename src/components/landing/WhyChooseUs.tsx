@@ -7,25 +7,25 @@ export default function WhyChooseUs() {
       icon: Zap,
       title: "Lightning Fast",
       description:
-        "Automation-first approach delivers projects 3x faster than traditional development.",
+        "Automation-first development lets us deliver full MVPs 3× faster than traditional teams.",
     },
     {
       icon: Bot,
       title: "AI-Powered",
       description:
-        "Smart workflows and intelligent integrations that adapt to your business needs.",
+        "From smart assistants to internal tools — we embed AI directly into your workflows.",
     },
     {
       icon: Lock,
       title: "Secure & Scalable",
       description:
-        "Enterprise-grade infrastructure with Supabase ensuring data security and growth.",
+        "Built on Supabase with row-level security, encrypted storage, and GDPR-ready infrastructure.",
     },
     {
       icon: Palette,
-      title: "Modern Design",
+      title: "UX-Driven Design",
       description:
-        "Clean, minimal aesthetics with responsive interfaces that users love.",
+        "Clean, modern UI paired with intuitive UX, designed around real user journeys.",
     },
   ];
 
@@ -55,6 +55,24 @@ export default function WhyChooseUs() {
             </Card>
           );
         })}
+      </div>
+
+      <div className="mt-16 text-center">
+        <h3 className="text-2xl font-semibold mb-6">Real Results</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
+          <div>
+            <p className="text-4xl font-bold text-accent mb-2">10+</p>
+            <p className="text-muted-foreground">Projects Delivered</p>
+          </div>
+          <div>
+            <p className="text-4xl font-bold text-accent mb-2">3 weeks</p>
+            <p className="text-muted-foreground">Average MVP Timeline</p>
+          </div>
+          <div>
+            <p className="text-4xl font-bold text-accent mb-2">25+</p>
+            <p className="text-muted-foreground">Automated Workflows</p>
+          </div>
+        </div>
       </div>
     </section>
   );

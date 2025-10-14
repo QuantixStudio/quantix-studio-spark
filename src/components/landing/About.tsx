@@ -7,10 +7,17 @@ export default function About() {
         <div className="text-center mb-16">
           <h2 className="section-title">About Quantix Studio</h2>
           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mt-6">
-            We're a digital studio at the intersection of <strong className="text-foreground">artificial intelligence</strong>, 
-            <strong className="text-foreground"> modern web development</strong>, and <strong className="text-foreground">intelligent automation</strong>. 
-            Our mission is to empower businesses with scalable, future-proof technology solutions 
-            built on cutting-edge platforms like Supabase, n8n, and GPT-powered AI.
+            Quantix Studio is a next-generation digital agency specializing in fast and scalable{" "}
+            <strong className="text-foreground">web and mobile development</strong>,{" "}
+            <strong className="text-foreground">AI automation</strong>, and{" "}
+            <strong className="text-foreground">no-code / low-code solutions</strong>.
+          </p>
+          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mt-4">
+            We help businesses launch digital products 3× faster by leveraging tools like{" "}
+            <strong className="text-foreground">Supabase</strong>,{" "}
+            <strong className="text-foreground">n8n</strong>,{" "}
+            <strong className="text-foreground">GPT</strong>, and{" "}
+            <strong className="text-foreground">Bubble</strong> — without compromising on design, scalability, or security.
           </p>
         </div>
 

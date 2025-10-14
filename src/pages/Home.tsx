@@ -2,6 +2,7 @@ import Navbar from "@/components/landing/Navbar";
 import Hero from "@/components/landing/Hero";
 import About from "@/components/landing/About";
 import Services from "@/components/landing/Services";
+import Process from "@/components/landing/Process";
 import WhyChooseUs from "@/components/landing/WhyChooseUs";
 import FeaturedProjects from "@/components/landing/FeaturedProjects";
 import Testimonials from "@/components/landing/Testimonials";
@@ -15,6 +16,7 @@ export default function Home() {
       <Hero />
       <About />
       <Services />
+      <Process />
       <WhyChooseUs />
       <FeaturedProjects />
       <Testimonials />
