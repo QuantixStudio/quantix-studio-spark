@@ -45,13 +45,38 @@ interface Project {
 
 interface ProjectsTableProps {
   projects: Project[];
-  onEdit: (project: Project) => void;
+  onEdit: (project: any) => void;
 }
 
 export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
   const queryClient = useQueryClient();
+
+  const handleEdit = async (projectId: string) => {
+    setIsFetching(true);
+    try {
+      const { data, error } = await supabase
+        .from("projects")
+        .select(`
+          *,
+          project_category (id, name, description),
+          project_technologies (
+            technologies (id, name)
+          )
+        `)
+        .eq("id", projectId)
+        .single();
+
+      if (error) throw error;
+      onEdit(data);
+    } catch (error: any) {
+      toast.error("Failed to load project");
+    } finally {
+      setIsFetching(false);
+    }
+  };
 
   const handleDelete = async () => {
     if (!deleteId) return;
@@ -132,9 +157,9 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="bg-background">
-                        <DropdownMenuItem onClick={() => onEdit(project)}>
+                        <DropdownMenuItem onClick={() => handleEdit(project.id)} disabled={isFetching}>
                           <Pencil className="w-4 h-4 mr-2" />
-                          Edit
+                          {isFetching ? "Loading..." : "Edit"}
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem

@@ -95,6 +95,20 @@ export default function ProjectFormModal({
       fetchTechnologies();
 
       if (project) {
+        form.reset({
+          title: project.title || "",
+          slug: project.slug || "",
+          categoryId: project.category_id || "",
+          shortDescription: project.short_description || "",
+          fullDescription: project.full_description || "",
+          demoUrl: project.demo_url || "",
+          githubUrl: project.github_url || "",
+          published: project.published || false,
+          showOnHome: project.show_on_home || false,
+          keyMetric: project.key_metric || "",
+          technologies: project.project_technologies?.map((pt: any) => pt.technologies.id) || [],
+        });
+
         const projectImages = project.images && Array.isArray(project.images) && project.images.length > 0
           ? project.images.sort((a: any, b: any) => a.order - b.order)
           : project.cover_url
@@ -104,6 +118,19 @@ export default function ProjectFormModal({
         setImages(projectImages);
         setOriginalImages(projectImages.map((img: any) => img.url));
       } else {
+        form.reset({
+          title: "",
+          slug: "",
+          categoryId: "",
+          shortDescription: "",
+          fullDescription: "",
+          demoUrl: "",
+          githubUrl: "",
+          published: false,
+          showOnHome: false,
+          keyMetric: "",
+          technologies: [],
+        });
         setImages([]);
         setOriginalImages([]);
       }
@@ -178,9 +205,11 @@ export default function ProjectFormModal({
       return;
     }
 
-    if (!images.some((img) => img.is_main)) {
-      toast.error("Please select a main image");
-      return;
+    let validatedImages = [...images];
+    if (!validatedImages.some((img) => img.is_main)) {
+      validatedImages[0].is_main = true;
+      setImages(validatedImages);
+      toast.info("First image set as main");
     }
 
     setIsLoading(true);
@@ -188,56 +217,46 @@ export default function ProjectFormModal({
       let projectId = project?.id;
 
       if (!projectId) {
+        const insertData: any = { 
+          title: values.title, 
+          slug: values.slug,
+          short_description: values.shortDescription,
+        };
+        
         const { data: newProject, error: insertError } = await supabase
           .from("projects")
-          .insert({
-            title: values.title,
-            slug: values.slug,
-            short_description: values.shortDescription,
-            full_description: values.fullDescription || null,
-            category_id: values.categoryId || null,
-            demo_url: values.demoUrl || null,
-            github_url: values.githubUrl || null,
-            published: values.published,
-            show_on_home: values.showOnHome,
-            key_metric: values.keyMetric || null,
-          })
+          .insert(insertData)
           .select()
           .single();
 
         if (insertError) throw insertError;
         projectId = newProject.id;
-      } else {
-        const { error: updateError } = await supabase
-          .from("projects")
-          .update({
-            title: values.title,
-            slug: values.slug,
-            short_description: values.shortDescription,
-            full_description: values.fullDescription || null,
-            category_id: values.categoryId || null,
-            demo_url: values.demoUrl || null,
-            github_url: values.githubUrl || null,
-            published: values.published,
-            show_on_home: values.showOnHome,
-            key_metric: values.keyMetric || null,
-          })
-          .eq("id", projectId);
-
-        if (updateError) throw updateError;
       }
 
       const uploadedImages = await uploadImages(projectId);
+      const mainImage = uploadedImages.find((img) => img.is_main) || uploadedImages[0];
 
-      const mainImage = uploadedImages.find((img) => img.is_main);
+      const updateData: any = {
+        title: values.title,
+        slug: values.slug,
+        short_description: values.shortDescription,
+        full_description: values.fullDescription || null,
+        category_id: values.categoryId || null,
+        demo_url: values.demoUrl || null,
+        github_url: values.githubUrl || null,
+        published: values.published,
+        show_on_home: values.showOnHome,
+        key_metric: values.keyMetric || null,
+        images: uploadedImages,
+        cover_url: mainImage?.url || null,
+      };
 
-      await supabase
+      const { error: updateError } = await supabase
         .from("projects")
-        .update({
-          images: uploadedImages as any,
-          cover_url: mainImage?.url || null,
-        })
+        .update(updateData)
         .eq("id", projectId);
+
+      if (updateError) throw updateError;
 
       const currentImageUrls = uploadedImages.map((img) => img.url);
       const deletedImageUrls = originalImages.filter(

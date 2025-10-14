@@ -46,8 +46,8 @@ export default function ImageUploader({
         continue;
       }
 
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error(`${file.name} is too large (max 2MB)`);
+      if (file.size > 3 * 1024 * 1024) {
+        toast.error(`${file.name} is too large (max 3MB)`);
         continue;
       }
 
@@ -161,7 +161,7 @@ export default function ImageUploader({
             Drag and drop images here, or click to select
           </p>
           <p className="text-xs text-muted-foreground">
-            JPG, PNG, WebP • Max 2MB per image • Max {maxImages} images
+            JPG, PNG, WebP • Max 3MB per image • Max {maxImages} images
           </p>
         </label>
       </div>
