@@ -46,7 +46,7 @@ export default function ProjectGrid() {
               : project.cover_url
               ? [{ url: project.cover_url, alt: project.title, is_main: true, order: 0 }]
               : [];
-            const mainImage = images[0]?.url;
+            const mainImage = images.find((img: any) => img.is_main)?.url || images[0]?.url;
             const technologies = project.project_technologies?.slice(0, 4) || [];
 
             return (
@@ -57,13 +57,13 @@ export default function ProjectGrid() {
                 rel="noopener noreferrer"
                 className="block group"
               >
-                <Card className="overflow-hidden hover-lift h-full">
+                <Card className="overflow-hidden border transition-colors hover:border-accent h-full">
                   <div className="relative aspect-video bg-muted overflow-hidden">
                     {mainImage ? (
                       <img
                         src={mainImage}
                         alt={project.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        className="w-full h-full object-cover"
                         loading="lazy"
                       />
                     ) : (
@@ -71,9 +71,6 @@ export default function ProjectGrid() {
                         No Image
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-4">
-                      <ExternalLink className="h-5 w-5 text-white" />
-                    </div>
                   </div>
 
                   <CardContent className="pt-6">

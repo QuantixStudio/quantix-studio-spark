@@ -36,7 +36,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
     : project.cover_url
     ? [{ url: project.cover_url, alt: project.title, is_main: true, order: 0 }]
     : [];
-  const mainImage = images[0]?.url;
+  const mainImage = images.find((img: any) => img.is_main)?.url || images[0]?.url;
 
   const technologies = project.project_technologies
     ?.map(pt => pt.technologies)

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { deleteAllProjectImages } from "@/lib/storageUtils";
 import { toast } from "sonner";
 import {
   Table,
@@ -57,6 +58,8 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
 
     setIsDeleting(true);
     try {
+      await deleteAllProjectImages(deleteId);
+
       const { error } = await supabase
         .from("projects")
         .delete()

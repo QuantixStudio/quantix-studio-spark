@@ -1,15 +1,20 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ExternalLink, Github, ArrowLeft } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { ExternalLink, Github, ArrowLeft, Mail } from "lucide-react";
 import { useProjectDetail } from "@/hooks/useProjectDetail";
 
 export default function ProjectDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { data: project, isLoading } = useProjectDetail(slug || "");
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   if (isLoading) {
     return (
@@ -54,25 +59,61 @@ export default function ProjectDetail() {
     );
   }
 
+  const projectData = project as any;
+  const images = projectData.images && Array.isArray(projectData.images) && projectData.images.length > 0
+    ? projectData.images.sort((a: any, b: any) => a.order - b.order)
+    : project.cover_url
+    ? [{ url: project.cover_url, alt: project.title, is_main: true, order: 0 }]
+    : [];
+
+  const openLightbox = (index: number) => {
+    setLightboxIndex(index);
+    setLightboxOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
 
       <article className="container mx-auto px-4 py-16 max-w-4xl">
         <Link
-          to="/"
+          to="/portfolio"
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Home
+          Back to Portfolio
         </Link>
 
-        {project.cover_url && (
-          <img
-            src={project.cover_url}
-            alt={project.title}
-            className="w-full h-96 object-cover rounded-lg mb-8"
-          />
+        {images.length > 0 && (
+          <div className="mb-8">
+            <Carousel className="w-full">
+              <CarouselContent>
+                {images.map((image: any, index: number) => (
+                  <CarouselItem key={index}>
+                    <div
+                      className="relative aspect-video bg-muted rounded-lg overflow-hidden cursor-pointer group"
+                      onClick={() => openLightbox(index)}
+                    >
+                      <img
+                        src={image.url}
+                        alt={image.alt || project.title}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                        <ExternalLink className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              {images.length > 1 && (
+                <>
+                  <CarouselPrevious className="left-4" />
+                  <CarouselNext className="right-4" />
+                </>
+              )}
+            </Carousel>
+          </div>
         )}
 
         <div className="mb-6">
@@ -83,6 +124,12 @@ export default function ProjectDetail() {
           )}
           <h1 className="text-4xl md:text-5xl font-bold">{project.title}</h1>
         </div>
+
+        {projectData.key_metric && (
+          <div className="mb-6 p-4 border border-accent rounded-lg bg-accent/5">
+            <p className="text-accent font-semibold">{projectData.key_metric}</p>
+          </div>
+        )}
 
         {project.project_technologies && project.project_technologies.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-8">
@@ -100,7 +147,7 @@ export default function ProjectDetail() {
           </p>
         </div>
 
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-4">
           {project.demo_url && (
             <Button asChild>
               <a href={project.demo_url} target="_blank" rel="noopener noreferrer">
@@ -119,6 +166,29 @@ export default function ProjectDetail() {
           )}
         </div>
       </article>
+
+      <div className="fixed bottom-8 right-8 z-50">
+        <Button size="lg" className="shadow-lg" asChild>
+          <a href="/#contact">
+            <Mail className="mr-2 h-5 w-5" />
+            Request Similar Project
+          </a>
+        </Button>
+      </div>
+
+      <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+        <DialogContent className="max-w-7xl w-full p-0 bg-black/95">
+          <div className="relative w-full h-[90vh] flex items-center justify-center">
+            {images[lightboxIndex] && (
+              <img
+                src={images[lightboxIndex].url}
+                alt={images[lightboxIndex].alt || project.title}
+                className="max-w-full max-h-full object-contain"
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>

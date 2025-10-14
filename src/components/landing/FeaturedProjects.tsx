@@ -47,7 +47,7 @@ export default function FeaturedProjects() {
               : project.cover_url
               ? [{ url: project.cover_url, alt: project.title, is_main: true, order: 0 }]
               : [];
-            const mainImage = images[0]?.url;
+            const mainImage = images.find((img: any) => img.is_main)?.url || images[0]?.url;
 
             return (
               <CarouselItem key={project.id} className="md:basis-1/2 lg:basis-1/3">

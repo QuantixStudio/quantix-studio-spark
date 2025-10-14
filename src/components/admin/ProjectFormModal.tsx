@@ -1,12 +1,11 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { compressImage } from "@/lib/imageUtils";
+import { deleteProjectImages } from "@/lib/storageUtils";
 import { toast } from "sonner";
-import { Upload, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -32,7 +31,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
+import ImageUploader, { ProjectImage } from "./ImageUploader";
 
 const projectSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -49,6 +49,8 @@ const projectSchema = z.object({
   demoUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   githubUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   published: z.boolean(),
+  showOnHome: z.boolean(),
+  keyMetric: z.string().max(100).optional(),
   technologies: z.array(z.string()).optional(),
 });
 
@@ -64,11 +66,10 @@ export default function ProjectFormModal({
   project,
 }: ProjectFormModalProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [coverFile, setCoverFile] = useState<File | null>(null);
-  const [coverPreview, setCoverPreview] = useState<string>("");
+  const [images, setImages] = useState<ProjectImage[]>([]);
+  const [originalImages, setOriginalImages] = useState<string[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [technologies, setTechnologies] = useState<any[]>([]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof projectSchema>>({
@@ -82,6 +83,8 @@ export default function ProjectFormModal({
       demoUrl: project?.demo_url || "",
       githubUrl: project?.github_url || "",
       published: project?.published || false,
+      showOnHome: project?.show_on_home || false,
+      keyMetric: project?.key_metric || "",
       technologies: project?.project_technologies?.map((pt: any) => pt.technologies.id) || [],
     },
   });
@@ -90,8 +93,19 @@ export default function ProjectFormModal({
     if (isOpen) {
       fetchCategories();
       fetchTechnologies();
-      if (project?.cover_url) {
-        setCoverPreview(project.cover_url);
+
+      if (project) {
+        const projectImages = project.images && Array.isArray(project.images) && project.images.length > 0
+          ? project.images.sort((a: any, b: any) => a.order - b.order)
+          : project.cover_url
+          ? [{ url: project.cover_url, alt: project.title, is_main: true, order: 0 }]
+          : [];
+
+        setImages(projectImages);
+        setOriginalImages(projectImages.map((img: any) => img.url));
+      } else {
+        setImages([]);
+        setOriginalImages([]);
       }
     }
   }, [isOpen, project]);
@@ -119,53 +133,59 @@ export default function ProjectFormModal({
       .replace(/^-+|-+$/g, "");
   };
 
-  const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const uploadImages = async (projectId: string): Promise<ProjectImage[]> => {
+    const uploadedImages: ProjectImage[] = [];
 
-    if (!file.type.startsWith("image/")) {
-      toast.error("Please select an image file");
-      return;
+    for (let i = 0; i < images.length; i++) {
+      const image = images[i];
+
+      if (image.file) {
+        const fileExt = image.file.name.split(".").pop();
+        const fileName = `${projectId}/image-${Date.now()}-${i}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("portfolio")
+          .upload(fileName, image.file, { upsert: true });
+
+        if (uploadError) throw uploadError;
+
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from("portfolio").getPublicUrl(fileName);
+
+        uploadedImages.push({
+          url: publicUrl,
+          alt: image.alt,
+          is_main: image.is_main,
+          order: i,
+        });
+      } else {
+        uploadedImages.push({
+          url: image.url,
+          alt: image.alt,
+          is_main: image.is_main,
+          order: i,
+        });
+      }
     }
 
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error("Image must be less than 10MB");
-      return;
-    }
-
-    try {
-      const compressed = await compressImage(file, 1);
-      setCoverFile(compressed);
-      setCoverPreview(URL.createObjectURL(compressed));
-    } catch (error) {
-      toast.error("Failed to process image");
-    }
-  };
-
-  const uploadCover = async (projectId: string): Promise<string | null> => {
-    if (!coverFile) return null;
-
-    const fileExt = coverFile.name.split(".").pop();
-    const fileName = `${projectId}/cover-${Date.now()}.${fileExt}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("portfolio")
-      .upload(fileName, coverFile, { upsert: true });
-
-    if (uploadError) throw uploadError;
-
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("portfolio").getPublicUrl(fileName);
-
-    return publicUrl;
+    return uploadedImages;
   };
 
   const onSubmit = async (values: z.infer<typeof projectSchema>) => {
+    if (images.length === 0) {
+      toast.error("Please add at least one image");
+      return;
+    }
+
+    if (!images.some((img) => img.is_main)) {
+      toast.error("Please select a main image");
+      return;
+    }
+
     setIsLoading(true);
     try {
       let projectId = project?.id;
-      let coverUrl = coverPreview;
 
       if (!projectId) {
         const { data: newProject, error: insertError } = await supabase
@@ -179,6 +199,8 @@ export default function ProjectFormModal({
             demo_url: values.demoUrl || null,
             github_url: values.githubUrl || null,
             published: values.published,
+            show_on_home: values.showOnHome,
+            key_metric: values.keyMetric || null,
           })
           .select()
           .single();
@@ -197,22 +219,33 @@ export default function ProjectFormModal({
             demo_url: values.demoUrl || null,
             github_url: values.githubUrl || null,
             published: values.published,
+            show_on_home: values.showOnHome,
+            key_metric: values.keyMetric || null,
           })
           .eq("id", projectId);
 
         if (updateError) throw updateError;
       }
 
-      if (coverFile) {
-        const uploadedUrl = await uploadCover(projectId);
-        if (uploadedUrl) coverUrl = uploadedUrl;
-      }
+      const uploadedImages = await uploadImages(projectId);
 
-      if (coverUrl && coverUrl !== project?.cover_url) {
-        await supabase
-          .from("projects")
-          .update({ cover_url: coverUrl })
-          .eq("id", projectId);
+      const mainImage = uploadedImages.find((img) => img.is_main);
+
+      await supabase
+        .from("projects")
+        .update({
+          images: uploadedImages as any,
+          cover_url: mainImage?.url || null,
+        })
+        .eq("id", projectId);
+
+      const currentImageUrls = uploadedImages.map((img) => img.url);
+      const deletedImageUrls = originalImages.filter(
+        (url) => !currentImageUrls.includes(url)
+      );
+
+      if (deletedImageUrls.length > 0) {
+        await deleteProjectImages(projectId, deletedImageUrls);
       }
 
       if (values.technologies && values.technologies.length > 0) {
@@ -239,59 +272,20 @@ export default function ProjectFormModal({
     }
   };
 
+  const showOnHome = form.watch("showOnHome");
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{project ? "Edit Project" : "Create Project"}</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <ImageUploader images={images} onChange={setImages} />
+
             <div className="space-y-4">
-              <div className="flex flex-col items-center gap-4">
-                {coverPreview && (
-                  <img
-                    src={coverPreview}
-                    alt="Cover preview"
-                    className="w-full h-48 object-cover rounded-lg"
-                  />
-                )}
-
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleCoverChange}
-                  className="hidden"
-                />
-
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <Upload className="w-4 h-4 mr-2" />
-                    Upload Cover
-                  </Button>
-                  {coverPreview && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setCoverFile(null);
-                        setCoverPreview("");
-                      }}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  )}
-                </div>
-              </div>
-
               <FormField
                 control={form.control}
                 name="title"
@@ -417,19 +411,59 @@ export default function ProjectFormModal({
                 control={form.control}
                 name="published"
                 render={({ field }) => (
-                  <FormItem className="flex items-center space-x-2 space-y-0">
+                  <FormItem className="flex items-center justify-between border rounded-lg p-4">
+                    <div>
+                      <FormLabel>Published</FormLabel>
+                      <FormDescription className="text-sm">
+                        Visible in portfolio page
+                      </FormDescription>
+                    </div>
                     <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
-                    <FormLabel className="font-normal cursor-pointer">
-                      Published (visible on landing page)
-                    </FormLabel>
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="showOnHome"
+                render={({ field }) => (
+                  <FormItem className="flex items-center justify-between border rounded-lg p-4">
+                    <div>
+                      <FormLabel>Show on Home</FormLabel>
+                      <FormDescription className="text-sm">
+                        Featured on landing page
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              {showOnHome && (
+                <FormField
+                  control={form.control}
+                  name="keyMetric"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Key Metric</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="e.g., '40% increase in conversions'"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Highlight a key achievement (shown on home page)
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
             </div>
 
             <div className="flex gap-2">
