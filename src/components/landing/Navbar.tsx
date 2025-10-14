@@ -65,17 +65,17 @@ export default function Navbar() {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
+              <Link to="/" className="text-foreground/80 hover:text-foreground transition-colors">
+                Home
+              </Link>
+              <Link to="/portfolio" className="text-foreground/80 hover:text-foreground transition-colors">
+                Portfolio
+              </Link>
               <button
                 onClick={() => scrollToSection("services")}
                 className="text-foreground/80 hover:text-foreground transition-colors"
               >
                 Services
-              </button>
-              <button
-                onClick={() => scrollToSection("portfolio")}
-                className="text-foreground/80 hover:text-foreground transition-colors"
-              >
-                Portfolio
               </button>
               <button
                 onClick={() => scrollToSection("contact")}
@@ -162,17 +162,25 @@ export default function Navbar() {
           {/* Mobile Menu */}
           {isOpen && (
             <div className="md:hidden py-4 space-y-4">
+              <Link
+                to="/"
+                onClick={() => setIsOpen(false)}
+                className="block w-full text-left px-4 py-2 text-foreground/80 hover:text-foreground hover:bg-accent/10 rounded-lg transition-colors"
+              >
+                Home
+              </Link>
+              <Link
+                to="/portfolio"
+                onClick={() => setIsOpen(false)}
+                className="block w-full text-left px-4 py-2 text-foreground/80 hover:text-foreground hover:bg-accent/10 rounded-lg transition-colors"
+              >
+                Portfolio
+              </Link>
               <button
                 onClick={() => scrollToSection("services")}
                 className="block w-full text-left px-4 py-2 text-foreground/80 hover:text-foreground hover:bg-accent/10 rounded-lg transition-colors"
               >
                 Services
-              </button>
-              <button
-                onClick={() => scrollToSection("portfolio")}
-                className="block w-full text-left px-4 py-2 text-foreground/80 hover:text-foreground hover:bg-accent/10 rounded-lg transition-colors"
-              >
-                Portfolio
               </button>
               <button
                 onClick={() => scrollToSection("contact")}

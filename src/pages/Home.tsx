@@ -3,12 +3,12 @@ import Hero from "@/components/landing/Hero";
 import About from "@/components/landing/About";
 import Services from "@/components/landing/Services";
 import WhyChooseUs from "@/components/landing/WhyChooseUs";
-import Portfolio from "@/components/landing/Portfolio";
+import FeaturedProjects from "@/components/landing/FeaturedProjects";
 import Testimonials from "@/components/landing/Testimonials";
 import Contact from "@/components/landing/Contact";
 import Footer from "@/components/landing/Footer";
 
-export default function LandingPage() {
+export default function Home() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -16,7 +16,7 @@ export default function LandingPage() {
       <About />
       <Services />
       <WhyChooseUs />
-      <Portfolio />
+      <FeaturedProjects />
       <Testimonials />
       <Contact />
       <Footer />

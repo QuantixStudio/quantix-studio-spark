@@ -12,8 +12,7 @@ export default function Footer() {
               Quantix Studio
             </Link>
             <p className="text-muted-foreground mb-4 max-w-md">
-              AI-powered web development, business automation, and smart integrations.
-              Building the future, one project at a time.
+              Investor-ready products built with Bubble, WeWeb, and AI.
             </p>
             <div className="flex gap-4">
               <a
@@ -51,6 +50,16 @@ export default function Footer() {
             <h3 className="font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
+                <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link to="/portfolio" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Portfolio
+                </Link>
+              </li>
+              <li>
                 <button
                   onClick={() => {
                     const el = document.getElementById("services");
@@ -62,49 +71,29 @@ export default function Footer() {
                 </button>
               </li>
               <li>
-                <button
-                  onClick={() => {
-                    const el = document.getElementById("portfolio");
-                    el?.scrollIntoView({ behavior: "smooth" });
-                  }}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Portfolio
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => {
-                    const el = document.getElementById("contact");
-                    el?.scrollIntoView({ behavior: "smooth" });
-                  }}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Contact
-                </button>
+                <Link to="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Privacy
+                </Link>
               </li>
             </ul>
           </div>
 
-          {/* Legal */}
+          {/* Contact */}
           <div>
-            <h3 className="font-semibold mb-4">Legal</h3>
+            <h3 className="font-semibold mb-4">Contact</h3>
             <ul className="space-y-2">
               <li>
                 <a
-                  href="#"
+                  href="mailto:hello@quantixstudio.com"
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  Privacy Policy
+                  hello@quantixstudio.com
                 </a>
               </li>
               <li>
-                <a
-                  href="#"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Terms of Service
-                </a>
+                <Link to="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Privacy Policy
+                </Link>
               </li>
             </ul>
           </div>

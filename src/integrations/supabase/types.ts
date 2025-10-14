@@ -16,28 +16,46 @@ export type Database = {
     Tables: {
       inquiries: {
         Row: {
+          budget_range: string | null
+          company: string | null
           created_at: string | null
           email: string
           id: string
           message: string
           name: string
+          page_path: string | null
           status: string | null
+          timeline: string | null
+          use_case: string | null
+          utm_params: Json | null
         }
         Insert: {
+          budget_range?: string | null
+          company?: string | null
           created_at?: string | null
           email: string
           id?: string
           message: string
           name: string
+          page_path?: string | null
           status?: string | null
+          timeline?: string | null
+          use_case?: string | null
+          utm_params?: Json | null
         }
         Update: {
+          budget_range?: string | null
+          company?: string | null
           created_at?: string | null
           email?: string
           id?: string
           message?: string
           name?: string
+          page_path?: string | null
           status?: string | null
+          timeline?: string | null
+          use_case?: string | null
+          utm_params?: Json | null
         }
         Relationships: [
           {
@@ -157,9 +175,12 @@ export type Database = {
           full_description: string | null
           github_url: string | null
           id: string
+          images: Json | null
+          key_metric: string | null
           order_index: number | null
           published: boolean | null
           short_description: string
+          show_on_home: boolean | null
           slug: string
           title: string
           updated_at: string | null
@@ -172,9 +193,12 @@ export type Database = {
           full_description?: string | null
           github_url?: string | null
           id?: string
+          images?: Json | null
+          key_metric?: string | null
           order_index?: number | null
           published?: boolean | null
           short_description: string
+          show_on_home?: boolean | null
           slug: string
           title: string
           updated_at?: string | null
@@ -187,9 +211,12 @@ export type Database = {
           full_description?: string | null
           github_url?: string | null
           id?: string
+          images?: Json | null
+          key_metric?: string | null
           order_index?: number | null
           published?: boolean | null
           short_description?: string
+          show_on_home?: boolean | null
           slug?: string
           title?: string
           updated_at?: string | null

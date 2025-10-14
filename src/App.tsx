@@ -13,7 +13,9 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
-import LandingPage from "./pages/LandingPage";
+import Home from "./pages/Home";
+import Portfolio from "./pages/Portfolio";
+import Privacy from "./pages/Privacy";
 import ProjectDetail from "./pages/ProjectDetail";
 import ProjectsManagement from "./pages/admin/ProjectsManagement";
 
@@ -29,8 +31,11 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               {/* Public Routes */}
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/project/:slug" element={<ProjectDetail />} />
+              <Route path="/" element={<Home />} />
+              <Route path="/portfolio" element={<Portfolio />} />
+              <Route path="/portfolio/:slug" element={<ProjectDetail />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/project/:slug" element={<Navigate to="/portfolio/:slug" replace />} />
               <Route path="/auth" element={<Auth />} />
               
               {/* Protected Admin Routes */}

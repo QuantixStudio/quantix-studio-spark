@@ -18,6 +18,9 @@ interface Project {
   slug: string;
   short_description: string;
   cover_url: string | null;
+  images: any[] | null;
+  key_metric: string | null;
+  show_on_home: boolean;
   published: boolean;
   created_at: string;
   category_id: string | null;
@@ -25,9 +28,9 @@ interface Project {
   project_technologies: Array<{ technologies: Technology }>;
 }
 
-export function useProjects(adminMode = false) {
+export function useProjects(adminMode = false, featuredOnly = false) {
   return useQuery({
-    queryKey: ["projects", adminMode ? "all" : "published"],
+    queryKey: ["projects", adminMode ? "all" : "published", featuredOnly ? "featured" : "all"],
     queryFn: async () => {
       let query = supabase
         .from("projects")
@@ -37,6 +40,9 @@ export function useProjects(adminMode = false) {
           slug,
           short_description,
           cover_url,
+          images,
+          key_metric,
+          show_on_home,
           published,
           created_at,
           category_id,
@@ -55,7 +61,13 @@ export function useProjects(adminMode = false) {
         .order("order_index", { ascending: true });
 
       if (!adminMode) {
-        query = query.eq("published", true).limit(6);
+        query = query.eq("published", true);
+      }
+
+      if (featuredOnly) {
+        query = query.eq("show_on_home", true).limit(4);
+      } else if (!adminMode) {
+        query = query.limit(12);
       }
 
       const { data, error } = await query;

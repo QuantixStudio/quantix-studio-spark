@@ -1,8 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
-import { useState } from "react";
-import ProjectDetailModal from "./ProjectDetailModal";
 
 interface Technology {
   id: string;
@@ -21,6 +19,9 @@ interface Project {
   slug: string;
   short_description: string;
   cover_url: string | null;
+  images: any[] | null;
+  key_metric: string | null;
+  show_on_home: boolean;
   project_category: ProjectCategory | null;
   project_technologies: Array<{ technologies: Technology }>;
 }
@@ -30,24 +31,32 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project }: ProjectCardProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  
+  const images = project.images && Array.isArray(project.images) && project.images.length > 0
+    ? project.images
+    : project.cover_url
+    ? [{ url: project.cover_url, alt: project.title, is_main: true, order: 0 }]
+    : [];
+  const mainImage = images[0]?.url;
+
   const technologies = project.project_technologies
     ?.map(pt => pt.technologies)
     .slice(0, 4) || [];
 
   return (
-    <>
-      <Card 
-        className="overflow-hidden hover-lift cursor-pointer group border-border/50"
-        onClick={() => setIsModalOpen(true)}
-      >
+    <a
+      href={`/portfolio/${project.slug}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block"
+    >
+      <Card className="overflow-hidden hover-lift group border-border/50">
         <div className="relative overflow-hidden aspect-video bg-muted">
-          {project.cover_url ? (
+          {mainImage ? (
             <img
-              src={project.cover_url}
+              src={mainImage}
               alt={project.title}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              loading="lazy"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-muted-foreground">
@@ -69,7 +78,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             </Badge>
           )}
 
-          <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
+          <h3 className="text-xl font-semibold mb-2 group-hover:text-accent transition-colors">
             {project.title}
           </h3>
           <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3 mb-4">
@@ -87,12 +96,6 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           )}
         </CardContent>
       </Card>
-
-      <ProjectDetailModal
-        slug={project.slug}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
-    </>
+    </a>
   );
 }
