@@ -46,8 +46,8 @@ export default function ImageUploader({
         continue;
       }
 
-      if (file.size > 3 * 1024 * 1024) {
-        toast.error(`${file.name} is too large (max 3MB)`);
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error(`${file.name} is too large (max 10MB)`);
         continue;
       }
 
@@ -59,7 +59,7 @@ export default function ImageUploader({
 
       for (let i = 0; i < validFiles.length; i++) {
         const file = validFiles[i];
-        const compressed = await compressImage(file, 0.5);
+        const compressed = await compressImage(file, 5);
         const url = URL.createObjectURL(compressed);
 
         newImages.push({
@@ -161,7 +161,7 @@ export default function ImageUploader({
             Drag and drop images here, or click to select
           </p>
           <p className="text-xs text-muted-foreground">
-            JPG, PNG, WebP • Max 3MB per image • Max {maxImages} images
+            JPG, PNG, WebP • Max 10MB per image • Max {maxImages} images
           </p>
         </label>
       </div>
@@ -182,6 +182,7 @@ export default function ImageUploader({
                     src={image.url}
                     alt={image.alt}
                     className="w-full h-full object-cover"
+                    style={{ imageRendering: "auto" }}
                   />
                   {image.is_main && (
                     <Badge className="absolute top-1 left-1 text-xs bg-accent text-primary">

@@ -172,7 +172,10 @@ export default function ProjectFormModal({
 
         const { error: uploadError } = await supabase.storage
           .from("portfolio")
-          .upload(fileName, image.file, { upsert: true });
+          .upload(fileName, image.file, { 
+            upsert: true,
+            contentType: image.file.type,
+          });
 
         if (uploadError) throw uploadError;
 

@@ -56,6 +56,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
               src={mainImage}
               alt={project.title}
               className="w-full h-full object-cover"
+              style={{ imageRendering: "auto" }}
               loading="lazy"
             />
           ) : (

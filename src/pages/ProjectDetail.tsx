@@ -98,6 +98,8 @@ export default function ProjectDetail() {
                         src={image.url}
                         alt={image.alt || project.title}
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        style={{ imageRendering: "auto" }}
+                        loading="lazy"
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
                         <ExternalLink className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -184,6 +186,7 @@ export default function ProjectDetail() {
                 src={images[lightboxIndex].url}
                 alt={images[lightboxIndex].alt || project.title}
                 className="max-w-full max-h-full object-contain"
+                style={{ imageRendering: "auto" }}
               />
             )}
           </div>
