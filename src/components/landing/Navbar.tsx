@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Moon, Sun, LogOut, User, LayoutDashboard } from "lucide-react";
-import { useTheme } from "@/contexts/ThemeContext";
+import { Menu, X, LogOut, User, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useProfileModal } from "@/hooks/useProfileModal";
@@ -22,7 +21,6 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
-  const { theme, toggleTheme } = useTheme();
   const { user, signOut } = useAuth();
   const { data: roleData } = useUserRole();
   const { isOpen: autoProfileOpen, isFirstLogin, closeModal: closeAutoModal } = useProfileModal();
@@ -83,17 +81,6 @@ export default function Navbar() {
               >
                 Contact
               </button>
-              <button
-                onClick={toggleTheme}
-                className="p-2 rounded-lg hover:bg-accent/10 transition-colors"
-                aria-label="Toggle theme"
-              >
-                {theme === "dark" ? (
-                  <Sun className="h-5 w-5" />
-                ) : (
-                  <Moon className="h-5 w-5" />
-                )}
-              </button>
 
               {user ? (
                 <DropdownMenu>
@@ -133,18 +120,7 @@ export default function Navbar() {
             </div>
 
             {/* Mobile Menu Button */}
-            <div className="md:hidden flex items-center space-x-2">
-              <button
-                onClick={toggleTheme}
-                className="p-2 rounded-lg hover:bg-accent/10 transition-colors"
-                aria-label="Toggle theme"
-              >
-                {theme === "dark" ? (
-                  <Sun className="h-5 w-5" />
-                ) : (
-                  <Moon className="h-5 w-5" />
-                )}
-              </button>
+            <div className="md:hidden">
               <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="p-2 rounded-lg hover:bg-accent/10 transition-colors"

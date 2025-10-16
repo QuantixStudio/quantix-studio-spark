@@ -9,7 +9,7 @@ export default function Services() {
   const getIcon = (iconName: string | null) => {
     if (!iconName) return null;
     const Icon = LucideIcons[iconName as keyof typeof LucideIcons] as any;
-    return Icon ? <Icon className="h-12 w-12 text-primary" /> : null;
+    return Icon ? <Icon className="h-12 w-12 text-accent" /> : null;
   };
 
   return (
@@ -36,25 +36,36 @@ export default function Services() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {services?.map((service) => (
-            <Card key={service.id} className="border transition-colors hover:border-accent">
-              <CardContent className="pt-6">
+            <Card key={service.id} className="border transition-all duration-300 hover:border-accent hover:shadow-lg hover:shadow-accent/10 rounded-2xl">
+              <CardContent className="pt-6 space-y-4">
                 {service.service_icon?.icon_url ? (
                   <img
                     src={service.service_icon.icon_url}
                     alt={service.service_icon.name}
-                    className="h-12 w-12 mb-4 object-contain"
+                    className="h-12 w-12 object-contain"
                   />
                 ) : service.service_icon?.name ? (
-                  <div className="mb-4">{getIcon(service.service_icon.name)}</div>
+                  <div>{getIcon(service.service_icon.name)}</div>
                 ) : (
-                  <div className="h-12 w-12 mb-4 bg-primary/10 rounded-lg flex items-center justify-center">
+                  <div className="h-12 w-12 bg-accent/10 rounded-lg flex items-center justify-center">
                     <span className="text-2xl">🔧</span>
                   </div>
                 )}
-                <h3 className="text-xl font-semibold mb-3">{service.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {service.description}
-                </p>
+                <div>
+                  <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
+                  {/* Tools subtitle - stored in description field temporarily until we add a tools column */}
+                  {service.description.includes("Tools:") && (
+                    <p className="text-sm text-accent/80 mb-3">
+                      {service.description.split("\n")[0]}
+                    </p>
+                  )}
+                  <p className="text-muted-foreground leading-relaxed text-sm">
+                    {service.description.includes("Tools:") 
+                      ? service.description.split("\n").slice(1).join("\n").trim()
+                      : service.description
+                    }
+                  </p>
+                </div>
               </CardContent>
             </Card>
           ))}

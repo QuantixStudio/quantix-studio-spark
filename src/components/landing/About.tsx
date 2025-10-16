@@ -8,16 +8,16 @@ export default function About() {
           <h2 className="section-title">About Quantix Studio</h2>
           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mt-6">
             Quantix Studio is a next-generation digital agency specializing in fast and scalable{" "}
-            <strong className="text-foreground">web and mobile development</strong>,{" "}
+            <strong className="text-foreground">no-code / low-code development</strong>,{" "}
             <strong className="text-foreground">AI automation</strong>, and{" "}
-            <strong className="text-foreground">no-code / low-code solutions</strong>.
+            <strong className="text-foreground">cloud infrastructure</strong>.
           </p>
           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mt-4">
-            We help businesses launch digital products 3× faster by leveraging tools like{" "}
+            We help businesses launch digital products 3× faster using{" "}
             <strong className="text-foreground">Supabase</strong>,{" "}
             <strong className="text-foreground">n8n</strong>,{" "}
             <strong className="text-foreground">GPT</strong>, and{" "}
-            <strong className="text-foreground">Bubble</strong> — without compromising on design, scalability, or security.
+            <strong className="text-foreground">Bubble</strong> — without compromising design, scalability, or security.
           </p>
         </div>
 

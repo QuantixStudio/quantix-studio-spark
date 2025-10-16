@@ -39,33 +39,33 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 0 0% 4%; /* #0B0B0C */
-    --foreground: 0 0% 98%;
-    --card: 0 0% 4%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 4%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 4%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 42 30% 66%; /* champagne stays same */
-    --accent-foreground: 0 0% 4%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
+    --background: 0 0% 6%; /* #0F0F0F */
+    --foreground: 0 0% 100%; /* #FFFFFF */
+    --card: 0 0% 10.5%; /* #1B1B1B */
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 10.5%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 6%;
+    --secondary: 0 0% 10.5%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 10.5%;
+    --muted-foreground: 0 0% 63%; /* #A0A0A0 */
+    --accent: 258 86% 65%; /* #7F5AF0 purple */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%; /* #EF4444 */
+    --destructive-foreground: 0 0% 100%;
     --border: 0 0% 20%;
     --input: 0 0% 20%;
-    --ring: 42 30% 66%;
-    --sidebar-background: 0 0% 4%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 0 0% 98%;
-    --sidebar-primary-foreground: 0 0% 4%;
-    --sidebar-accent: 0 0% 14.9%;
-    --sidebar-accent-foreground: 0 0% 98%;
+    --ring: 258 86% 65%;
+    --sidebar-background: 0 0% 6%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 0 0% 6%;
+    --sidebar-accent: 0 0% 10.5%;
+    --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 0 0% 20%;
-    --sidebar-ring: 42 30% 66%;
+    --sidebar-ring: 258 86% 65%;
   }
 }
 

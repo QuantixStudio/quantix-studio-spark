@@ -1,26 +1,34 @@
-import { Search, Palette, Code, Rocket } from "lucide-react";
+import { Search, Palette, Workflow, Rocket } from "lucide-react";
 
 export default function Process() {
   const steps = [
     {
       icon: Search,
+      number: "01",
       title: "Discovery & Planning",
-      description: "Research & Scope",
+      subtitle: "Research & Scope",
+      description: "We start by understanding your goals, target users, and project scope — setting a solid foundation for success.",
     },
     {
       icon: Palette,
+      number: "02",
       title: "Design & Prototype",
-      description: "Figma UI/UX",
+      subtitle: "Figma UI/UX",
+      description: "We create intuitive, beautiful interfaces and interactive prototypes to visualize your product before development.",
     },
     {
-      icon: Code,
+      icon: Workflow,
+      number: "03",
       title: "Build & Automate",
-      description: "Low-code stack (Supabase, n8n, GPT)",
+      subtitle: "No-code Stack (Bubble, Supabase, n8n, GPT)",
+      description: "We build fast, scalable products using no-code tools and automate workflows with AI.",
     },
     {
       icon: Rocket,
+      number: "04",
       title: "Launch & Scale",
-      description: "Fast iteration & analytics",
+      subtitle: "Fast iteration & analytics",
+      description: "We launch, test, and refine — ensuring stability, performance, and long-term scalability.",
     },
   ];
 
@@ -37,14 +45,18 @@ export default function Process() {
         {steps.map((step, idx) => {
           const Icon = step.icon;
           return (
-            <div key={idx} className="text-center relative">
+            <div key={idx} className="text-center relative group">
               {idx < steps.length - 1 && (
-                <div className="hidden lg:block absolute top-8 left-[60%] w-[80%] h-0.5 bg-border" />
+                <div className="hidden lg:block absolute top-12 left-[60%] w-[80%] h-0.5 bg-accent/30" />
               )}
-              <div className="relative z-10 inline-flex items-center justify-center w-16 h-16 rounded-full bg-accent/10 border-2 border-accent mb-4">
+              <div className="mb-3">
+                <span className="text-4xl font-bold text-accent/30">{step.number}</span>
+              </div>
+              <div className="relative z-10 inline-flex items-center justify-center w-16 h-16 rounded-full bg-accent/10 border-2 border-accent mb-4 transition-all duration-300 group-hover:scale-110 group-hover:bg-accent/20">
                 <Icon className="h-8 w-8 text-accent" />
               </div>
               <h3 className="text-lg font-semibold mb-2">{step.title}</h3>
+              <p className="text-sm text-accent/80 mb-2">{step.subtitle}</p>
               <p className="text-sm text-muted-foreground">{step.description}</p>
             </div>
           );
