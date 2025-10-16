@@ -31,25 +31,37 @@ export default function Contact() {
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase.from("inquiries").insert({
-        name: formData.name,
-        email: formData.email,
-        message: formData.message,
-      });
+      const response = await fetch(
+        "https://pivovarius.space/webhook/fd5bb622-d19d-4052-97df-0b65fc2c1273",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            message: formData.message,
+            source: "quantix_studio_website",
+          }),
+        }
+      );
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error("Failed to send message");
+      }
 
       toast({
-        title: "Message sent!",
-        description: "We'll get back to you within 24 hours.",
+        title: "Your message has been sent successfully!",
+        description: "We'll get back to you soon.",
       });
 
       setFormData({ name: "", email: "", message: "" });
     } catch (error) {
       console.error("Error submitting inquiry:", error);
       toast({
-        title: "Error",
-        description: "Failed to send message. Please try again.",
+        title: "Something went wrong. Please try again.",
+        description: "Failed to send message.",
         variant: "destructive",
       });
     } finally {

@@ -23,7 +23,7 @@ export default function Navbar() {
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const { user, signOut } = useAuth();
   const { data: roleData } = useUserRole();
-  const { isOpen: autoProfileOpen, isFirstLogin, closeModal: closeAutoModal } = useProfileModal();
+  const { isOpen: autoProfileOpen, openModal, closeModal: closeAutoModal } = useProfileModal();
 
   const [profile, setProfile] = useState<any>(null);
 
@@ -85,11 +85,11 @@ export default function Navbar() {
               {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                     <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                       <Avatar className="h-10 w-10">
                         <AvatarImage src={profile?.avatar_url} />
                         <AvatarFallback>
-                          {profile?.full_name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || "?"}
+                          <User className="h-4 w-4" />
                         </AvatarFallback>
                       </Avatar>
                     </Button>
@@ -218,7 +218,7 @@ export default function Navbar() {
           setProfileModalOpen(false);
           closeAutoModal();
         }}
-        isFirstLogin={isFirstLogin}
+        isFirstLogin={false}
       />
     </>
   );

@@ -1,13 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function Hero() {
-  const scrollToPortfolio = () => {
-    const element = document.getElementById("portfolio");
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
-  };
+  const navigate = useNavigate();
 
   const scrollToContact = () => {
     const element = document.getElementById("contact");
@@ -38,8 +34,8 @@ export default function Hero() {
             <Button
               size="lg"
               variant="outline"
-              onClick={scrollToPortfolio}
-              className="text-lg"
+              onClick={() => navigate("/portfolio")}
+              className="text-lg bg-white text-black hover:bg-white/90"
             >
               View Our Work
             </Button>

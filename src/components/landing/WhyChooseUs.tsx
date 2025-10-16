@@ -42,8 +42,8 @@ export default function WhyChooseUs() {
         {features.map((feature, idx) => {
           const Icon = feature.icon;
           return (
-            <Card key={idx} className="text-center border transition-colors hover:border-accent">
-              <CardContent className="pt-8">
+            <Card key={idx} className="text-center border transition-colors hover:border-accent h-full flex flex-col">
+              <CardContent className="pt-8 flex-1 flex flex-col">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-accent mb-4">
                   <Icon className="h-8 w-8 text-accent" />
                 </div>
