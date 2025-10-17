@@ -56,9 +56,7 @@ export default function Process() {
                 <Icon className="h-8 w-8 text-accent" />
               </div>
               <h3 className="text-lg font-semibold mb-2">{step.title}</h3>
-              <p className="text-sm text-accent/80 mb-2 [text-align:justify] [text-justify:inter-word]">
-  {step.description}
-</p>
+              <p className="text-sm text-muted-foreground [text-align:justify] [text-justify:inter-word]">{step.description}</p>
               <p className="text-sm text-muted-foreground">{step.description}</p>
             </div>
           );
