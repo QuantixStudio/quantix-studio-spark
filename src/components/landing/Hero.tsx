@@ -22,7 +22,7 @@ export default function Hero() {
           </h1>
  
           <p className="text-xl md:text-2xl text-muted-foreground mb-12 mx-auto hyphens-auto !text-justify">
-            We’re a product studio that helps founders launch fast, automate smart, grow scalably
+            We’re a studio that helps founders launch fast, automate smart, and grow scalably
             <br />
             Built on Bubble, Lovable, Weweb, Supabase, n8n, OpenAI - 60 % cheaper than code
           </p>
