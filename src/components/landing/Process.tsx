@@ -7,7 +7,7 @@ export default function Process() {
       number: "01",
       title: "Discovery & Planning",
       subtitle: "Research & Scope",
-      description: "We start by understanding your goals, target users, and project scope — setting a solid foundation for success.",
+      description: "We start by understanding your goals, target users, and project scope - setting a solid foundation for success.",
     },
     {
       icon: Palette,
@@ -28,7 +28,7 @@ export default function Process() {
       number: "04",
       title: "Launch & Scale",
       subtitle: "Fast iteration & analytics",
-      description: "We launch, test, and refine — ensuring stability, performance, and long-term scalability.",
+      description: "We launch, test, and refine - ensuring stability, performance, and long-term scalability.",
     },
   ];
 
