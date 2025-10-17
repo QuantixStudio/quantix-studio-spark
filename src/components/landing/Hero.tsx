@@ -20,7 +20,7 @@ export default function Hero() {
           <h1 className="text-5xl md:text-7xl font-bold mb-6">
             Build your MVP in 4 weeks and 60% cheaper than code
           </h1>
-
+ 
           <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto">
             We’re a product studio that helps founders launch fast, automate smart, and grow with clarity.
             <br />
