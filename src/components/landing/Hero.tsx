@@ -23,7 +23,8 @@ export default function Hero() {
 
           <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto">
             We’re a product studio that helps founders launch fast, automate smart, and grow with clarity.
-            <br />Built on Bubble, Lovable, Weweb, Supabase, n8n, OpenAI - 60 % cheaper than code.
+            <br />
+            Built on Bubble, Lovable, Weweb, Supabase, n8n, OpenAI - 60 % cheaper than code.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
