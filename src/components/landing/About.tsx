@@ -8,9 +8,9 @@ export default function About() {
           <h2 className="section-title">About Quantix Studio</h2>
           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mt-6">
             Quantix Studio ships investor-ready scalable MVPs and revenue automations fast.{" "}
-            {/* /* <strong className="text-foreground">no-code / low-code development</strong>,{" "} 
+            <!-{/* /* <strong className="text-foreground">no-code / low-code development</strong>,{" "} 
             -- <strong className="text-foreground">AI automation</strong>, and{" "}
-            --<strong className="text-foreground">cloud infrastructure</strong>.*/ */}
+            --<strong className="text-foreground">cloud infrastructure</strong>.*/ */}-!>
           </p>
           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mt-6">
             Stack: Bubble, Lovable, Weweb, Supabase, n8n, OpenAI{" "}
