@@ -42,7 +42,7 @@ export default function About() {
             </div>
             <h3 className="text-xl font-semibold">Secure & Scalable</h3>
             <p className="text-muted-foreground">
-              Secure infrastructure with row-level security, encrypted storage, and compliance-ready architecture.
+              Privacy rules, RLS, GDPR-ready
             </p>
           </div>
         </div>
