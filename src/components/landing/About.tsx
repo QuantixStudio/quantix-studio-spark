@@ -6,11 +6,12 @@ export default function About() {
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="section-title">About Quantix Studio</h2>
-          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mt-6">
-            Quantix Studio is a fast no/low-code product studio. 
-            In 3–4 weeks we ship investor-ready MVPs and AI automations that cut manual work and deliver first metrics—signups, MRR, leads. 
-            Stack: Bubble, Supabase, n8n, GPT; we connect analytics, payments, external APIs, and build secure infra (RLS/GDPR). 
-            Process: cut-list → prototype → core flows → release. 10+ products and 25+ automations shipped—without excess code or months of waiting.{" "}
+          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mt-6" text-justify>
+            Quantix Studio helps founders launch investor-ready products fast. 
+            In just 3–4 weeks, we turn ideas into clean, scalable MVPs — 60% cheaper than traditional code. 
+            Using Bubble, Lovable, Weweb, Supabase, n8n, OpenAI, we build with automation, analytics, payments, and GDPR-level security from day one. 
+            Simple agency flow — cut-list → prototype → core flows → launch — has powered 20+ products and 35+ automations. 
+            Our mission: help startups grow faster with clarity, speed, and zero drag.{" "}
           </p>
            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mt-6">
              Average MVP timeline — 4 weeks, 60% cheaper than code{" "}
