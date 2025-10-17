@@ -21,7 +21,7 @@ export default function Hero() {
             Build your MVP in 4 weeks and 60% cheaper than code{" "}
           </h1>
  
-          <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto hyphens-auto !text-justify">
+          <p className="text-xl md:text-2xl text-muted-foreground mb-6 max-w-3xl mx-auto hyphens-auto !text-justify">
             We’re a product studio that helps founders launch fast, automate smart, and grow with clarity.
             <br />
             Built on Bubble, Lovable, Weweb, Supabase, n8n, OpenAI - 60 % cheaper than code.
