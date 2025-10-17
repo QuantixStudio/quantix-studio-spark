@@ -6,7 +6,7 @@ export default function WhyChooseUs() {
     {
       icon: Zap,
       title: "Lightning Fast",
-      description: !text-justify
+      description: 
         "Automation-first development lets us deliver full MVPs 3× faster than traditional teams.",
     },
     {
@@ -48,9 +48,9 @@ export default function WhyChooseUs() {
                   <Icon className="h-8 w-8 text-accent" />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {feature.description}
-                </p>
+                <p className="[text-align:justify] [text-justify:inter-word] leading-relaxed">
+                   {feature.description}
+               </p>
               </CardContent>
             </Card>
           );
