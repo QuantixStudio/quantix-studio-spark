@@ -6,7 +6,7 @@ export default function WhyChooseUs() {
     {
       icon: Zap,
       title: "Lightning Fast",
-      description:
+      description: !text-justify
         "Automation-first development lets us deliver full MVPs 3× faster than traditional teams.",
     },
     {
