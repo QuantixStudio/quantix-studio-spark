@@ -12,14 +12,14 @@ export default function About() {
             -- <strong className="text-foreground">AI automation</strong>, and{" "}
             --<strong className="text-foreground">cloud infrastructure</strong>.*/ */}
           </p>
-          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mt-4">
+          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mt-6">
             Stack: Bubble, Lovable, Weweb, Supabase, n8n, OpenAI{" "}
             {/* -- <strong className="text-foreground">Supabase</strong>,{" "}
             -- <strong className="text-foreground">n8n</strong>,{" "}
             -- <strong className="text-foreground">GPT</strong>, and{" "}
             -- <strong className="text-foreground">Bubble</strong> — without compromising design, scalability, or security. */}
           </p>
-          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mt-4">
+          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mt-6">
             Average MVP timeline — 4 weeks, 60% cheaper then code{" "}
           </p>
         </div>
