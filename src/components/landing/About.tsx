@@ -8,14 +8,11 @@ export default function About() {
           <h2 className="section-title">About Quantix Studio</h2>
           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mt-6" text-justify hyphens-auto>
             Quantix Studio helps founders launch investor-ready products fast. 
-            In just 3–4 weeks, we turn ideas into clean, scalable MVPs — 60% cheaper than traditional code. 
+            In just 3–4 weeks, we turn ideas into clean, scalable MVPs - 60% cheaper than traditional code. 
             Using Bubble, Lovable, Weweb, Supabase, n8n, OpenAI, we build with automation, analytics, payments, and GDPR-level security from day one. 
-            Simple agency flow — cut-list → prototype → core flows → launch — has powered 20+ products and 35+ automations. 
+            Simple agency flow - cut-list → prototype → core flows → launch - has powered 20+ products and 35+ automations. 
             Our mission: help startups grow faster with clarity, speed, and zero drag.{" "}
           </p>
-           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mt-6">
-             Average MVP timeline — 4 weeks, 60% cheaper than code{" "}
-           </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
