@@ -12,7 +12,7 @@ export default function About() {
             Stack: Bubble, Supabase, n8n, GPT; we connect analytics, payments, external APIs, and build secure infra (RLS/GDPR). 
             Process: cut-list → prototype → core flows → release. 10+ products and 25+ automations shipped—without excess code or months of waiting.{" "}
           </p>
-          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mt-6">
+          {/*<p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mt-6">
             Stack: Bubble, Lovable, Weweb, Supabase, n8n, OpenAI{" "}
             {/* -- <strong className="text-foreground">Supabase</strong>,{" "}
             -- <strong className="text-foreground">n8n</strong>,{" "}
@@ -21,7 +21,7 @@ export default function About() {
           </p>
           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mt-6">
             Average MVP timeline — 4 weeks, 60% cheaper then code{" "}
-          </p>
+          </p>*/}
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
