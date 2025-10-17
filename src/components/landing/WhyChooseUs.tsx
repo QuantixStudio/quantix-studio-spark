@@ -48,7 +48,7 @@ export default function WhyChooseUs() {
                   <Icon className="h-8 w-8 text-accent" />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-                <p className="[text-align:justify] [text-justify:inter-word] leading-relaxed">
+                <p className="text-sm text-muted-foreground [text-align:justify] [text-justify:inter-word] leading-relaxed">
                    {feature.description}
                </p>
               </CardContent>
