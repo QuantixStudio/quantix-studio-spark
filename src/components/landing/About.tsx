@@ -7,17 +7,20 @@ export default function About() {
         <div className="text-center mb-16">
           <h2 className="section-title">About Quantix Studio</h2>
           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mt-6">
-            Quantix Studio is a next-generation digital agency specializing in fast and scalable{" "}
-            <strong className="text-foreground">no-code / low-code development</strong>,{" "}
-            <strong className="text-foreground">AI automation</strong>, and{" "}
-            <strong className="text-foreground">cloud infrastructure</strong>.
+            Quantix Studio ships investor-ready scalable MVPs and revenue automations fast.{" "}
+            -- <strong className="text-foreground">no-code / low-code development</strong>,{" "}
+            -- <strong className="text-foreground">AI automation</strong>, and{" "}
+            --<strong className="text-foreground">cloud infrastructure</strong>.
           </p>
           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mt-4">
-            We help businesses launch digital products 3× faster using{" "}
-            <strong className="text-foreground">Supabase</strong>,{" "}
-            <strong className="text-foreground">n8n</strong>,{" "}
-            <strong className="text-foreground">GPT</strong>, and{" "}
-            <strong className="text-foreground">Bubble</strong> — without compromising design, scalability, or security.
+            Stack: Bubble, Lovable, Weweb, Supabase, n8n, OpenAI{" "}
+            -- <strong className="text-foreground">Supabase</strong>,{" "}
+            -- <strong className="text-foreground">n8n</strong>,{" "}
+            -- <strong className="text-foreground">GPT</strong>, and{" "}
+            -- <strong className="text-foreground">Bubble</strong> — without compromising design, scalability, or security.
+          </p>
+          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mt-4">
+            Average MVP timeline — 4 weeks, 60% cheaper then code{" "}
           </p>
         </div>
 
@@ -26,9 +29,9 @@ export default function About() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-accent">
               <Zap className="h-8 w-8 text-accent" />
             </div>
-            <h3 className="text-xl font-semibold">Lightning Fast</h3>
+            <h3 className="text-xl font-semibold">3× Faster</h3>
             <p className="text-muted-foreground">
-              Automation-first approach with serverless architecture ensures rapid deployment and instant scalability.
+              Automation-first approach & no-code speed
             </p>
           </div>
 
@@ -38,7 +41,7 @@ export default function About() {
             </div>
             <h3 className="text-xl font-semibold">AI-Powered</h3>
             <p className="text-muted-foreground">
-              Intelligent workflows, smart chatbots, and document analysis powered by state-of-the-art language models.
+              Assistant bots, smart routing, GPT workflows
             </p>
           </div>
 
@@ -46,7 +49,7 @@ export default function About() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-accent">
               <Shield className="h-8 w-8 text-accent" />
             </div>
-            <h3 className="text-xl font-semibold">Enterprise-Grade</h3>
+            <h3 className="text-xl font-semibold">Secure & Scalable</h3>
             <p className="text-muted-foreground">
               Secure infrastructure with row-level security, encrypted storage, and compliance-ready architecture.
             </p>
