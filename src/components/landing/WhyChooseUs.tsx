@@ -13,7 +13,7 @@ export default function WhyChooseUs() {
       icon: Bot,
       title: "AI-Powered",
       description:
-        "From smart assistants to internal tools — we embed AI directly into your workflows.",
+        "From smart assistants to internal tools - we embed AI directly into your workflows.",
     },
     {
       icon: Lock,
