@@ -13,8 +13,8 @@ export default function About() {
             Process: cut-list → prototype → core flows → release. 10+ products and 25+ automations shipped—without excess code or months of waiting.{" "}
           </p>
            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mt-6">
-            Average MVP timeline — 4 weeks, 60% cheaper then code{" "}
-          </p>*/}
+             Average MVP timeline — 4 weeks, 60% cheaper than code{" "}
+           </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
