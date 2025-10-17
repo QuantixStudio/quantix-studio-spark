@@ -11,7 +11,7 @@ export default function Hero() {
       element.scrollIntoView({ behavior: "smooth" });
     }
   };
-
+ 
   return (
     <section className="relative py-32 flex items-center justify-center overflow-hidden">
       {/* Content */}
