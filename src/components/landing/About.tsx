@@ -7,9 +7,10 @@ export default function About() {
         <div className="text-center mb-16">
           <h2 className="section-title">About Quantix Studio</h2>
           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mt-6">
-            Quantix Studio ships investor-ready scalable MVPs and revenue automations fast.
-            <br />Stack: Bubble, Lovable, Weweb, Supabase, n8n, OpenAI{" "}
-            <br />Average MVP timeline — 4 weeks, 60% cheaper then code{" "}
+            Quantix Studio is a fast no/low-code product studio. 
+            In 3–4 weeks we ship investor-ready MVPs and AI automations that cut manual work and deliver first metrics—signups, MRR, leads. 
+            Stack: Bubble, Supabase, n8n, GPT; we connect analytics, payments, external APIs, and build secure infra (RLS/GDPR). 
+            Process: cut-list → prototype → core flows → release. 10+ products and 25+ automations shipped—without excess code or months of waiting.{" "}
           </p>
           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mt-6">
             Stack: Bubble, Lovable, Weweb, Supabase, n8n, OpenAI{" "}
