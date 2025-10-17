@@ -20,7 +20,7 @@ export default function Process() {
       icon: Workflow,
       number: "03",
       title: "Build & Automate",
-      subtitle: "No-code Stack (Bubble, Supabase, n8n, GPT)",
+      subtitle: "No-code Stack (Bubble, n8n, OpenAI)",
       description: "We build fast, scalable products using no-code tools and automate workflows with AI.",
     },
     {
