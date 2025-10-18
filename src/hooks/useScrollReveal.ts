@@ -39,7 +39,7 @@ export function useScrollReveal(options: ScrollRevealOptions = {}) {
     }
 
     return () => observer.disconnect();
-  }, [options.threshold, options.triggerOnce]);
+  }, []);
 
   return { isVisible, ref };
 }
