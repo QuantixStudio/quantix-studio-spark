@@ -154,8 +154,19 @@ export default function Navbar() {
             </div>
 
             {/* Desktop Navigation - Centered */}
-            <div className="hidden md:flex absolute left-1/2 -translate-x-1/2">
-              
+            <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-8">
+              <button onClick={() => handleNavigation("home")} className={`nav-link cursor-pointer transition-colors ${activeSection === '' && window.location.pathname === '/' && window.scrollY === 0 ? 'text-accent font-medium' : 'text-foreground/80 hover:text-foreground'}`}>
+                Home
+              </button>
+              <button onClick={() => handleNavigation("services")} className={`nav-link cursor-pointer transition-colors ${activeSection === 'services' ? 'text-accent font-medium' : 'text-foreground/80 hover:text-foreground'}`}>
+                Services
+              </button>
+              <button onClick={() => handleNavigation("portfolio")} className={`nav-link cursor-pointer transition-colors ${activeSection === 'featured-work' ? 'text-accent font-medium' : 'text-foreground/80 hover:text-foreground'}`}>
+                Portfolio
+              </button>
+              <button onClick={() => handleNavigation("contact")} className={`nav-link cursor-pointer transition-colors ${activeSection === 'contact' ? 'text-accent font-medium' : 'text-foreground/80 hover:text-foreground'}`}>
+                Contact
+              </button>
             </div>
 
             {/* Right side spacer for balance */}
