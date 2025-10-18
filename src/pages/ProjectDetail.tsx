@@ -9,16 +9,20 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { ExternalLink, Github, ArrowLeft, Mail } from "lucide-react";
 import { useProjectDetail } from "@/hooks/useProjectDetail";
-
 export default function ProjectDetail() {
-  const { slug } = useParams<{ slug: string }>();
-  const { data: project, isLoading } = useProjectDetail(slug || "");
+  const {
+    slug
+  } = useParams<{
+    slug: string;
+  }>();
+  const {
+    data: project,
+    isLoading
+  } = useProjectDetail(slug || "");
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
-
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background">
+    return <div className="min-h-screen bg-background">
         <Navbar />
         <article className="container mx-auto px-4 py-16 max-w-4xl">
           <Skeleton className="w-full h-96 rounded-lg mb-8" />
@@ -32,13 +36,10 @@ export default function ProjectDetail() {
           <Skeleton className="h-48 w-full" />
         </article>
         <Footer />
-      </div>
-    );
+      </div>;
   }
-
   if (!project) {
-    return (
-      <div className="min-h-screen bg-background flex flex-col">
+    return <div className="min-h-screen bg-background flex flex-col">
         <Navbar />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
@@ -55,93 +56,65 @@ export default function ProjectDetail() {
           </div>
         </div>
         <Footer />
-      </div>
-    );
+      </div>;
   }
-
   const projectData = project as any;
-  const images = projectData.images && Array.isArray(projectData.images) && projectData.images.length > 0
-    ? projectData.images.sort((a: any, b: any) => a.order - b.order)
-    : project.cover_url
-    ? [{ url: project.cover_url, alt: project.title, is_main: true, order: 0 }]
-    : [];
-
+  const images = projectData.images && Array.isArray(projectData.images) && projectData.images.length > 0 ? projectData.images.sort((a: any, b: any) => a.order - b.order) : project.cover_url ? [{
+    url: project.cover_url,
+    alt: project.title,
+    is_main: true,
+    order: 0
+  }] : [];
   const openLightbox = (index: number) => {
     setLightboxIndex(index);
     setLightboxOpen(true);
   };
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <Navbar />
 
       <article className="container mx-auto px-4 py-16 max-w-4xl">
-        <Link
-          to="/portfolio"
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors"
-        >
+        <Link to="/portfolio" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors my-[20px]">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Portfolio
         </Link>
 
-        {images.length > 0 && (
-          <div className="mb-8">
+        {images.length > 0 && <div className="mb-8">
             <Carousel className="w-full">
               <CarouselContent>
-                {images.map((image: any, index: number) => (
-                  <CarouselItem key={index}>
-                    <div
-                      className="relative aspect-video bg-muted rounded-lg overflow-hidden cursor-pointer group"
-                      onClick={() => openLightbox(index)}
-                    >
-                      <img
-                        src={image.url}
-                        alt={image.alt || project.title}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        style={{ imageRendering: "auto" }}
-                        loading="lazy"
-                      />
+                {images.map((image: any, index: number) => <CarouselItem key={index}>
+                    <div className="relative aspect-video bg-muted rounded-lg overflow-hidden cursor-pointer group" onClick={() => openLightbox(index)}>
+                      <img src={image.url} alt={image.alt || project.title} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" style={{
+                  imageRendering: "auto"
+                }} loading="lazy" />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
                         <ExternalLink className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
                     </div>
-                  </CarouselItem>
-                ))}
+                  </CarouselItem>)}
               </CarouselContent>
-              {images.length > 1 && (
-                <>
+              {images.length > 1 && <>
                   <CarouselPrevious className="left-4" />
                   <CarouselNext className="right-4" />
-                </>
-              )}
+                </>}
             </Carousel>
-          </div>
-        )}
+          </div>}
 
         <div className="mb-6">
-          {project.project_category && (
-            <Badge variant="secondary" className="text-sm mb-3">
+          {project.project_category && <Badge variant="secondary" className="text-sm mb-3">
               {project.project_category.name}
-            </Badge>
-          )}
+            </Badge>}
           <h1 className="text-4xl md:text-5xl font-bold">{project.title}</h1>
         </div>
 
-        {projectData.key_metric && (
-          <div className="mb-6 p-4 border border-accent rounded-lg bg-accent/5">
+        {projectData.key_metric && <div className="mb-6 p-4 border border-accent rounded-lg bg-accent/5">
             <p className="text-accent font-semibold">{projectData.key_metric}</p>
-          </div>
-        )}
+          </div>}
 
-        {project.project_technologies && project.project_technologies.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-8">
-            {project.project_technologies.map((pt) => (
-              <Badge key={pt.technologies.id} variant="outline">
+        {project.project_technologies && project.project_technologies.length > 0 && <div className="flex flex-wrap gap-2 mb-8">
+            {project.project_technologies.map(pt => <Badge key={pt.technologies.id} variant="outline">
                 {pt.technologies.name}
-              </Badge>
-            ))}
-          </div>
-        )}
+              </Badge>)}
+          </div>}
 
         <div className="prose dark:prose-invert max-w-none mb-8">
           <p className="text-lg text-muted-foreground leading-relaxed">
@@ -150,22 +123,18 @@ export default function ProjectDetail() {
         </div>
 
         <div className="flex flex-wrap gap-4">
-          {project.demo_url && (
-            <Button asChild>
+          {project.demo_url && <Button asChild>
               <a href={project.demo_url} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="mr-2 h-4 w-4" />
                 View Live Demo
               </a>
-            </Button>
-          )}
-          {project.github_url && (
-            <Button variant="outline" asChild>
+            </Button>}
+          {project.github_url && <Button variant="outline" asChild>
               <a href={project.github_url} target="_blank" rel="noopener noreferrer">
                 <Github className="mr-2 h-4 w-4" />
                 View on GitHub
               </a>
-            </Button>
-          )}
+            </Button>}
         </div>
       </article>
 
@@ -181,19 +150,13 @@ export default function ProjectDetail() {
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
         <DialogContent className="max-w-7xl w-full p-0 bg-black/95">
           <div className="relative w-full h-[90vh] flex items-center justify-center">
-            {images[lightboxIndex] && (
-              <img
-                src={images[lightboxIndex].url}
-                alt={images[lightboxIndex].alt || project.title}
-                className="max-w-full max-h-full object-contain"
-                style={{ imageRendering: "auto" }}
-              />
-            )}
+            {images[lightboxIndex] && <img src={images[lightboxIndex].url} alt={images[lightboxIndex].alt || project.title} className="max-w-full max-h-full object-contain" style={{
+            imageRendering: "auto"
+          }} />}
           </div>
         </DialogContent>
       </Dialog>
 
       <Footer />
-    </div>
-  );
+    </div>;
 }
