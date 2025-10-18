@@ -44,7 +44,7 @@ export default function WhyChooseUs() {
           return (
             <Card key={idx} className="text-center border transition-colors hover:border-accent h-full flex flex-col">
               <CardContent className="pt-8 flex-1 flex flex-col">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-accent mb-4">
+                <div className="flex items-center justify-center w-16 h-16 rounded-full border border-accent mb-4 mx-auto">
                   <Icon className="h-8 w-8 text-accent" />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
