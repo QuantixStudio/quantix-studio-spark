@@ -8,7 +8,7 @@ export default function Portfolio() {
       <Navbar />
       <PortfolioHero />
       <ProjectGrid />
-      <CalloutStrip className="bg-inherit" />
+      <CalloutStrip />
       <Footer />
     </div>;
 }
