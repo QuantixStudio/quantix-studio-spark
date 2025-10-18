@@ -135,7 +135,7 @@ export default function Contact() {
               })} rows={6} required />
               </div>
 
-              <Button type="submit" disabled={isSubmitting} className="w-full">
+              <Button type="submit" disabled={isSubmitting} className="w-full" size="lg">
                 {isSubmitting ? "Sending..." : <>
                     <Send className="mr-2 h-4 w-4" />
                     Send Message
