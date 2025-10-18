@@ -90,12 +90,12 @@ export default function Contact() {
                 <div className="flex items-center gap-3">
                   <Linkedin className="h-5 w-5 flex-shrink-0 text-muted-foreground" />
                   <a 
-                    href="https://www.linkedin.com/company/quantixstudio" 
+                    href="https://www.linkedin.com/company/quantix-studio" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-muted-foreground hover:text-primary transition-colors"
                   >
-                    linkedin.com/company/quantixstudio
+                    linkedin.com/company/quantix-studio
                   </a>
                 </div>
               </div>
