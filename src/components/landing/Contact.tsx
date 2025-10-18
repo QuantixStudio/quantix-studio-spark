@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Calendar, Mail, Send, Linkedin } from "lucide-react";
+import { Calendar, Mail, Send } from "lucide-react";
 export default function Contact() {
   const [formData, setFormData] = useState({
     name: "",
@@ -84,6 +84,13 @@ export default function Contact() {
                 </p>
               </div>
 
+              <Button asChild className="w-full" size="lg">
+                <a href="https://calendly.com/quantixstudio" target="_blank" rel="noopener noreferrer">
+                  <Calendar className="mr-2 h-5 w-5" />
+                  Schedule a Call
+                </a>
+              </Button>
+
               <div className="pt-6 border-t border-border">
                 <div className="flex items-center gap-3 text-muted-foreground">
                   <Mail className="h-5 w-5" />
@@ -119,27 +126,12 @@ export default function Contact() {
               })} rows={6} required />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <Button type="submit" disabled={isSubmitting} className="w-full">
-                  {isSubmitting ? "Sending..." : <>
-                      <Send className="mr-2 h-4 w-4" />
-                      Send Message
-                    </>}
-                </Button>
-                <Button asChild variant="outline" size="default">
-                  <a href="https://calendly.com/quantixstudio" target="_blank" rel="noopener noreferrer">
-                    <Calendar className="mr-2 h-5 w-5" />
-                    Schedule a Call
-                  </a>
-                </Button>
-              </div>
-              
-              <div className="pt-4 border-t border-border text-center">
-                <a href="https://www.linkedin.com/company/quantix-studio/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
-                  <Linkedin className="h-5 w-5" />
-                  <span>Follow us on LinkedIn</span>
-                </a>
-              </div>
+              <Button type="submit" disabled={isSubmitting} className="w-full">
+                {isSubmitting ? "Sending..." : <>
+                    <Send className="mr-2 h-4 w-4" />
+                    Send Message
+                  </>}
+              </Button>
             </form>
           </CardContent>
         </Card>
