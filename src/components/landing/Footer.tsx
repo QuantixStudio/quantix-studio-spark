@@ -1,9 +1,7 @@
 import { Link } from "react-router-dom";
 import { Linkedin } from "lucide-react";
-
 export default function Footer() {
-  return (
-    <footer className="bg-muted/30 border-t border-border">
+  return <footer className="bg-muted/30 border-t border-border">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
@@ -15,60 +13,21 @@ export default function Footer() {
               Investor-ready products built with Bubble, WeWeb, and AI.
             </p>
             <div className="flex gap-4">
-              <a
-                href="https://www.linkedin.com/company/quantix-studio/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary transition-colors"
-                aria-label="LinkedIn"
-              >
+              <a href="https://www.linkedin.com/company/quantix-studio/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors" aria-label="LinkedIn">
                 <Linkedin className="h-5 w-5" />
               </a>
             </div>
           </div>
 
           {/* Quick Links */}
-          <div>
-            <h3 className="font-semibold mb-4">Quick Links</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link to="/portfolio" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Portfolio
-                </Link>
-              </li>
-              <li>
-                <button
-                  onClick={() => {
-                    const el = document.getElementById("services");
-                    el?.scrollIntoView({ behavior: "smooth" });
-                  }}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Services
-                </button>
-              </li>
-              <li>
-                <Link to="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Privacy
-                </Link>
-              </li>
-            </ul>
-          </div>
+          
 
           {/* Contact */}
           <div>
             <h3 className="font-semibold mb-4">Contact</h3>
             <ul className="space-y-2">
               <li>
-                <a
-                  href="mailto:support@quantixstudio.com"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
+                <a href="mailto:support@quantixstudio.com" className="text-muted-foreground hover:text-foreground transition-colors">
                   support@quantixstudio.com
                 </a>
               </li>
@@ -82,9 +41,8 @@ export default function Footer() {
         </div>
 
         <div className="pt-8 border-t border-border text-center text-sm text-muted-foreground">
-          <p>© 2025 Quantix Studio. All rights reserved.</p>
+          <p>© 2024 Quantix Studio. All rights reserved.</p>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 }
