@@ -10,6 +10,18 @@ export function useScrollReveal(options: ScrollRevealOptions = {}) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Check if element is already visible on mount
+    if (ref.current) {
+      const rect = ref.current.getBoundingClientRect();
+      const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
+      if (isInViewport) {
+        setIsVisible(true);
+        if (options.triggerOnce) {
+          return; // Don't set up observer if already visible and triggerOnce is true
+        }
+      }
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
