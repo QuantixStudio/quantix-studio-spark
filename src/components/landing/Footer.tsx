@@ -7,9 +7,7 @@ export default function Footer() {
           <Link to="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">
             Privacy Policy
           </Link>
-          <a href="mailto:support@quantixstudio.com" className="text-muted-foreground hover:text-foreground transition-colors">
-            support@quantixstudio.com
-          </a>
+          
           <a href="https://www.linkedin.com/company/quantix-studio/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors" aria-label="LinkedIn">
             <Linkedin className="h-5 w-5" />
           </a>
