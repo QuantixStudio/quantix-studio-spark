@@ -17,7 +17,7 @@
  * - Restore commented imports
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 // import { LogOut, User, LayoutDashboard } from "lucide-react"; // Auth UI disabled
@@ -39,6 +39,7 @@ import { Link } from "react-router-dom";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('');
   // const [authModalOpen, setAuthModalOpen] = useState(false); // Auth UI disabled
   // const [profileModalOpen, setProfileModalOpen] = useState(false); // Auth UI disabled
   const { user, signOut } = useAuth();
@@ -59,19 +60,51 @@ export default function Navbar() {
   //   }
   // });
 
+  // Track active section with Intersection Observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      { threshold: 0.3, rootMargin: '-100px 0px -50% 0px' }
+    );
+
+    const sections = ['services', 'contact'];
+    sections.forEach((id) => {
+      const element = document.getElementById(id);
+      if (element) observer.observe(element);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   const scrollToSection = (id: string) => {
+    // If not on home page, navigate first
+    if (window.location.pathname !== '/') {
+      window.location.href = `/#${id}`;
+      return;
+    }
+
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ 
-        behavior: "smooth", 
-        block: "start",
-        inline: "nearest"
+      const navbarHeight = 64; // h-16 = 64px
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.scrollY - navbarHeight;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth"
       });
+      
       setIsOpen(false);
       
-      // Add active state visual feedback
+      // Enhanced visual feedback
       element.classList.add('section-active');
-      setTimeout(() => element.classList.remove('section-active'), 1000);
+      setTimeout(() => element.classList.remove('section-active'), 1200);
     }
   };
 
@@ -84,70 +117,92 @@ export default function Navbar() {
     <>
       <nav className="fixed top-0 left-0 right-0 z-50 glass">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <Link to="/" className="text-xl font-bold">
-              QUANTIX STUDIO
-            </Link>
-
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              <Link to="/" className="text-foreground/80 hover:text-foreground transition-colors">
-                Home
+          <div className="relative flex items-center justify-between h-16">
+            {/* Logo - Fixed left */}
+            <div className="flex-shrink-0">
+              <Link to="/" className="text-xl font-bold">
+                QUANTIX STUDIO
               </Link>
-              <Link to="/portfolio" className="text-foreground/80 hover:text-foreground transition-colors">
-                Portfolio
-              </Link>
-              <button
-                onClick={() => scrollToSection("services")}
-                className="text-foreground/80 hover:text-foreground transition-colors"
-              >
-                Services
-              </button>
-              <button
-                onClick={() => scrollToSection("contact")}
-                className="text-foreground/80 hover:text-foreground transition-colors"
-              >
-              Contact
-              </button>
-
-              {/* AUTHENTICATION DISABLED FOR PUBLIC - Admin access via /auth only
-              {user ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                     <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage src={profile?.avatar_url} />
-                        <AvatarFallback>
-                          <User className="h-4 w-4" />
-                        </AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => setProfileModalOpen(true)}>
-                      <User className="mr-2 h-4 w-4" />
-                      Profile
-                    </DropdownMenuItem>
-                    {roleData?.isAdmin && (
-                      <DropdownMenuItem asChild>
-                        <Link to="/admin">
-                          <LayoutDashboard className="mr-2 h-4 w-4" />
-                          Admin Dashboard
-                        </Link>
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleSignOut}>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Sign Out
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <Button onClick={() => setAuthModalOpen(true)}>Login / Register</Button>
-              )}
-              */}
             </div>
+
+            {/* Desktop Navigation - Centered */}
+            <div className="hidden md:flex absolute left-1/2 -translate-x-1/2">
+              <nav className="flex items-center gap-8">
+                <Link 
+                  to="/" 
+                  className="nav-link text-foreground/80 hover:text-foreground cursor-pointer"
+                >
+                  Home
+                </Link>
+                <Link 
+                  to="/portfolio" 
+                  className="nav-link text-foreground/80 hover:text-foreground cursor-pointer"
+                >
+                  Portfolio
+                </Link>
+                <button
+                  onClick={() => scrollToSection("services")}
+                  className={`nav-link cursor-pointer ${
+                    activeSection === 'services' 
+                      ? 'text-accent font-medium' 
+                      : 'text-foreground/80 hover:text-foreground'
+                  }`}
+                >
+                  Services
+                </button>
+                <button
+                  onClick={() => scrollToSection("contact")}
+                  className={`nav-link cursor-pointer ${
+                    activeSection === 'contact' 
+                      ? 'text-accent font-medium' 
+                      : 'text-foreground/80 hover:text-foreground'
+                  }`}
+                >
+                  Contact
+                </button>
+              </nav>
+            </div>
+
+            {/* Right side spacer for balance */}
+            <div className="hidden md:block flex-shrink-0 w-[200px]"></div>
+
+            {/* AUTHENTICATION DISABLED FOR PUBLIC - Admin access via /auth only
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                   <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={profile?.avatar_url} />
+                      <AvatarFallback>
+                        <User className="h-4 w-4" />
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setProfileModalOpen(true)}>
+                    <User className="mr-2 h-4 w-4" />
+                    Profile
+                  </DropdownMenuItem>
+                  {roleData?.isAdmin && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin">
+                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                        Admin Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button onClick={() => setAuthModalOpen(true)}>Login / Register</Button>
+            )}
+            */}
 
             {/* Mobile Menu Button */}
             <div className="md:hidden">
@@ -167,32 +222,40 @@ export default function Navbar() {
 
           {/* Mobile Menu */}
           {isOpen && (
-            <div className="md:hidden py-4 space-y-4">
+            <div className="md:hidden py-4 space-y-2 animate-fade-in">
               <Link
                 to="/"
                 onClick={() => setIsOpen(false)}
-                className="block w-full text-left px-4 py-2 text-foreground/80 hover:text-foreground hover:bg-accent/10 rounded-lg transition-colors"
+                className="block w-full text-left px-4 py-3 text-foreground/80 hover:text-foreground hover:bg-accent/10 rounded-lg transition-colors"
               >
                 Home
               </Link>
               <Link
                 to="/portfolio"
                 onClick={() => setIsOpen(false)}
-                className="block w-full text-left px-4 py-2 text-foreground/80 hover:text-foreground hover:bg-accent/10 rounded-lg transition-colors"
+                className="block w-full text-left px-4 py-3 text-foreground/80 hover:text-foreground hover:bg-accent/10 rounded-lg transition-colors"
               >
                 Portfolio
               </Link>
               <button
                 onClick={() => scrollToSection("services")}
-                className="block w-full text-left px-4 py-2 text-foreground/80 hover:text-foreground hover:bg-accent/10 rounded-lg transition-colors"
+                className={`block w-full text-left px-4 py-3 rounded-lg transition-colors ${
+                  activeSection === 'services'
+                    ? 'text-accent font-medium bg-accent/10'
+                    : 'text-foreground/80 hover:text-foreground hover:bg-accent/10'
+                }`}
               >
                 Services
               </button>
               <button
                 onClick={() => scrollToSection("contact")}
-                className="block w-full text-left px-4 py-2 text-foreground/80 hover:text-foreground hover:bg-accent/10 rounded-lg transition-colors"
+                className={`block w-full text-left px-4 py-3 rounded-lg transition-colors ${
+                  activeSection === 'contact'
+                    ? 'text-accent font-medium bg-accent/10'
+                    : 'text-foreground/80 hover:text-foreground hover:bg-accent/10'
+                }`}
               >
-              Contact
+                Contact
               </button>
               {/* AUTHENTICATION DISABLED FOR PUBLIC - Admin access via /auth only
               {user ? (

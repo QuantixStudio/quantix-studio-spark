@@ -127,7 +127,7 @@ All colors MUST be HSL.
 
   /* Section active state animation for smooth scroll */
   .section-active {
-    animation: sectionHighlight 1s ease-in-out;
+    animation: sectionHighlight 1.2s ease-in-out;
   }
 
   @keyframes sectionHighlight {
@@ -138,5 +138,25 @@ All colors MUST be HSL.
       opacity: 0.95; 
       transform: translateY(-2px); 
     }
+  }
+
+  /* Navigation link with hover underline animation */
+  .nav-link {
+    @apply relative transition-colors duration-300;
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0%;
+    height: 2px;
+    background: hsl(var(--accent));
+    transition: width 0.3s ease-out;
+  }
+
+  .nav-link:hover::after {
+    width: 100%;
   }
 }
