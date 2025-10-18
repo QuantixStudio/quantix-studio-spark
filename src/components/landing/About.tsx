@@ -16,8 +16,8 @@ export default function About() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
-          <div className="text-center space-y-4">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-accent">
+          <div className="text-center space-y-4 group">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-accent transition-all duration-300 group-hover:scale-110 group-hover:bg-accent/20">
               <Zap className="h-8 w-8 text-accent" />
             </div>
             <h3 className="text-xl font-semibold">3× Faster</h3>
@@ -26,8 +26,8 @@ export default function About() {
             </p>
           </div>
 
-          <div className="text-center space-y-4">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-accent">
+          <div className="text-center space-y-4 group">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-accent transition-all duration-300 group-hover:scale-110 group-hover:bg-accent/20">
               <Target className="h-8 w-8 text-accent" />
             </div>
             <h3 className="text-xl font-semibold">AI-Powered</h3>
@@ -36,8 +36,8 @@ export default function About() {
             </p>
           </div>
 
-          <div className="text-center space-y-4">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-accent">
+          <div className="text-center space-y-4 group">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-accent transition-all duration-300 group-hover:scale-110 group-hover:bg-accent/20">
               <Shield className="h-8 w-8 text-accent" />
             </div>
             <h3 className="text-xl font-semibold">Secure & Scalable</h3>
