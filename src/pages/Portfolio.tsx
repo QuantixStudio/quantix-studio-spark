@@ -6,9 +6,9 @@ import CalloutStrip from "@/components/landing/CalloutStrip";
 export default function Portfolio() {
   return (
     <div className="min-h-screen bg-background">
-      <PortfolioHero className="bg-inherit pt-16" />
+      <PortfolioHero />
       <ProjectGrid />
-      <CalloutStrip className="bg-inherit" />
+      <CalloutStrip className="mt-8" />
       <Footer />
     </div>
   );
