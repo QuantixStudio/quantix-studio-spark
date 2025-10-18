@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface Technology {
   id: string;
@@ -43,10 +44,8 @@ export default function ProjectCard({ project }: ProjectCardProps) {
     .slice(0, 4) || [];
 
   return (
-    <a
-      href={`/portfolio/${project.slug}`}
-      target="_blank"
-      rel="noopener noreferrer"
+    <Link
+      to={`/portfolio/${project.slug}`}
       className="block"
     >
       <Card className="overflow-hidden group border transition-colors hover:border-accent">
@@ -88,9 +87,9 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 </Badge>
               ))}
             </div>
-          )}
-        </CardContent>
-      </Card>
-    </a>
+        )}
+      </CardContent>
+    </Card>
+    </Link>
   );
 }

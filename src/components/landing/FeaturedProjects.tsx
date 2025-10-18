@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function FeaturedProjects() {
   const { data: projects, isLoading } = useProjects(false, true);
@@ -27,7 +28,7 @@ export default function FeaturedProjects() {
   if (!projects?.length) return null;
 
   return (
-    <section className="section-container">
+    <section id="featured-work" className="section-container">
       <div className="text-center mb-16">
         <h2 className="section-title">Featured Work</h2>
         <p className="section-subtitle">Real results from real projects</p>
@@ -51,10 +52,8 @@ export default function FeaturedProjects() {
 
             return (
               <CarouselItem key={project.id} className="md:basis-1/2 lg:basis-1/3">
-                <a
-                  href={`/portfolio/${project.slug}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  to={`/portfolio/${project.slug}`}
                   className="block group"
                 >
                   <Card className="overflow-hidden border transition-colors hover:border-accent">
@@ -90,7 +89,7 @@ export default function FeaturedProjects() {
                       )}
                     </CardContent>
                   </Card>
-                </a>
+                </Link>
               </CarouselItem>
             );
           })}

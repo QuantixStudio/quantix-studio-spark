@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExternalLink } from "lucide-react";
 import FilterBar from "./FilterBar";
+import { Link } from "react-router-dom";
 
 export default function ProjectGrid() {
   const [activeFilter, setActiveFilter] = useState("all");
@@ -44,11 +45,9 @@ export default function ProjectGrid() {
             const technologies = project.project_technologies?.slice(0, 4) || [];
 
             return (
-              <a
+              <Link
                 key={project.id}
-                href={`/portfolio/${project.slug}`}
-                target="_blank"
-                rel="noopener noreferrer"
+                to={`/portfolio/${project.slug}`}
                 className="block group"
               >
                 <Card className="overflow-hidden border transition-colors hover:border-accent h-full">
@@ -95,7 +94,7 @@ export default function ProjectGrid() {
                     )}
                   </CardContent>
                 </Card>
-              </a>
+              </Link>
             );
           })}
         </div>

@@ -73,7 +73,7 @@ export default function Navbar() {
       { threshold: 0.3, rootMargin: '-100px 0px -50% 0px' }
     );
 
-    const sections = ['services', 'contact'];
+    const sections = ['featured-work', 'services', 'contact'];
     sections.forEach((id) => {
       const element = document.getElementById(id);
       if (element) observer.observe(element);
@@ -82,29 +82,51 @@ export default function Navbar() {
     return () => observer.disconnect();
   }, []);
 
-  const scrollToSection = (id: string) => {
-    // If not on home page, navigate first
-    if (window.location.pathname !== '/') {
-      window.location.href = `/#${id}`;
+  const handleNavigation = (target: string) => {
+    const offset = 64; // Fixed header height
+    
+    // Close mobile menu first
+    setIsOpen(false);
+    
+    // Handle HOME - scroll to top
+    if (target === "home") {
+      if (window.location.pathname !== '/') {
+        window.location.href = '/';
+      } else {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
       return;
     }
-
-    const element = document.getElementById(id);
-    if (element) {
-      const navbarHeight = 64; // h-16 = 64px
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.scrollY - navbarHeight;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth"
-      });
-      
-      setIsOpen(false);
-      
-      // Enhanced visual feedback
-      element.classList.add('section-active');
-      setTimeout(() => element.classList.remove('section-active'), 1200);
+    
+    // Handle PORTFOLIO - scroll to Featured Work section
+    if (target === "portfolio") {
+      if (window.location.pathname !== '/') {
+        window.location.href = '/#featured-work';
+      } else {
+        const element = document.getElementById('featured-work');
+        if (element) {
+          const y = element.getBoundingClientRect().top + window.scrollY - offset;
+          window.scrollTo({ top: y, behavior: "smooth" });
+          
+          element.classList.add('section-active');
+          setTimeout(() => element.classList.remove('section-active'), 1200);
+        }
+      }
+      return;
+    }
+    
+    // Handle SERVICES, CONTACT and other sections
+    if (window.location.pathname !== '/') {
+      window.location.href = `/#${target}`;
+    } else {
+      const element = document.getElementById(target);
+      if (element) {
+        const y = element.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top: y, behavior: "smooth" });
+        
+        element.classList.add('section-active');
+        setTimeout(() => element.classList.remove('section-active'), 1200);
+      }
     }
   };
 
@@ -128,20 +150,28 @@ export default function Navbar() {
             {/* Desktop Navigation - Centered */}
             <div className="hidden md:flex absolute left-1/2 -translate-x-1/2">
               <nav className="flex items-center gap-8">
-                <Link 
-                  to="/" 
-                  className="nav-link text-foreground/80 hover:text-foreground cursor-pointer"
+                <button
+                  onClick={() => handleNavigation("home")}
+                  className={`nav-link cursor-pointer ${
+                    activeSection === '' && window.location.pathname === '/' && window.scrollY === 0
+                      ? 'text-accent font-medium' 
+                      : 'text-foreground/80 hover:text-foreground'
+                  }`}
                 >
                   Home
-                </Link>
-                <Link 
-                  to="/portfolio" 
-                  className="nav-link text-foreground/80 hover:text-foreground cursor-pointer"
+                </button>
+                <button
+                  onClick={() => handleNavigation("portfolio")}
+                  className={`nav-link cursor-pointer ${
+                    activeSection === 'featured-work' 
+                      ? 'text-accent font-medium' 
+                      : 'text-foreground/80 hover:text-foreground'
+                  }`}
                 >
                   Portfolio
-                </Link>
+                </button>
                 <button
-                  onClick={() => scrollToSection("services")}
+                  onClick={() => handleNavigation("services")}
                   className={`nav-link cursor-pointer ${
                     activeSection === 'services' 
                       ? 'text-accent font-medium' 
@@ -151,7 +181,7 @@ export default function Navbar() {
                   Services
                 </button>
                 <button
-                  onClick={() => scrollToSection("contact")}
+                  onClick={() => handleNavigation("contact")}
                   className={`nav-link cursor-pointer ${
                     activeSection === 'contact' 
                       ? 'text-accent font-medium' 
@@ -223,22 +253,28 @@ export default function Navbar() {
           {/* Mobile Menu */}
           {isOpen && (
             <div className="md:hidden py-4 space-y-2 animate-fade-in">
-              <Link
-                to="/"
-                onClick={() => setIsOpen(false)}
-                className="block w-full text-left px-4 py-3 text-foreground/80 hover:text-foreground hover:bg-accent/10 rounded-lg transition-colors"
+              <button
+                onClick={() => handleNavigation("home")}
+                className={`block w-full text-left px-4 py-3 rounded-lg transition-colors ${
+                  activeSection === '' && window.location.pathname === '/' && window.scrollY === 0
+                    ? 'text-accent font-medium bg-accent/10'
+                    : 'text-foreground/80 hover:text-foreground hover:bg-accent/10'
+                }`}
               >
                 Home
-              </Link>
-              <Link
-                to="/portfolio"
-                onClick={() => setIsOpen(false)}
-                className="block w-full text-left px-4 py-3 text-foreground/80 hover:text-foreground hover:bg-accent/10 rounded-lg transition-colors"
+              </button>
+              <button
+                onClick={() => handleNavigation("portfolio")}
+                className={`block w-full text-left px-4 py-3 rounded-lg transition-colors ${
+                  activeSection === 'featured-work'
+                    ? 'text-accent font-medium bg-accent/10'
+                    : 'text-foreground/80 hover:text-foreground hover:bg-accent/10'
+                }`}
               >
                 Portfolio
-              </Link>
+              </button>
               <button
-                onClick={() => scrollToSection("services")}
+                onClick={() => handleNavigation("services")}
                 className={`block w-full text-left px-4 py-3 rounded-lg transition-colors ${
                   activeSection === 'services'
                     ? 'text-accent font-medium bg-accent/10'
@@ -248,7 +284,7 @@ export default function Navbar() {
                 Services
               </button>
               <button
-                onClick={() => scrollToSection("contact")}
+                onClick={() => handleNavigation("contact")}
                 className={`block w-full text-left px-4 py-3 rounded-lg transition-colors ${
                   activeSection === 'contact'
                     ? 'text-accent font-medium bg-accent/10'
