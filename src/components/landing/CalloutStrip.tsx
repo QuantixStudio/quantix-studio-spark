@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
-export default function CalloutStrip() {
+import { cn } from "@/lib/utils";
+
+export default function CalloutStrip({ className }: { className?: string }) {
   const navigate = useNavigate();
   const location = useLocation();
   const handleOpenInquiry = () => {
@@ -27,7 +29,7 @@ export default function CalloutStrip() {
       }
     }
   };
-  return <section className="bg-primary text-primary-foreground py-16">
+  return <section className={cn("bg-primary text-primary-foreground py-16", className)}>
       <div className="container mx-auto px-4 text-center">
         <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">
           Need something similar?
