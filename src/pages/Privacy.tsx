@@ -1,13 +1,11 @@
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
-
 export default function Privacy() {
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <Navbar />
       
       <div className="container mx-auto px-4 py-16 max-w-4xl">
-        <h1 className="text-4xl font-bold mb-8">Privacy Policy</h1>
+        <h1 className="text-4xl font-bold mb-8 my-[30px]">Privacy Policy</h1>
         
         <div className="prose dark:prose-invert max-w-none">
           <p className="text-muted-foreground mb-6">
@@ -68,15 +66,12 @@ export default function Privacy() {
             <h2 className="text-2xl font-semibold mb-4">Contact Us</h2>
             <p className="text-muted-foreground">
               If you have any questions about this Privacy Policy, please contact us at{" "}
-              <a href="mailto:hello@quantixstudio.com" className="text-accent hover:underline">
-                hello@quantixstudio.com
-              </a>
+              <a href="mailto:hello@quantixstudio.com" className="text-accent hover:underline">support@quantixstudio.com</a>
             </p>
           </section>
         </div>
       </div>
 
       <Footer />
-    </div>
-  );
+    </div>;
 }
