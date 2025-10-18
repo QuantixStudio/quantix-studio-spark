@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminRoute } from "@/components/AdminRoute";
 import { DashboardLayout } from "@/components/DashboardLayout";
+import { ScrollToTop } from "@/components/ScrollToTop";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
@@ -29,6 +30,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <ScrollToTop />
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<Home />} />
@@ -41,6 +43,16 @@ const App = () => (
               {/* Protected Admin Routes */}
               <Route
                 path="/admin"
+                element={
+                  <AdminRoute>
+                    <DashboardLayout>
+                      <Dashboard />
+                    </DashboardLayout>
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/aus"
                 element={
                   <AdminRoute>
                     <DashboardLayout>

@@ -1,4 +1,5 @@
 import { useServices } from "@/hooks/useServices";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import * as LucideIcons from "lucide-react";
@@ -7,6 +8,8 @@ export default function Services() {
     data: services,
     isLoading
   } = useServices();
+  const { isVisible, ref } = useScrollReveal({ triggerOnce: true, threshold: 0.2 });
+  
   const getIcon = (iconName: string | null) => {
     if (!iconName) return null;
     const Icon = LucideIcons[iconName as keyof typeof LucideIcons] as any;
@@ -28,11 +31,11 @@ export default function Services() {
                 <Skeleton className="h-20 w-full" />
               </CardContent>
             </Card>)}
-        </div> : <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {services?.map(service => <Card key={service.id} className="border transition-all duration-300 hover:border-accent hover:shadow-lg hover:shadow-accent/10 rounded-2xl flex flex-col h-full">
+        </div> : <div ref={ref} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {services?.map((service, index) => <Card key={service.id} className={`border transition-all duration-300 hover:border-accent hover:shadow-lg hover:shadow-accent/10 rounded-2xl flex flex-col h-full group ${isVisible ? 'scroll-reveal-item' : 'opacity-0'}`}>
               <CardContent className="pt-6 flex-1 flex flex-col">
                 {/* Icon Section - Fixed height */}
-                <div className="h-12 mb-6 flex items-center">
+                <div className="h-12 mb-6 flex items-center transition-all duration-300 group-hover:scale-110">
                   {service.service_icon?.icon_url ? <img src={service.service_icon.icon_url} alt={service.service_icon.name} className="h-12 w-12 object-contain" /> : service.service_icon?.name ? getIcon(service.service_icon.name) : <div className="h-12 w-12 bg-accent/10 rounded-lg flex items-center justify-center">
                       <span className="text-2xl">🔧</span>
                     </div>}

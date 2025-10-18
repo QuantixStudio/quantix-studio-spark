@@ -163,4 +163,28 @@ All colors MUST be HSL.
   .nav-link:hover::after {
     width: 100%;
   }
+
+  /* Scroll reveal animation for icon sections */
+  @keyframes scroll-reveal {
+    from {
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .scroll-reveal-item {
+    opacity: 0;
+    animation: scroll-reveal 0.6s ease-out forwards;
+  }
+
+  .scroll-reveal-item:nth-child(1) { animation-delay: 0s; }
+  .scroll-reveal-item:nth-child(2) { animation-delay: 0.1s; }
+  .scroll-reveal-item:nth-child(3) { animation-delay: 0.2s; }
+  .scroll-reveal-item:nth-child(4) { animation-delay: 0.3s; }
+  .scroll-reveal-item:nth-child(5) { animation-delay: 0.4s; }
+  .scroll-reveal-item:nth-child(6) { animation-delay: 0.5s; }
 }

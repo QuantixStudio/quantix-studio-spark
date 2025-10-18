@@ -1,6 +1,9 @@
 import { Search, Palette, Workflow, Rocket } from "lucide-react";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 export default function Process() {
+  const { isVisible, ref } = useScrollReveal({ triggerOnce: true, threshold: 0.2 });
+  
   const steps = [
     {
       icon: Search,
@@ -41,11 +44,11 @@ export default function Process() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+      <div ref={ref} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
         {steps.map((step, idx) => {
           const Icon = step.icon;
           return (
-            <div key={idx} className="text-center relative group">
+            <div key={idx} className={`text-center relative group ${isVisible ? 'scroll-reveal-item' : 'opacity-0'}`}>
               {idx < steps.length - 1 && (
                 <div className="hidden lg:block absolute top-12 left-[60%] w-[80%] h-0.5 bg-accent/30" />
               )}

@@ -1,7 +1,10 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Zap, Bot, Lock, Palette } from "lucide-react";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 export default function WhyChooseUs() {
+  const { isVisible, ref } = useScrollReveal({ triggerOnce: true, threshold: 0.2 });
+  
   const features = [
     {
       icon: Zap,
@@ -38,13 +41,13 @@ export default function WhyChooseUs() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div ref={ref} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {features.map((feature, idx) => {
           const Icon = feature.icon;
           return (
-            <Card key={idx} className="text-center border transition-colors hover:border-accent h-full flex flex-col">
+            <Card key={idx} className={`text-center border transition-colors hover:border-accent h-full flex flex-col group ${isVisible ? 'scroll-reveal-item' : 'opacity-0'}`}>
               <CardContent className="pt-8 flex-1 flex flex-col">
-                <div className="flex items-center justify-center w-16 h-16 rounded-full border border-accent mb-4 mx-auto">
+                <div className="flex items-center justify-center w-16 h-16 rounded-full border border-accent mb-4 mx-auto transition-all duration-300 group-hover:scale-110 group-hover:bg-accent/20">
                   <Icon className="h-8 w-8 text-accent" />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
