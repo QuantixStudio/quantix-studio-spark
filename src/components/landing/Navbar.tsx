@@ -1,49 +1,77 @@
+/**
+ * QUANTIX STUDIO NAVBAR
+ * 
+ * PUBLIC MODE:
+ * - Shows only: Home, Portfolio, Services, Contact navigation
+ * - No login/register buttons visible
+ * - No user profile or admin links
+ * 
+ * ADMIN ACCESS:
+ * - Navigate directly to /auth URL to login
+ * - Authentication system remains fully functional
+ * - Admin dashboard accessible after login
+ * - Role-based access control still enforced
+ * 
+ * TO RE-ENABLE PUBLIC AUTH:
+ * - Uncomment auth UI blocks (search for "AUTHENTICATION DISABLED")
+ * - Restore commented imports
+ */
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, LogOut, User, LayoutDashboard } from "lucide-react";
+import { Menu, X } from "lucide-react";
+// import { LogOut, User, LayoutDashboard } from "lucide-react"; // Auth UI disabled
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
-import { useProfileModal } from "@/hooks/useProfileModal";
+// import { useProfileModal } from "@/hooks/useProfileModal"; // Auth UI disabled
 import { Link } from "react-router-dom";
-import AuthModal from "@/components/modals/AuthModal";
-import ProfileEditModal from "@/components/modals/ProfileEditModal";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { supabase } from "@/integrations/supabase/client";
+// import AuthModal from "@/components/modals/AuthModal"; // Auth UI disabled
+// import ProfileEditModal from "@/components/modals/ProfileEditModal"; // Auth UI disabled
+// import {
+//   DropdownMenu,
+//   DropdownMenuContent,
+//   DropdownMenuItem,
+//   DropdownMenuSeparator,
+//   DropdownMenuTrigger,
+// } from "@/components/ui/dropdown-menu"; // Auth UI disabled
+// import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Auth UI disabled
+// import { supabase } from "@/integrations/supabase/client"; // Auth UI disabled
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  // const [authModalOpen, setAuthModalOpen] = useState(false); // Auth UI disabled
+  // const [profileModalOpen, setProfileModalOpen] = useState(false); // Auth UI disabled
   const { user, signOut } = useAuth();
   const { data: roleData } = useUserRole();
-  const { isOpen: autoProfileOpen, openModal, closeModal: closeAutoModal } = useProfileModal();
+  // const { isOpen: autoProfileOpen, openModal, closeModal: closeAutoModal } = useProfileModal(); // Auth UI disabled
 
-  const [profile, setProfile] = useState<any>(null);
+  // const [profile, setProfile] = useState<any>(null); // Auth UI disabled
 
-  // Fetch profile when user is available
-  useState(() => {
-    if (user) {
-      supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .maybeSingle()
-        .then(({ data }) => setProfile(data));
-    }
-  });
+  // Fetch profile when user is available (disabled for public)
+  // useState(() => {
+  //   if (user) {
+  //     supabase
+  //       .from("profiles")
+  //       .select("*")
+  //       .eq("id", user.id)
+  //       .maybeSingle()
+  //       .then(({ data }) => setProfile(data));
+  //   }
+  // });
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+      element.scrollIntoView({ 
+        behavior: "smooth", 
+        block: "start",
+        inline: "nearest"
+      });
       setIsOpen(false);
+      
+      // Add active state visual feedback
+      element.classList.add('section-active');
+      setTimeout(() => element.classList.remove('section-active'), 1000);
     }
   };
 
@@ -79,9 +107,10 @@ export default function Navbar() {
                 onClick={() => scrollToSection("contact")}
                 className="text-foreground/80 hover:text-foreground transition-colors"
               >
-                Contact
+              Contact
               </button>
 
+              {/* AUTHENTICATION DISABLED FOR PUBLIC - Admin access via /auth only
               {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -117,6 +146,7 @@ export default function Navbar() {
               ) : (
                 <Button onClick={() => setAuthModalOpen(true)}>Login / Register</Button>
               )}
+              */}
             </div>
 
             {/* Mobile Menu Button */}
@@ -162,8 +192,9 @@ export default function Navbar() {
                 onClick={() => scrollToSection("contact")}
                 className="block w-full text-left px-4 py-2 text-foreground/80 hover:text-foreground hover:bg-accent/10 rounded-lg transition-colors"
               >
-                Contact
+              Contact
               </button>
+              {/* AUTHENTICATION DISABLED FOR PUBLIC - Admin access via /auth only
               {user ? (
                 <>
                   <button
@@ -201,11 +232,13 @@ export default function Navbar() {
                   </Button>
                 </div>
               )}
+              */}
             </div>
           )}
         </div>
       </nav>
 
+      {/* AUTHENTICATION MODALS DISABLED FOR PUBLIC
       <AuthModal
         isOpen={authModalOpen}
         onClose={() => setAuthModalOpen(false)}
@@ -220,6 +253,7 @@ export default function Navbar() {
         }}
         isFirstLogin={false}
       />
+      */}
     </>
   );
 }

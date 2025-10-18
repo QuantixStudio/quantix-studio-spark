@@ -10,21 +10,14 @@ export default function ProjectGrid() {
   const [activeFilter, setActiveFilter] = useState("all");
   const { data: projects, isLoading } = useProjects();
 
-  const filteredProjects = projects?.filter((project) => {
-    if (activeFilter === "all") return true;
-
-    const categoryMatch = project.project_category?.name.toLowerCase().includes(activeFilter);
-    const techMatch = project.project_technologies?.some(
-      (pt: any) => pt.technologies.name.toLowerCase().includes(activeFilter)
-    );
-
-    return categoryMatch || techMatch;
-  });
+  // Show all projects without filtering (FilterBar disabled)
+  const filteredProjects = projects;
 
   if (isLoading) {
     return (
       <section className="section-container">
-        <FilterBar activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+        {/* FILTER BAR DISABLED - Showing all projects by default */}
+        {/* <FilterBar activeFilter={activeFilter} onFilterChange={setActiveFilter} /> */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <Skeleton key={i} className="h-80 w-full" />
@@ -36,7 +29,8 @@ export default function ProjectGrid() {
 
   return (
     <section className="section-container pt-0">
-      <FilterBar activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+      {/* FILTER BAR DISABLED - Showing all projects by default */}
+      {/* <FilterBar activeFilter={activeFilter} onFilterChange={setActiveFilter} /> */}
 
       {filteredProjects && filteredProjects.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

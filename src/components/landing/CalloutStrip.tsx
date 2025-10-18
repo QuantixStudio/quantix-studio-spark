@@ -1,11 +1,26 @@
 import { Button } from "@/components/ui/button";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function CalloutStrip() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const handleOpenInquiry = () => {
-    // Scroll to contact section
-    const contactSection = document.getElementById("contact");
-    if (contactSection) {
-      contactSection.scrollIntoView({ behavior: "smooth" });
+    // If on portfolio page, navigate to home first
+    if (location.pathname === "/portfolio") {
+      navigate("/#contact");
+      setTimeout(() => {
+        const contactSection = document.getElementById("contact");
+        if (contactSection) {
+          contactSection.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 100);
+    } else {
+      // Already on home page, just scroll
+      const contactSection = document.getElementById("contact");
+      if (contactSection) {
+        contactSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
   };
 
@@ -21,7 +36,7 @@ export default function CalloutStrip() {
         <Button
           size="lg"
           variant="outline"
-          className="bg-transparent border-2 border-accent text-primary-foreground hover:bg-accent hover:text-accent-foreground"
+          className="bg-white text-black hover:bg-white/90 border-none"
           onClick={handleOpenInquiry}
         >
           Book a Discovery Call

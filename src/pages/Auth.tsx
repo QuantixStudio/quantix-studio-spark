@@ -110,13 +110,13 @@ export default function Auth() {
             </div>
           </div>
           <CardTitle className="text-2xl text-center">
-            {mode === "signin" && "Welcome Back"}
-            {mode === "signup" && "Create Account"}
+            {mode === "signin" && "Admin Access"}
+            {mode === "signup" && "Create Admin Account"}
             {mode === "reset" && "Reset Password"}
           </CardTitle>
           <CardDescription className="text-center">
-            {mode === "signin" && "Sign in to your Quantix Studio account"}
-            {mode === "signup" && "Start your journey with Quantix Studio"}
+            {mode === "signin" && "Authorized personnel only"}
+            {mode === "signup" && "Create your admin account"}
             {mode === "reset" && "Enter your email to reset your password"}
           </CardDescription>
         </CardHeader>
