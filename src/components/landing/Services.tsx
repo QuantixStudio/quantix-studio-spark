@@ -46,7 +46,7 @@ export default function Services() {
                 {/* Tools Section - Fixed height */}
                 <div className="h-10 mb-4">
                   {service.description.includes("Tools:") && <p className="text-sm text-accent/80">
-                      {service.description.split("\n")[0]}
+                      {service.description.split("\n")[0].replace(/^Tools:\s*/i, "")}
                     </p>}
                 </div>
 
