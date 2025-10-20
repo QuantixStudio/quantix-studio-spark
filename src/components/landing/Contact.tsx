@@ -102,7 +102,7 @@ export default function Contact() {
             </div>
 
             <Button asChild className="w-full mt-auto" size="lg">
-              <a href="https://calendly.com/quantixstudio" target="_blank" rel="noopener noreferrer">
+              <a href="https://calendly.com/quantixstudio/30min" target="_blank" rel="noopener noreferrer">
                 <Calendar className="mr-2 h-5 w-5" />
                 Schedule a Call
               </a>
