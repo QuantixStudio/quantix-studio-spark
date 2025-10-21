@@ -85,48 +85,30 @@ export default function Navbar() {
     return () => observer.disconnect();
   }, []);
   const handleNavigation = (target: string) => {
-    const offset = 64; // Fixed header height
-
     // Close mobile menu first
     setIsOpen(false);
 
-    // Handle HOME - scroll to top or navigate to home
+    // Handle HOME - always navigate to landing page
     if (target === "home") {
-      if (window.location.pathname !== '/') {
-        window.location.href = '/';
-      } else {
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth"
-        });
-      }
+      window.location.href = '/';
       return;
     }
 
-    // Handle PORTFOLIO - ALWAYS navigate to /portfolio page
+    // Handle PORTFOLIO - always navigate to portfolio page
     if (target === "portfolio") {
-      if (window.location.pathname !== '/portfolio') {
-        window.location.href = '/portfolio';
-      }
+      window.location.href = '/portfolio';
       return;
     }
 
-    // Handle SERVICES and CONTACT - scroll on home, navigate to home + section otherwise
-    if (target === "services" || target === "contact") {
-      if (window.location.pathname !== '/') {
-        window.location.href = `/#${target}`;
-      } else {
-        const element = document.getElementById(target);
-        if (element) {
-          const y = element.getBoundingClientRect().top + window.scrollY - offset;
-          window.scrollTo({
-            top: y,
-            behavior: "smooth"
-          });
-          element.classList.add('section-active');
-          setTimeout(() => element.classList.remove('section-active'), 1200);
-        }
-      }
+    // Handle SERVICES - always navigate to home with services hash
+    if (target === "services") {
+      window.location.href = '/#services';
+      return;
+    }
+
+    // Handle CONTACT - always navigate to home with contact hash
+    if (target === "contact") {
+      window.location.href = '/#contact';
       return;
     }
   };

@@ -15,14 +15,14 @@ export default function Hero() {
   return (
     <section className="relative py-32 flex items-center justify-center overflow-hidden">
       {/* Content */}
-      <div className="container mx-auto px-4 py-20 relative z-10">
+      <div className="container mx-auto px-5 sm:px-6 md:px-8 py-20 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 hyphens-auto !text-justify">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-center">
             Build your MVP in 4 weeks and 60% cheaper than code{" "}
           </h1>
  
-          <p className="text-xl md:text-2xl text-muted-foreground mb-12 mx-auto hyphens-auto !text-justify">
-            We’re a studio that helps founders launch fast, automate smart, and grow scalably.
+          <p className="text-xl md:text-2xl text-muted-foreground mb-12 mx-auto text-center max-w-3xl">
+            We're a studio that helps founders launch fast, automate smart, and grow scalably.
             <br />
             Built on Bubble, Lovable, Weweb, Supabase, n8n, OpenAI - 60 % cheaper than code.
           </p>
