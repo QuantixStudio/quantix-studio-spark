@@ -3,11 +3,13 @@ import { useProjects } from "@/hooks/useProjects";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ExternalLink } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Link } from "react-router-dom";
 
 export default function FeaturedProjects() {
   const { data: projects, isLoading } = useProjects(false, true);
+  const isMobile = useIsMobile();
 
   if (isLoading) {
     return (
@@ -27,6 +29,9 @@ export default function FeaturedProjects() {
 
   if (!projects?.length) return null;
 
+  // Limit projects on mobile to prevent overly long page
+  const displayProjects = isMobile ? projects.slice(0, 3) : projects;
+
   return (
     <section id="featured-work" className="section-container">
       <div className="text-center mb-16">
@@ -34,25 +39,21 @@ export default function FeaturedProjects() {
         <p className="section-subtitle">Real results from real projects</p>
       </div>
 
-      <Carousel
-        opts={{
-          align: "start",
-          loop: true,
-        }}
-        className="w-full max-w-6xl mx-auto"
-      >
-        <CarouselContent>
-          {projects.map((project) => {
-            const images = project.images && Array.isArray(project.images) && project.images.length > 0
-              ? project.images
-              : project.cover_url
-              ? [{ url: project.cover_url, alt: project.title, is_main: true, order: 0 }]
-              : [];
-            const mainImage = images.find((img: any) => img.is_main)?.url || images[0]?.url;
+      {/* MOBILE VIEW: Vertical Stack */}
+      {isMobile ? (
+        <>
+          <div className="space-y-6 max-w-lg mx-auto">
+            {displayProjects.map((project) => {
+              const images = project.images && Array.isArray(project.images) && project.images.length > 0
+                ? project.images
+                : project.cover_url
+                ? [{ url: project.cover_url, alt: project.title, is_main: true, order: 0 }]
+                : [];
+              const mainImage = images.find((img: any) => img.is_main)?.url || images[0]?.url;
 
-            return (
-              <CarouselItem key={project.id} className="md:basis-1/2 lg:basis-1/3">
+              return (
                 <Link
+                  key={project.id}
                   to={`/portfolio/${project.slug}`}
                   className="block group"
                 >
@@ -90,13 +91,85 @@ export default function FeaturedProjects() {
                     </CardContent>
                   </Card>
                 </Link>
-              </CarouselItem>
-            );
-          })}
-        </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
-      </Carousel>
+              );
+            })}
+          </div>
+          
+          {/* "View More Projects" button - mobile only */}
+          <div className="mt-8 text-center">
+            <Link to="/portfolio">
+              <Button size="lg" className="w-full sm:w-auto">
+                View More Projects
+              </Button>
+            </Link>
+          </div>
+        </>
+      ) : (
+        /* DESKTOP VIEW: Carousel with Arrows */
+        <Carousel
+          opts={{
+            align: "start",
+            loop: true,
+          }}
+          className="w-full max-w-6xl mx-auto"
+        >
+          <CarouselContent>
+            {projects.map((project) => {
+              const images = project.images && Array.isArray(project.images) && project.images.length > 0
+                ? project.images
+                : project.cover_url
+                ? [{ url: project.cover_url, alt: project.title, is_main: true, order: 0 }]
+                : [];
+              const mainImage = images.find((img: any) => img.is_main)?.url || images[0]?.url;
+
+              return (
+                <CarouselItem key={project.id} className="md:basis-1/2 lg:basis-1/3">
+                  <Link
+                    to={`/portfolio/${project.slug}`}
+                    className="block group"
+                  >
+                    <Card className="overflow-hidden border transition-colors hover:border-accent">
+                      <div className="relative aspect-video bg-muted overflow-hidden">
+                        {mainImage ? (
+                          <img
+                            src={mainImage}
+                            alt={project.title}
+                            className="w-full h-full object-cover"
+                            style={{ imageRendering: "auto" }}
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                            No Image
+                          </div>
+                        )}
+                      </div>
+
+                      <CardContent className="pt-6">
+                        {project.project_category && (
+                          <Badge variant="secondary" className="mb-3">
+                            {project.project_category.name}
+                          </Badge>
+                        )}
+
+                        <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
+
+                        {project.key_metric && (
+                          <p className="text-accent font-medium text-sm">
+                            {project.key_metric}
+                          </p>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </Link>
+                </CarouselItem>
+              );
+            })}
+          </CarouselContent>
+          <CarouselPrevious />
+          <CarouselNext />
+        </Carousel>
+      )}
     </section>
   );
 }
