@@ -1,9 +1,9 @@
 import { Search, Palette, Workflow, Rocket } from "lucide-react";
-import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { FadeInUp } from "@/components/animations/FadeInUp";
+import { StaggerContainer } from "@/components/animations/StaggerContainer";
+import { StaggerItem } from "@/components/animations/StaggerItem";
 
 export default function Process() {
-  const { isVisible, ref } = useScrollReveal({ triggerOnce: true, threshold: 0.2 });
-  
   const steps = [
     {
       icon: Search,
@@ -37,18 +37,20 @@ export default function Process() {
 
   return (
     <section className="section-container">
-      <div className="text-center mb-16">
-        <h2 className="section-title">How We Work</h2>
-        <p className="section-subtitle">
-          A streamlined process that gets you from idea to launch in weeks, not months
-        </p>
-      </div>
+      <FadeInUp>
+        <div className="text-center mb-16">
+          <h2 className="section-title">How We Work</h2>
+          <p className="section-subtitle">
+            A streamlined process that gets you from idea to launch in weeks, not months
+          </p>
+        </div>
+      </FadeInUp>
 
-      <div ref={ref} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+      <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto" staggerDelay={0.1}>
         {steps.map((step, idx) => {
           const Icon = step.icon;
           return (
-            <div key={idx} className={`text-center relative group ${isVisible ? 'scroll-reveal-item' : 'opacity-0'}`}>
+            <StaggerItem key={idx} className="text-center relative group">
               {idx < steps.length - 1 && (
                 <div className="hidden lg:block absolute top-12 left-[60%] w-[80%] h-0.5 bg-accent/30" />
               )}
@@ -61,10 +63,10 @@ export default function Process() {
               <h3 className="text-lg font-semibold mb-2">{step.title}</h3>
               <p className="text-sm text-accent/80 mb-2">{step.subtitle}</p>
               <p className="text-sm text-muted-foreground [text-align:justify] [text-justify:inter-word]">{step.description}</p>
-            </div>
+            </StaggerItem>
           );
         })}
-      </div>
+      </StaggerContainer>
     </section>
   );
 }

@@ -2,6 +2,7 @@ import { useTestimonials } from "@/hooks/useTestimonials";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Star } from "lucide-react";
+import { FadeInUp } from "@/components/animations/FadeInUp";
 import {
   Carousel,
   CarouselContent,
@@ -20,12 +21,14 @@ export default function Testimonials() {
 
   return (
     <section className="section-container bg-muted/30">
-      <div className="text-center mb-16">
-        <h2 className="section-title">Client Testimonials</h2>
-        <p className="section-subtitle">
-          What our clients say about working with us
-        </p>
-      </div>
+      <FadeInUp>
+        <div className="text-center mb-16">
+          <h2 className="section-title">Client Testimonials</h2>
+          <p className="section-subtitle">
+            What our clients say about working with us
+          </p>
+        </div>
+      </FadeInUp>
 
       {isLoading ? (
         <div className="text-center text-muted-foreground">Loading testimonials...</div>

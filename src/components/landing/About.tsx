@@ -1,22 +1,27 @@
 import { Target, Zap, Shield } from "lucide-react";
+import { FadeInUp } from "@/components/animations/FadeInUp";
+import { StaggerContainer } from "@/components/animations/StaggerContainer";
+import { StaggerItem } from "@/components/animations/StaggerItem";
 
 export default function About() {
   return (
     <section className="section-container bg-muted/30">
       <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="section-title">About Quantix Studio</h2>
-          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed mx-auto mt-6 hyphens-auto !text-justify">
-            Quantix Studio helps founders launch investor-ready products fast. 
-            In just 3–4 weeks, we turn ideas into clean, scalable MVPs - 60% cheaper than traditional code. 
-            Using Bubble, Lovable, Weweb, Supabase, n8n, OpenAI, we build with automation, analytics, payments, and GDPR-level security from day one. 
-            Simple agency flow - cut-list → prototype → core flows → launch - has powered 20+ products and 35+ automations. 
-            Our mission: help startups grow faster with clarity, speed, and zero drag.{" "}
-          </p>
-        </div>
+        <FadeInUp>
+          <div className="text-center mb-16">
+            <h2 className="section-title">About Quantix Studio</h2>
+            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed mx-auto mt-6 hyphens-auto !text-justify">
+              Quantix Studio helps founders launch investor-ready products fast. 
+              In just 3–4 weeks, we turn ideas into clean, scalable MVPs - 60% cheaper than traditional code. 
+              Using Bubble, Lovable, Weweb, Supabase, n8n, OpenAI, we build with automation, analytics, payments, and GDPR-level security from day one. 
+              Simple agency flow - cut-list → prototype → core flows → launch - has powered 20+ products and 35+ automations. 
+              Our mission: help startups grow faster with clarity, speed, and zero drag.{" "}
+            </p>
+          </div>
+        </FadeInUp>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          <div className="text-center space-y-4 group">
+        <StaggerContainer className="grid md:grid-cols-3 gap-8" staggerDelay={0.15}>
+          <StaggerItem className="text-center space-y-4 group">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-accent transition-all duration-300 group-hover:scale-110 group-hover:bg-accent/20">
               <Zap className="h-8 w-8 text-accent" />
             </div>
@@ -24,9 +29,9 @@ export default function About() {
             <p className="text-muted-foreground">
               Automation-first approach & no-code speed
             </p>
-          </div>
+          </StaggerItem>
 
-          <div className="text-center space-y-4 group">
+          <StaggerItem className="text-center space-y-4 group">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-accent transition-all duration-300 group-hover:scale-110 group-hover:bg-accent/20">
               <Target className="h-8 w-8 text-accent" />
             </div>
@@ -34,9 +39,9 @@ export default function About() {
             <p className="text-muted-foreground">
               Assistant bots, smart routing, GPT workflows
             </p>
-          </div>
+          </StaggerItem>
 
-          <div className="text-center space-y-4 group">
+          <StaggerItem className="text-center space-y-4 group">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-accent transition-all duration-300 group-hover:scale-110 group-hover:bg-accent/20">
               <Shield className="h-8 w-8 text-accent" />
             </div>
@@ -44,8 +49,8 @@ export default function About() {
             <p className="text-muted-foreground">
               Privacy rules, RLS, GDPR-ready
             </p>
-          </div>
-        </div>
+          </StaggerItem>
+        </StaggerContainer>
       </div>
     </section>
   );
