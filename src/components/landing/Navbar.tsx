@@ -77,7 +77,7 @@ export default function Navbar() {
       threshold: 0.3,
       rootMargin: '-100px 0px -50% 0px'
     });
-    const sections = ['featured-work', 'services', 'contact'];
+    const sections = ['services', 'contact'];
     sections.forEach(id => {
       const element = document.getElementById(id);
       if (element) observer.observe(element);
@@ -90,7 +90,7 @@ export default function Navbar() {
     // Close mobile menu first
     setIsOpen(false);
 
-    // Handle HOME - scroll to top
+    // Handle HOME - scroll to top or navigate to home
     if (target === "home") {
       if (window.location.pathname !== '/') {
         window.location.href = '/';
@@ -103,12 +103,20 @@ export default function Navbar() {
       return;
     }
 
-    // Handle PORTFOLIO - scroll to Featured Work section
+    // Handle PORTFOLIO - ALWAYS navigate to /portfolio page
     if (target === "portfolio") {
+      if (window.location.pathname !== '/portfolio') {
+        window.location.href = '/portfolio';
+      }
+      return;
+    }
+
+    // Handle SERVICES and CONTACT - scroll on home, navigate to home + section otherwise
+    if (target === "services" || target === "contact") {
       if (window.location.pathname !== '/') {
-        window.location.href = '/#featured-work';
+        window.location.href = `/#${target}`;
       } else {
-        const element = document.getElementById('featured-work');
+        const element = document.getElementById(target);
         if (element) {
           const y = element.getBoundingClientRect().top + window.scrollY - offset;
           window.scrollTo({
@@ -120,22 +128,6 @@ export default function Navbar() {
         }
       }
       return;
-    }
-
-    // Handle SERVICES, CONTACT and other sections
-    if (window.location.pathname !== '/') {
-      window.location.href = `/#${target}`;
-    } else {
-      const element = document.getElementById(target);
-      if (element) {
-        const y = element.getBoundingClientRect().top + window.scrollY - offset;
-        window.scrollTo({
-          top: y,
-          behavior: "smooth"
-        });
-        element.classList.add('section-active');
-        setTimeout(() => element.classList.remove('section-active'), 1200);
-      }
     }
   };
   const handleSignOut = async () => {
@@ -161,9 +153,9 @@ export default function Navbar() {
               <button onClick={() => handleNavigation("services")} className={`nav-link cursor-pointer transition-colors ${activeSection === 'services' ? 'text-accent font-medium' : 'text-foreground/80 hover:text-foreground'}`}>
                 Services
               </button>
-              <button onClick={() => handleNavigation("portfolio")} className={`nav-link cursor-pointer transition-colors ${activeSection === 'featured-work' ? 'text-accent font-medium' : 'text-foreground/80 hover:text-foreground'}`}>
-                Portfolio
-              </button>
+            <button onClick={() => handleNavigation("portfolio")} className={`nav-link cursor-pointer transition-colors ${window.location.pathname === '/portfolio' ? 'text-accent font-medium' : 'text-foreground/80 hover:text-foreground'}`}>
+              Portfolio
+            </button>
               <button onClick={() => handleNavigation("contact")} className={`nav-link cursor-pointer transition-colors ${activeSection === 'contact' ? 'text-accent font-medium' : 'text-foreground/80 hover:text-foreground'}`}>
                 Contact
               </button>
@@ -223,7 +215,7 @@ export default function Navbar() {
               <button onClick={() => handleNavigation("home")} className={`block w-full text-left px-4 py-3 rounded-lg transition-colors ${activeSection === '' && window.location.pathname === '/' && window.scrollY === 0 ? 'text-accent font-medium bg-accent/10' : 'text-foreground/80 hover:text-foreground hover:bg-accent/10'}`}>
                 Home
               </button>
-              <button onClick={() => handleNavigation("portfolio")} className={`block w-full text-left px-4 py-3 rounded-lg transition-colors ${activeSection === 'featured-work' ? 'text-accent font-medium bg-accent/10' : 'text-foreground/80 hover:text-foreground hover:bg-accent/10'}`}>
+              <button onClick={() => handleNavigation("portfolio")} className={`block w-full text-left px-4 py-3 rounded-lg transition-colors ${window.location.pathname === '/portfolio' ? 'text-accent font-medium bg-accent/10' : 'text-foreground/80 hover:text-foreground hover:bg-accent/10'}`}>
                 Portfolio
               </button>
               <button onClick={() => handleNavigation("services")} className={`block w-full text-left px-4 py-3 rounded-lg transition-colors ${activeSection === 'services' ? 'text-accent font-medium bg-accent/10' : 'text-foreground/80 hover:text-foreground hover:bg-accent/10'}`}>

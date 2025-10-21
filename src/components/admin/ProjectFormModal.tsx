@@ -32,6 +32,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import { X } from "lucide-react";
 import ImageUploader, { ProjectImage } from "./ImageUploader";
 
 const projectSchema = z.object({
@@ -486,6 +488,67 @@ export default function ProjectFormModal({
                   )}
                 />
               )}
+
+              <FormField
+                control={form.control}
+                name="technologies"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Technologies</FormLabel>
+                    <FormControl>
+                      <div className="space-y-2">
+                        {/* Selected technologies as badges */}
+                        <div className="flex flex-wrap gap-2 min-h-[40px] p-2 border rounded-md bg-background">
+                          {field.value && field.value.length > 0 ? (
+                            field.value.map((techId) => {
+                              const tech = technologies.find(t => t.id === techId);
+                              return tech ? (
+                                <Badge key={techId} variant="secondary" className="gap-1">
+                                  {tech.name}
+                                  <X 
+                                    className="h-3 w-3 cursor-pointer hover:text-destructive" 
+                                    onClick={() => {
+                                      field.onChange(field.value?.filter(id => id !== techId));
+                                    }} 
+                                  />
+                                </Badge>
+                              ) : null;
+                            })
+                          ) : (
+                            <span className="text-sm text-muted-foreground">No technologies selected</span>
+                          )}
+                        </div>
+                        {/* Dropdown to add more */}
+                        <Select 
+                          onValueChange={(value) => {
+                            if (!field.value?.includes(value)) {
+                              field.onChange([...(field.value || []), value]);
+                            }
+                          }}
+                          value=""
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Add technology..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {technologies
+                              .filter(tech => !field.value?.includes(tech.id))
+                              .map((tech) => (
+                                <SelectItem key={tech.id} value={tech.id}>
+                                  {tech.name}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </FormControl>
+                    <FormDescription>
+                      Select technologies used in this project
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
             <div className="flex gap-2">

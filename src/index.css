@@ -7,80 +7,126 @@ All colors MUST be HSL.
 */
 
 @layer base {
+  /* Force dark theme universally - disable light theme entirely */
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 4%; /* #0B0B0C near-black */
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 4%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 4%;
-    --primary: 0 0% 4%; /* #0B0B0C */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 4%;
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
-    --accent: 42 30% 66%; /* #C9B37E champagne */
-    --accent-foreground: 0 0% 4%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 84%; /* #D7D7D8 light platinum */
-    --input: 0 0% 84%;
-    --ring: 42 30% 66%; /* champagne for focus rings */
+    color-scheme: dark !important;
+    --background: 0 0% 6% !important; /* #0F0F0F */
+    --foreground: 0 0% 100% !important; /* #FFFFFF */
+    --card: 0 0% 10.5% !important; /* #1B1B1B */
+    --card-foreground: 0 0% 100% !important;
+    --popover: 0 0% 10.5% !important;
+    --popover-foreground: 0 0% 100% !important;
+    --primary: 0 0% 100% !important; /* White for buttons */
+    --primary-foreground: 0 0% 6% !important; /* Black text on white buttons */
+    --secondary: 0 0% 10.5% !important;
+    --secondary-foreground: 0 0% 100% !important;
+    --muted: 0 0% 10.5% !important;
+    --muted-foreground: 0 0% 63% !important; /* #A0A0A0 */
+    --accent: 0 0% 100% !important; /* #FFFFFF white */
+    --accent-foreground: 0 0% 6% !important;
+    --destructive: 0 84% 60% !important; /* #EF4444 */
+    --destructive-foreground: 0 0% 100% !important;
+    --border: 0 0% 20% !important;
+    --input: 0 0% 20% !important;
+    --ring: 0 0% 100% !important;
     --radius: 0.5rem;
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 0 0% 4%;
-    --sidebar-primary: 0 0% 4%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 96%;
-    --sidebar-accent-foreground: 0 0% 4%;
-    --sidebar-border: 0 0% 84%;
-    --sidebar-ring: 42 30% 66%;
+    --sidebar-background: 0 0% 6% !important;
+    --sidebar-foreground: 0 0% 100% !important;
+    --sidebar-primary: 0 0% 100% !important;
+    --sidebar-primary-foreground: 0 0% 6% !important;
+    --sidebar-accent: 0 0% 10.5% !important;
+    --sidebar-accent-foreground: 0 0% 100% !important;
+    --sidebar-border: 0 0% 20% !important;
+    --sidebar-ring: 0 0% 100% !important;
   }
 
   .dark {
-    --background: 0 0% 6%; /* #0F0F0F */
-    --foreground: 0 0% 100%; /* #FFFFFF */
-    --card: 0 0% 10.5%; /* #1B1B1B */
-    --card-foreground: 0 0% 100%;
-    --popover: 0 0% 10.5%;
-    --popover-foreground: 0 0% 100%;
-    --primary: 0 0% 100%;
-    --primary-foreground: 0 0% 6%;
-    --secondary: 0 0% 10.5%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 0 0% 10.5%;
-    --muted-foreground: 0 0% 63%; /* #A0A0A0 */
-    --accent: 0 0% 100%; /* #FFFFFF white */
-    --accent-foreground: 0 0% 6%;
-    --destructive: 0 84% 60%; /* #EF4444 */
-    --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 0 0% 100%;
-    --sidebar-background: 0 0% 6%;
-    --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 0 0% 100%;
-    --sidebar-primary-foreground: 0 0% 6%;
-    --sidebar-accent: 0 0% 10.5%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 0 0% 20%;
-    --sidebar-ring: 0 0% 100%;
+    --background: 0 0% 6% !important; /* #0F0F0F */
+    --foreground: 0 0% 100% !important; /* #FFFFFF */
+    --card: 0 0% 10.5% !important; /* #1B1B1B */
+    --card-foreground: 0 0% 100% !important;
+    --popover: 0 0% 10.5% !important;
+    --popover-foreground: 0 0% 100% !important;
+    --primary: 0 0% 100% !important;
+    --primary-foreground: 0 0% 6% !important;
+    --secondary: 0 0% 10.5% !important;
+    --secondary-foreground: 0 0% 100% !important;
+    --muted: 0 0% 10.5% !important;
+    --muted-foreground: 0 0% 63% !important; /* #A0A0A0 */
+    --accent: 0 0% 100% !important; /* #FFFFFF white */
+    --accent-foreground: 0 0% 6% !important;
+    --destructive: 0 84% 60% !important; /* #EF4444 */
+    --destructive-foreground: 0 0% 100% !important;
+    --border: 0 0% 20% !important;
+    --input: 0 0% 20% !important;
+    --ring: 0 0% 100% !important;
+    --sidebar-background: 0 0% 6% !important;
+    --sidebar-foreground: 0 0% 100% !important;
+    --sidebar-primary: 0 0% 100% !important;
+    --sidebar-primary-foreground: 0 0% 6% !important;
+    --sidebar-accent: 0 0% 10.5% !important;
+    --sidebar-accent-foreground: 0 0% 100% !important;
+    --sidebar-border: 0 0% 20% !important;
+    --sidebar-ring: 0 0% 100% !important;
   }
 }
 
 @layer base {
+  /* Force dark theme on all elements */
+  html {
+    color-scheme: dark !important;
+  }
+
+  html, body, #root {
+    background-color: hsl(var(--background)) !important;
+    color: hsl(var(--foreground)) !important;
+    min-height: 100vh;
+  }
+
   * {
     @apply border-border;
+    box-sizing: border-box;
   }
+  
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    width: 100%;
+    overflow-x: hidden;
   }
+  
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold tracking-tight leading-tight;
+  }
+
+  /* Ensure text always fits */
+  p, h1, h2, h3, h4, h5, h6, span, div {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+
+  /* Normalize buttons across browsers */
+  button {
+    font-family: inherit !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+  }
+}
+
+/* Disable system theme preferences */
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: dark !important;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark !important;
   }
 }
 
