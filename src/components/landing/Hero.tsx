@@ -24,8 +24,8 @@ export default function Hero() {
             </h1>
           </FadeInUp>
  
-          <FadeInUp delay={0}>
-            <p className="text-xl md:text-2xl text-muted-foreground mb-12 mx-auto text-center max-w-3xl">
+          <FadeInUp delay={0.2}>
+            <p className="text-5xl md:text-2xl text-muted-foreground mb-12 mx-auto text-center max-w-3xl">
               We're a studio that helps founders launch fast, automate smart, and grow scalably.
               <br />
               Build SaaS & CRM apps using Bubble, Lovable, WeWeb, Supabase, n8n, and OpenAI.
