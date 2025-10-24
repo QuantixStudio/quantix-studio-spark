@@ -19,7 +19,7 @@ export default function Hero() {
       <div className="container mx-auto px-5 sm:px-6 md:px-8 py-20 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
           <FadeInUp delay={0}>
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 text-center">
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 text-center hyphens-auto !text-justify">
               Build your MVP in 4 weeks and 60% cheaper than code{" "}
             </h1>
           </FadeInUp>
@@ -28,7 +28,7 @@ export default function Hero() {
             <p className="text-xl md:text-2xl text-muted-foreground mb-12 mx-auto text-center max-w-3xl">
               We're a studio that helps founders launch fast, automate smart, and grow scalably.
               <br />
-              Built on Bubble, Lovable, Weweb, Supabase, n8n, OpenAI - 60 % cheaper than code.
+              Build SaaS & CRM apps using Bubble, Lovable, WeWeb, Supabase, n8n, and OpenAI.
             </p>
           </FadeInUp>
 
