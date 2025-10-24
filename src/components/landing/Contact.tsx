@@ -84,6 +84,9 @@ export default function Contact() {
                 <p className="text-muted-foreground leading-relaxed mb-6">
                   Schedule a free consultation call to discuss your project, or send us
                   a message using the form.
+                  <br />
+                  <br />
+                  <br />
                 </p>
                 
                 <div className="space-y-3 mb-6">
