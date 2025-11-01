@@ -19,6 +19,7 @@ import Portfolio from "./pages/Portfolio";
 import Privacy from "./pages/Privacy";
 import ProjectDetail from "./pages/ProjectDetail";
 import ProjectsManagement from "./pages/admin/ProjectsManagement";
+import ToolsManagement from "./pages/admin/ToolsManagement";
 
 const queryClient = new QueryClient();
 
@@ -67,6 +68,16 @@ const App = () => (
                   <AdminRoute>
                     <DashboardLayout>
                       <ProjectsManagement />
+                    </DashboardLayout>
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/tools"
+                element={
+                  <AdminRoute>
+                    <DashboardLayout>
+                      <ToolsManagement />
                     </DashboardLayout>
                   </AdminRoute>
                 }
