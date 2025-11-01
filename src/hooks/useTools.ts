@@ -5,7 +5,7 @@ export interface Tool {
   id: string;
   name: string;
   slug: string;
-  category: string;
+  categories: string[];
   description: string | null;
   website_url: string | null;
   logo_path: string | null;

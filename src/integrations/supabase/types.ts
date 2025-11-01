@@ -14,6 +14,90 @@ export type Database = {
   }
   public: {
     Tables: {
+      documents: {
+        Row: {
+          content: string | null
+          created_at: string
+          embedding: string | null
+          id: number
+          metadata: Json | null
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          embedding?: string | null
+          id?: number
+          metadata?: Json | null
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          embedding?: string | null
+          id?: number
+          metadata?: Json | null
+        }
+        Relationships: []
+      }
+      email_logs: {
+        Row: {
+          HTML: string | null
+          id: string
+          resend_id: string
+          sent_at: string | null
+          status: string | null
+          subject: string | null
+          template_name: string | null
+          to_email: string
+        }
+        Insert: {
+          HTML?: string | null
+          id?: string
+          resend_id: string
+          sent_at?: string | null
+          status?: string | null
+          subject?: string | null
+          template_name?: string | null
+          to_email: string
+        }
+        Update: {
+          HTML?: string | null
+          id?: string
+          resend_id?: string
+          sent_at?: string | null
+          status?: string | null
+          subject?: string | null
+          template_name?: string | null
+          to_email?: string
+        }
+        Relationships: []
+      }
+      email_templates: {
+        Row: {
+          created_at: string | null
+          html_content: string
+          id: string
+          name: string
+          subject: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          html_content: string
+          id?: string
+          name: string
+          subject: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          html_content?: string
+          id?: string
+          name?: string
+          subject?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       inquiries: {
         Row: {
           budget_range: string | null
@@ -85,6 +169,54 @@ export type Database = {
           id?: string
           label?: string | null
           order_index?: number | null
+        }
+        Relationships: []
+      }
+      long_chat_history: {
+        Row: {
+          agent_message: string | null
+          chat_id: number | null
+          created_at: string
+          id: number
+          user_message: string | null
+          username: string | null
+        }
+        Insert: {
+          agent_message?: string | null
+          chat_id?: number | null
+          created_at?: string
+          id?: number
+          user_message?: string | null
+          username?: string | null
+        }
+        Update: {
+          agent_message?: string | null
+          chat_id?: number | null
+          created_at?: string
+          id?: number
+          user_message?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
+      n8n_chat_histories: {
+        Row: {
+          created_at: string
+          id: number
+          message: Json | null
+          session_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          message?: Json | null
+          session_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          message?: Json | null
+          session_id?: string | null
         }
         Relationships: []
       }
@@ -292,14 +424,17 @@ export type Database = {
       }
       technologies: {
         Row: {
+          description: string | null
           id: string
           name: string
         }
         Insert: {
+          description?: string | null
           id?: string
           name: string
         }
         Update: {
+          description?: string | null
           id?: string
           name?: string
         }
@@ -344,6 +479,45 @@ export type Database = {
         }
         Relationships: []
       }
+      tools: {
+        Row: {
+          categories: string[]
+          created_at: string | null
+          description: string | null
+          id: string
+          is_featured: boolean | null
+          logo_path: string | null
+          name: string
+          slug: string
+          updated_at: string | null
+          website_url: string | null
+        }
+        Insert: {
+          categories?: string[]
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_featured?: boolean | null
+          logo_path?: string | null
+          name: string
+          slug: string
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          categories?: string[]
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_featured?: boolean | null
+          logo_path?: string | null
+          name?: string
+          slug?: string
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -374,13 +548,24 @@ export type Database = {
         }
         Returns: boolean
       }
-      is_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      tools_category:
+        | "Frontend"
+        | "Backend"
+        | "Data base"
+        | "AI"
+        | "Automation"
+        | "Design"
+        | "CMS"
+        | "Email & Marketing"
+        | "Analytics"
+        | "CRM / Business Tools"
+        | "Mobile"
+        | "SaaS"
+        | "Full-stack"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -509,6 +694,21 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      tools_category: [
+        "Frontend",
+        "Backend",
+        "Data base",
+        "AI",
+        "Automation",
+        "Design",
+        "CMS",
+        "Email & Marketing",
+        "Analytics",
+        "CRM / Business Tools",
+        "Mobile",
+        "SaaS",
+        "Full-stack",
+      ],
     },
   },
 } as const

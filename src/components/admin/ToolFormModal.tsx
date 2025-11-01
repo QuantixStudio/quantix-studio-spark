@@ -19,13 +19,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { MultiSelect } from "@/components/ui/multi-select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -35,13 +29,48 @@ import { Tool } from "@/hooks/useTools";
 import { compressImage } from "@/lib/imageUtils";
 import { deleteToolLogo, getToolLogoUrl } from "@/lib/toolStorageUtils";
 
+const getCategoryColor = (category: string) => {
+  switch (category) {
+    case 'Frontend':
+      return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+    case 'Backend':
+      return 'bg-green-500/10 text-green-500 border-green-500/20';
+    case 'Database':
+      return 'bg-purple-500/10 text-purple-500 border-purple-500/20';
+    case 'AI':
+      return 'bg-pink-500/10 text-pink-500 border-pink-500/20';
+    case 'Automation':
+      return 'bg-orange-500/10 text-orange-500 border-orange-500/20';
+    case 'Design':
+      return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
+    case 'CMS':
+      return 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20';
+    case 'Email & Marketing':
+      return 'bg-red-500/10 text-red-500 border-red-500/20';
+    case 'Analytics':
+      return 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20';
+    case 'CRM / Business Tools':
+      return 'bg-teal-500/10 text-teal-500 border-teal-500/20';
+    case 'Mobile':
+      return 'bg-violet-500/10 text-violet-500 border-violet-500/20';
+    case 'SaaS':
+      return 'bg-fuchsia-500/10 text-fuchsia-500 border-fuchsia-500/20';
+    case 'Full-stack':
+      return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
+    default:
+      return 'bg-gray-500/10 text-gray-500 border-gray-500/20';
+  }
+};
+
 const toolSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(100),
   slug: z
     .string()
     .min(2, "Slug must be at least 2 characters")
     .regex(/^[a-z0-9-]+$/, "Slug must be lowercase with hyphens only"),
-  category: z.enum(["Frontend", "Backend", "Database", "AI", "Automation", "Design"]),
+  categories: z.array(z.string())
+    .min(1, "At least one category is required")
+    .max(5, "Maximum 5 categories allowed"),
   description: z.string().max(500, "Description must be less than 500 characters").optional().or(z.literal("")),
   website_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   is_featured: z.boolean(),
@@ -70,7 +99,7 @@ export default function ToolFormModal({
     defaultValues: {
       name: "",
       slug: "",
-      category: "Frontend",
+      categories: [],
       description: "",
       website_url: "",
       is_featured: false,
@@ -82,7 +111,7 @@ export default function ToolFormModal({
       form.reset({
         name: tool.name,
         slug: tool.slug,
-        category: tool.category as any,
+        categories: tool.categories || [],
         description: tool.description || "",
         website_url: tool.website_url || "",
         is_featured: tool.is_featured,
@@ -93,7 +122,7 @@ export default function ToolFormModal({
       form.reset({
         name: "",
         slug: "",
-        category: "Frontend",
+        categories: [],
         description: "",
         website_url: "",
         is_featured: false,
@@ -163,7 +192,7 @@ export default function ToolFormModal({
           .update({
             name: values.name,
             slug: values.slug,
-            category: values.category,
+            categories: values.categories,
             description: values.description || null,
             website_url: values.website_url || null,
             logo_path: logoPath,
@@ -181,7 +210,7 @@ export default function ToolFormModal({
           .insert({
             name: values.name,
             slug: values.slug,
-            category: values.category,
+            categories: values.categories,
             description: values.description || null,
             website_url: values.website_url || null,
             is_featured: values.is_featured,
@@ -269,25 +298,33 @@ export default function ToolFormModal({
 
             <FormField
               control={form.control}
-              name="category"
+              name="categories"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category *</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a category" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Frontend">Frontend</SelectItem>
-                      <SelectItem value="Backend">Backend</SelectItem>
-                      <SelectItem value="Database">Database</SelectItem>
-                      <SelectItem value="AI">AI</SelectItem>
-                      <SelectItem value="Automation">Automation</SelectItem>
-                      <SelectItem value="Design">Design</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <FormLabel>Categories *</FormLabel>
+                  <FormControl>
+                    <MultiSelect
+                      options={[
+                        'Frontend',
+                        'Backend',
+                        'Database',
+                        'AI',
+                        'Automation',
+                        'Design',
+                        'CMS',
+                        'Email & Marketing',
+                        'Analytics',
+                        'CRM / Business Tools',
+                        'Mobile',
+                        'SaaS',
+                        'Full-stack',
+                      ]}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Select one or more categories..."
+                      getCategoryColor={getCategoryColor}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
