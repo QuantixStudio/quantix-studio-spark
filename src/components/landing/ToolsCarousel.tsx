@@ -36,10 +36,11 @@ export default function ToolsCarousel() {
       align: "start",
       dragFree: true,
       containScroll: false,
+      direction: "rtl", // Right to left direction (logos move left to right visually)
     },
     [
       Autoplay({
-        delay: 0, // Continuous scroll
+        delay: 2500, // Slower continuous scroll (~45s full loop with duplicates)
         stopOnInteraction: false,
         stopOnMouseEnter: true, // Pause on hover
         playOnInit: true,
@@ -70,8 +71,8 @@ export default function ToolsCarousel() {
   return (
     <div className="relative w-full overflow-hidden">
       {/* Gradient fade overlays */}
-      <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+      <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#0F0F0F] to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#0F0F0F] to-transparent z-10 pointer-events-none" />
 
       {/* Embla Carousel */}
       <div ref={emblaRef} className="overflow-hidden cursor-grab active:cursor-grabbing">
