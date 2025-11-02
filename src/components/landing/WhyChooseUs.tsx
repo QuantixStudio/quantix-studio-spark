@@ -63,26 +63,6 @@ export default function WhyChooseUs() {
           );
         })}
       </StaggerContainer>
-
-      <FadeInUp delay={0.5}>
-        <div className="mt-16 text-center">
-          <h3 className="text-2xl font-semibold mb-6">Real Results</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
-            <div>
-              <p className="text-4xl font-bold text-accent mb-2">20+</p>
-              <p className="text-muted-foreground">Projects Delivered</p>
-            </div>
-            <div>
-              <p className="text-4xl font-bold text-accent mb-2">4 weeks</p>
-              <p className="text-muted-foreground">Average MVP Timeline</p>
-            </div>
-            <div>
-              <p className="text-4xl font-bold text-accent mb-2">35+</p>
-              <p className="text-muted-foreground">Automated Workflows</p>
-            </div>
-          </div>
-        </div>
-      </FadeInUp>
     </section>
   );
 }
