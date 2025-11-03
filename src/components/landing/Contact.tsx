@@ -122,7 +122,7 @@ export default function Contact() {
         {/* Contact Form Card */}
         <FadeInUp delay={0.2}>
           <Card className="border">
-            <CardContent className="pt-6">
+            <CardContent className="pt-6 pb-6">
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <Input placeholder="Your Name" value={formData.name} onChange={e => setFormData({
