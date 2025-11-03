@@ -40,7 +40,7 @@ export default function ToolsCarousel() {
     },
     [
       Autoplay({
-        delay: 2500, // Slower continuous scroll (~45s full loop with duplicates)
+        delay: 3000, // ~40s per full loop for smooth, relaxed scrolling
         stopOnInteraction: false,
         stopOnMouseEnter: true, // Pause on hover
         playOnInit: true,
@@ -51,9 +51,9 @@ export default function ToolsCarousel() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="flex gap-10 items-center justify-center py-8">
+      <div className="flex gap-8 items-center justify-center py-8">
         {[1, 2, 3, 4, 5, 6].map((i) => (
-          <Skeleton key={i} className="h-12 w-32 bg-gray-200 rounded" />
+          <Skeleton key={i} className="h-[88px] w-[180px] bg-gray-200 rounded-2xl" />
         ))}
       </div>
     );
@@ -71,23 +71,25 @@ export default function ToolsCarousel() {
   return (
     <div className="relative w-full overflow-hidden">
       {/* Gradient fade overlays */}
-      <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#0F0F0F] to-transparent z-10 pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#0F0F0F] to-transparent z-10 pointer-events-none" />
+      <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-[#0F0F0F] via-[#0F0F0F]/80 to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[#0F0F0F] via-[#0F0F0F]/80 to-transparent z-10 pointer-events-none" />
 
       {/* Embla Carousel */}
       <div ref={emblaRef} className="overflow-hidden cursor-grab active:cursor-grabbing">
-        <div className="flex gap-12 md:gap-16 items-center py-4">
+        <div className="flex gap-8 items-center py-4">
           {duplicatedTools.map((tool, index) => (
             <div key={`${tool.id}-${index}`} className="flex-[0_0_auto]">
-              <img
-                src={tool.logoUrl || "/placeholder.svg"}
-                alt={`${tool.name} logo`}
-                className="h-10 sm:h-12 md:h-14 w-auto opacity-70 hover:opacity-100 grayscale hover:grayscale-0 transition-all duration-300 hover:scale-105"
-                loading="lazy"
-                onError={(e) => {
-                  e.currentTarget.src = "/placeholder.svg";
-                }}
-              />
+              <div className="bg-white rounded-2xl shadow-sm hover:shadow-md p-6 transition-all duration-300 min-w-[180px] flex items-center justify-center">
+                <img
+                  src={tool.logoUrl || "/placeholder.svg"}
+                  alt={`${tool.name} logo`}
+                  className="h-12 md:h-14 w-auto opacity-80 hover:opacity-100 transition-opacity duration-300"
+                  loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.src = "/placeholder.svg";
+                  }}
+                />
+              </div>
             </div>
           ))}
         </div>
