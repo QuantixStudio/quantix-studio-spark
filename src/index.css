@@ -233,4 +233,22 @@ All colors MUST be HSL.
   .scroll-reveal-item:nth-child(4) { animation-delay: 0.3s; }
   .scroll-reveal-item:nth-child(5) { animation-delay: 0.4s; }
   .scroll-reveal-item:nth-child(6) { animation-delay: 0.5s; }
+
+  /* Smooth infinite scroll animation for Tools carousel */
+  @keyframes scroll-left {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  .animate-scroll-left {
+    animation: scroll-left 40s linear infinite;
+  }
+
+  .animate-scroll-left:hover {
+    animation-play-state: paused;
+  }
 }
