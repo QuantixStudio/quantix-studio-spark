@@ -62,7 +62,7 @@ export default function ToolsCarousel() {
                 <img
                   src={tool.logoUrl || "/placeholder.svg"}
                   alt={`${tool.name} logo`}
-                  className="w-full h-full object-contain opacity-80 hover:opacity-100 transition-opacity duration-300"
+                  className="w-full h-full object-cover opacity-80 hover:opacity-100 transition-opacity duration-300"
                   loading="lazy"
                   onError={(e) => {
                     e.currentTarget.src = "/placeholder.svg";
