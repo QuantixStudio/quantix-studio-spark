@@ -20,6 +20,7 @@ import Privacy from "./pages/Privacy";
 import ProjectDetail from "./pages/ProjectDetail";
 import ProjectsManagement from "./pages/admin/ProjectsManagement";
 import ToolsManagement from "./pages/admin/ToolsManagement";
+import TestimonialsManagement from "./pages/admin/TestimonialsManagement";
 
 const queryClient = new QueryClient();
 
@@ -78,6 +79,16 @@ const App = () => (
                   <AdminRoute>
                     <DashboardLayout>
                       <ToolsManagement />
+                    </DashboardLayout>
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/testimonials"
+                element={
+                  <AdminRoute>
+                    <DashboardLayout>
+                      <TestimonialsManagement />
                     </DashboardLayout>
                   </AdminRoute>
                 }
