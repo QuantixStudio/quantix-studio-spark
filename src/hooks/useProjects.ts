@@ -7,9 +7,14 @@ interface ProjectCategory {
   description: string | null;
 }
 
-interface Technology {
+interface Tool {
   id: string;
   name: string;
+  slug: string;
+  logo_path: string | null;
+  categories: string[];
+  description: string | null;
+  website_url: string | null;
 }
 
 interface Project {
@@ -25,13 +30,14 @@ interface Project {
   created_at: string;
   category_id: string | null;
   project_category: ProjectCategory | null;
-  project_technologies: Array<{ technologies: Technology }>;
+  project_tools: Tool[];
 }
 
 export function useProjects(adminMode = false, featuredOnly = false) {
   return useQuery({
     queryKey: ["projects", adminMode ? "all" : "published", featuredOnly ? "featured" : "all"],
     queryFn: async () => {
+      // Fetch projects
       let query = supabase
         .from("projects")
         .select(`
@@ -50,12 +56,6 @@ export function useProjects(adminMode = false, featuredOnly = false) {
             id,
             name,
             description
-          ),
-          project_technologies (
-            technologies (
-              id,
-              name
-            )
           )
         `)
         .order("order_index", { ascending: true });
@@ -70,9 +70,34 @@ export function useProjects(adminMode = false, featuredOnly = false) {
         query = query.limit(12);
       }
 
-      const { data, error } = await query;
+      const { data: projects, error } = await query;
       if (error) throw error;
-      return data as Project[];
+
+      // Fetch all tools
+      const { data: allTools } = await supabase
+        .from("tools")
+        .select("*");
+
+      // For each project, get its tools from project_technologies
+      const projectsWithTools = await Promise.all(
+        (projects || []).map(async (project) => {
+          const { data: projectTech } = await supabase
+            .from("project_technologies")
+            .select("tools")
+            .eq("project_id", project.id)
+            .maybeSingle();
+
+          const toolIds = projectTech?.tools || [];
+          const projectTools = allTools?.filter(tool => toolIds.includes(tool.id)) || [];
+
+          return {
+            ...project,
+            project_tools: projectTools,
+          };
+        })
+      );
+
+      return projectsWithTools as Project[];
     },
   });
 }

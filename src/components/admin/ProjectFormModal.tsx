@@ -71,7 +71,7 @@ export default function ProjectFormModal({
   const [images, setImages] = useState<ProjectImage[]>([]);
   const [originalImages, setOriginalImages] = useState<string[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
-  const [technologies, setTechnologies] = useState<any[]>([]);
+  const [tools, setTools] = useState<any[]>([]);  // Changed from 'technologies' to 'tools'
   const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof projectSchema>>({
@@ -87,14 +87,14 @@ export default function ProjectFormModal({
       published: project?.published || false,
       showOnHome: project?.show_on_home || false,
       keyMetric: project?.key_metric || "",
-      technologies: project?.project_technologies?.map((pt: any) => pt.technologies.id) || [],
+      technologies: project?.project_tools?.map((tool: any) => tool.id) || [],  // Extract tool IDs from project_tools
     },
   });
 
   useEffect(() => {
     if (isOpen) {
       fetchCategories();
-      fetchTechnologies();
+      fetchTools();  // Changed from fetchTechnologies
 
       if (project) {
         form.reset({
@@ -108,7 +108,7 @@ export default function ProjectFormModal({
           published: project.published || false,
           showOnHome: project.show_on_home || false,
           keyMetric: project.key_metric || "",
-          technologies: project.project_technologies?.map((pt: any) => pt.technologies.id) || [],
+          technologies: project?.project_tools?.map((tool: any) => tool.id) || [],  // Extract tool IDs
         });
 
         const projectImages = project.images && Array.isArray(project.images) && project.images.length > 0
@@ -147,12 +147,12 @@ export default function ProjectFormModal({
     if (data) setCategories(data);
   };
 
-  const fetchTechnologies = async () => {
+  const fetchTools = async () => {
     const { data } = await supabase
-      .from("technologies")
+      .from("tools")
       .select("*")
       .order("name");
-    if (data) setTechnologies(data);
+    if (data) setTools(data);
   };
 
   const generateSlug = (title: string) => {
@@ -272,18 +272,36 @@ export default function ProjectFormModal({
         await deleteProjectImages(projectId, deletedImageUrls);
       }
 
+      // Handle tools/technologies (new array-based approach)
       if (values.technologies && values.technologies.length > 0) {
+        // Check if row exists for this project
+        const { data: existing } = await supabase
+          .from("project_technologies")
+          .select("id")
+          .eq("project_id", projectId)
+          .maybeSingle();
+
+        if (existing) {
+          // Update existing row with new tool IDs
+          await supabase
+            .from("project_technologies")
+            .update({ tools: values.technologies })
+            .eq("project_id", projectId);
+        } else {
+          // Insert new row with tool IDs
+          await supabase
+            .from("project_technologies")
+            .insert({
+              project_id: projectId,
+              tools: values.technologies,
+            });
+        }
+      } else {
+        // Remove tools if none selected
         await supabase
           .from("project_technologies")
           .delete()
           .eq("project_id", projectId);
-
-        const techInserts = values.technologies.map((techId) => ({
-          project_id: projectId,
-          technology_id: techId,
-        }));
-
-        await supabase.from("project_technologies").insert(techInserts);
       }
 
       toast.success(project ? "Project updated!" : "Project created!");
@@ -494,28 +512,28 @@ export default function ProjectFormModal({
                 name="technologies"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Technologies</FormLabel>
+                    <FormLabel>Tools / Technologies Used</FormLabel>
                     <FormControl>
                       <div className="space-y-2">
-                        {/* Selected technologies as badges */}
+                        {/* Selected tools as badges */}
                         <div className="flex flex-wrap gap-2 min-h-[40px] p-2 border rounded-md bg-background">
                           {field.value && field.value.length > 0 ? (
-                            field.value.map((techId) => {
-                              const tech = technologies.find(t => t.id === techId);
-                              return tech ? (
-                                <Badge key={techId} variant="secondary" className="gap-1">
-                                  {tech.name}
+                            field.value.map((toolId) => {
+                              const tool = tools.find(t => t.id === toolId);
+                              return tool ? (
+                                <Badge key={toolId} variant="secondary" className="gap-1">
+                                  {tool.name}
                                   <X 
                                     className="h-3 w-3 cursor-pointer hover:text-destructive" 
                                     onClick={() => {
-                                      field.onChange(field.value?.filter(id => id !== techId));
+                                      field.onChange(field.value?.filter(id => id !== toolId));
                                     }} 
                                   />
                                 </Badge>
                               ) : null;
                             })
                           ) : (
-                            <span className="text-sm text-muted-foreground">No technologies selected</span>
+                            <span className="text-sm text-muted-foreground">No tools selected</span>
                           )}
                         </div>
                         {/* Dropdown to add more */}
@@ -528,14 +546,14 @@ export default function ProjectFormModal({
                           value=""
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Add technology..." />
+                            <SelectValue placeholder="Add tool..." />
                           </SelectTrigger>
                           <SelectContent>
-                            {technologies
-                              .filter(tech => !field.value?.includes(tech.id))
-                              .map((tech) => (
-                                <SelectItem key={tech.id} value={tech.id}>
-                                  {tech.name}
+                            {tools
+                              .filter(tool => !field.value?.includes(tool.id))
+                              .map((tool) => (
+                                <SelectItem key={tool.id} value={tool.id}>
+                                  {tool.name}
                                 </SelectItem>
                               ))}
                           </SelectContent>
@@ -543,7 +561,7 @@ export default function ProjectFormModal({
                       </div>
                     </FormControl>
                     <FormDescription>
-                      Select technologies used in this project
+                      Select tools and technologies used in this project
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

@@ -110,11 +110,30 @@ export default function ProjectDetail() {
             <p className="text-accent font-semibold">{projectData.key_metric}</p>
           </div>}
 
-        {project.project_technologies && project.project_technologies.length > 0 && <div className="flex flex-wrap gap-2 mb-8">
-            {project.project_technologies.map(pt => <Badge key={pt.technologies.id} variant="outline">
-                {pt.technologies.name}
-              </Badge>)}
-          </div>}
+        {project.project_tools && project.project_tools.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-sm font-semibold text-muted-foreground mb-3">
+              Technologies Used
+            </h2>
+            <div className="flex flex-wrap gap-3">
+              {project.project_tools.map(tool => (
+                <div 
+                  key={tool.id}
+                  className="flex items-center gap-2 px-3 py-2 border rounded-lg bg-card hover:bg-accent/5 transition-colors"
+                >
+                  {tool.logo_path && (
+                    <img 
+                      src={`https://tbdhzxarsshzoweyndha.supabase.co/storage/v1/object/public/tools_logos/${tool.logo_path}`}
+                      alt={tool.name}
+                      className="w-6 h-6 object-contain"
+                    />
+                  )}
+                  <span className="text-sm font-medium">{tool.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="prose dark:prose-invert max-w-none mb-8">
           <p className="text-lg text-muted-foreground leading-relaxed">

@@ -3,9 +3,12 @@ import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
 
-interface Technology {
+interface Tool {
   id: string;
   name: string;
+  slug: string;
+  logo_path: string | null;
+  categories: string[];
 }
 
 interface ProjectCategory {
@@ -24,7 +27,7 @@ interface Project {
   key_metric: string | null;
   show_on_home: boolean;
   project_category: ProjectCategory | null;
-  project_technologies: Array<{ technologies: Technology }>;
+  project_tools: Tool[];
 }
 
 interface ProjectCardProps {
@@ -39,9 +42,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
     : [];
   const mainImage = images.find((img: any) => img.is_main)?.url || images[0]?.url;
 
-  const technologies = project.project_technologies
-    ?.map(pt => pt.technologies)
-    .slice(0, 4) || [];
+  const tools = project.project_tools?.slice(0, 4) || [];
 
   return (
     <Link
@@ -79,15 +80,26 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             {project.short_description}
           </p>
 
-          {technologies.length > 0 && (
+          {tools.length > 0 && (
             <div className="flex flex-wrap gap-2">
-              {technologies.map((tech) => (
-                <Badge key={tech.id} variant="outline" className="text-xs">
-                  {tech.name}
-                </Badge>
+              {tools.map((tool) => (
+                <div 
+                  key={tool.id} 
+                  className="flex items-center gap-1.5 px-2 py-1 border rounded-md bg-card hover:bg-accent/5 transition-colors"
+                  title={tool.name}
+                >
+                  {tool.logo_path && (
+                    <img 
+                      src={`https://tbdhzxarsshzoweyndha.supabase.co/storage/v1/object/public/tools_logos/${tool.logo_path}`}
+                      alt={tool.name}
+                      className="w-4 h-4 object-contain"
+                    />
+                  )}
+                  <span className="text-xs font-medium">{tool.name}</span>
+                </div>
               ))}
             </div>
-        )}
+          )}
       </CardContent>
     </Card>
     </Link>

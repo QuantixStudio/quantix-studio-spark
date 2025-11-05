@@ -7,9 +7,14 @@ interface ProjectCategory {
   description: string | null;
 }
 
-interface Technology {
+interface Tool {
   id: string;
   name: string;
+  slug: string;
+  logo_path: string | null;
+  categories: string[];
+  description: string | null;
+  website_url: string | null;
 }
 
 interface ProjectDetail {
@@ -22,14 +27,14 @@ interface ProjectDetail {
   demo_url: string | null;
   github_url: string | null;
   project_category: ProjectCategory | null;
-  project_technologies: Array<{ technologies: Technology }>;
+  project_tools: Tool[];
 }
 
 export function useProjectDetail(slug: string) {
   return useQuery({
     queryKey: ["project", slug],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: project, error } = await supabase
         .from("projects")
         .select(`
           *,
@@ -37,12 +42,6 @@ export function useProjectDetail(slug: string) {
             id,
             name,
             description
-          ),
-          project_technologies (
-            technologies (
-              id,
-              name
-            )
           )
         `)
         .eq("slug", slug)
@@ -50,7 +49,27 @@ export function useProjectDetail(slug: string) {
         .maybeSingle();
 
       if (error) throw error;
-      return data as ProjectDetail | null;
+      if (!project) return null;
+
+      // Fetch tools for this project
+      const { data: projectTech } = await supabase
+        .from("project_technologies")
+        .select("tools")
+        .eq("project_id", project.id)
+        .maybeSingle();
+
+      const toolIds = projectTech?.tools || [];
+
+      // Fetch all tools that match the IDs
+      const { data: tools } = await supabase
+        .from("tools")
+        .select("*")
+        .in("id", toolIds.length > 0 ? toolIds : ['00000000-0000-0000-0000-000000000000']); // Avoid empty array error
+
+      return {
+        ...project,
+        project_tools: tools || [],
+      } as ProjectDetail;
     },
     enabled: !!slug,
   });

@@ -42,7 +42,7 @@ export default function ProjectGrid() {
               ? [{ url: project.cover_url, alt: project.title, is_main: true, order: 0 }]
               : [];
             const mainImage = images.find((img: any) => img.is_main)?.url || images[0]?.url;
-            const technologies = project.project_technologies?.slice(0, 4) || [];
+            const tools = project.project_tools?.slice(0, 4) || [];
 
             return (
               <Link
@@ -83,11 +83,11 @@ export default function ProjectGrid() {
                       {project.short_description.length > 90 && "..."}
                     </p>
 
-                    {technologies.length > 0 && (
+                    {tools.length > 0 && (
                       <div className="flex flex-wrap gap-2">
-                        {technologies.map((pt: any) => (
-                          <Badge key={pt.technologies.id} variant="outline" className="text-xs">
-                            {pt.technologies.name}
+                        {tools.map((tool: any) => (
+                          <Badge key={tool.id} variant="outline" className="text-xs">
+                            {tool.name}
                           </Badge>
                         ))}
                       </div>
