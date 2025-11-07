@@ -144,11 +144,13 @@ export default function ToolsTable({ tools, onEdit }: ToolsTableProps) {
               <TableRow key={tool.id}>
                 <TableCell>
                   {tool.logo_path ? (
-                    <img
-                      src={getToolLogoUrl(tool.logo_path) || ""}
-                      alt={tool.name}
-                      className="w-12 h-12 object-contain rounded"
-                    />
+                    <div className="w-12 h-12 bg-white rounded-[5px] p-1 flex items-center justify-center">
+                      <img
+                        src={getToolLogoUrl(tool.logo_path) || ""}
+                        alt={tool.name}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
                   ) : (
                     <div className="w-12 h-12 bg-muted rounded flex items-center justify-center text-xs text-muted-foreground">
                       No logo
