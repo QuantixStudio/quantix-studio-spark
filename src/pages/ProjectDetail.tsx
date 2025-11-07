@@ -125,7 +125,7 @@ export default function ProjectDetail() {
                     <img 
                       src={`https://tbdhzxarsshzoweyndha.supabase.co/storage/v1/object/public/tools_logos/${tool.logo_path}`}
                       alt={tool.name}
-                      className="w-full h-full object-cover bg-white rounded-[5px] scale-[1.3]"
+                      className="w-6 h-6 object-contain bg-white rounded-[5px] p-1"
                     />
                   )}
                   <span className="text-sm font-medium">{tool.name}</span>
