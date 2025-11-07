@@ -50,9 +50,6 @@ export function AppSidebar() {
         <Separator className="mx-4 bg-sidebar-border" />
 
         <SidebarGroup className="px-3 py-4">
-          <SidebarGroupLabel className={`px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-sidebar-foreground/50 ${isCollapsed ? "sr-only" : ""}`}>
-            Menu
-          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
               {menuItems.map((item) => (
@@ -62,21 +59,24 @@ export function AppSidebar() {
                       to={item.url}
                       end
                       className={({ isActive }) =>
-                        `group relative flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200 ${
+                        `group relative flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-300 overflow-hidden ${
                           isActive
-                            ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm font-medium"
-                            : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                            ? "text-white shadow-lg"
+                            : "text-sidebar-foreground/60 hover:text-sidebar-foreground/90"
                         }`
                       }
                     >
                       {({ isActive }) => (
                         <>
-                          <item.icon className={`h-5 w-5 transition-transform group-hover:scale-110`} />
-                          {!isCollapsed && (
-                            <span className="text-sm">{item.title}</span>
+                          {isActive && (
+                            <div className="absolute inset-0 bg-gradient-to-r from-white/5 via-white/20 to-white/30 rounded-xl" />
                           )}
-                          {isActive && !isCollapsed && (
-                            <div className="ml-auto h-2 w-2 rounded-full bg-primary animate-pulse" />
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-white/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                          <item.icon className={`relative z-10 h-5 w-5 transition-all duration-300 ${isActive ? "scale-105" : "group-hover:scale-110"}`} />
+                          {!isCollapsed && (
+                            <span className={`relative z-10 text-sm transition-all duration-300 ${isActive ? "font-medium" : "font-normal"}`}>
+                              {item.title}
+                            </span>
                           )}
                         </>
                       )}
