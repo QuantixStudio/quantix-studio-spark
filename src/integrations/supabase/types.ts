@@ -108,7 +108,7 @@ export type Database = {
           message: string
           name: string
           page_path: string | null
-          status: string | null
+          status: string
           timeline: string | null
           use_case: string | null
           utm_params: Json | null
@@ -122,7 +122,7 @@ export type Database = {
           message: string
           name: string
           page_path?: string | null
-          status?: string | null
+          status?: string
           timeline?: string | null
           use_case?: string | null
           utm_params?: Json | null
@@ -136,7 +136,7 @@ export type Database = {
           message?: string
           name?: string
           page_path?: string | null
-          status?: string | null
+          status?: string
           timeline?: string | null
           use_case?: string | null
           utm_params?: Json | null
@@ -271,25 +271,22 @@ export type Database = {
       project_technologies: {
         Row: {
           id: string
-          legacy_technology_id: string | null
           project_id: string
           tools: string[] | null
         }
         Insert: {
           id?: string
-          legacy_technology_id?: string | null
           project_id: string
           tools?: string[] | null
         }
         Update: {
           id?: string
-          legacy_technology_id?: string | null
           project_id?: string
           tools?: string[] | null
         }
         Relationships: [
           {
-            foreignKeyName: "project_technologies_project_id_fkey"
+            foreignKeyName: "project_technologies_project_fk"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
@@ -299,14 +296,7 @@ export type Database = {
             foreignKeyName: "project_technologies_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
-            referencedRelation: "projects_with_tools"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "project_technologies_technology_id_fkey"
-            columns: ["legacy_technology_id"]
-            isOneToOne: false
-            referencedRelation: "technologies"
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
@@ -367,6 +357,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "projects_category_fk"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "project_category"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "projects_category_id_fkey"
             columns: ["category_id"]
@@ -551,74 +548,7 @@ export type Database = {
       }
     }
     Views: {
-      projects_with_tools: {
-        Row: {
-          category_id: string | null
-          cover_url: string | null
-          created_at: string | null
-          demo_url: string | null
-          full_description: string | null
-          github_url: string | null
-          id: string | null
-          images: Json | null
-          key_metric: string | null
-          order_index: number | null
-          project_tools: Json | null
-          published: boolean | null
-          short_description: string | null
-          show_on_home: boolean | null
-          slug: string | null
-          title: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          category_id?: string | null
-          cover_url?: string | null
-          created_at?: string | null
-          demo_url?: string | null
-          full_description?: string | null
-          github_url?: string | null
-          id?: string | null
-          images?: Json | null
-          key_metric?: string | null
-          order_index?: number | null
-          project_tools?: never
-          published?: boolean | null
-          short_description?: string | null
-          show_on_home?: boolean | null
-          slug?: string | null
-          title?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          category_id?: string | null
-          cover_url?: string | null
-          created_at?: string | null
-          demo_url?: string | null
-          full_description?: string | null
-          github_url?: string | null
-          id?: string | null
-          images?: Json | null
-          key_metric?: string | null
-          order_index?: number | null
-          project_tools?: never
-          published?: boolean | null
-          short_description?: string | null
-          show_on_home?: boolean | null
-          slug?: string | null
-          title?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "projects_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "project_category"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
       has_role: {
