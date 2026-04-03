@@ -52,7 +52,7 @@ export function useProjects(adminMode = false, featuredOnly = false) {
           published,
           created_at,
           category_id,
-          project_category:category_id (
+          project_category:category_id!projects_category_id_fkey (
             id,
             name,
             description
