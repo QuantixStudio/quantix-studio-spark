@@ -38,7 +38,7 @@ export function useProjectDetail(slug: string) {
         .from("projects")
         .select(`
           *,
-          project_category:category_id (
+          project_category:project_category!projects_category_id_fkey (
             id,
             name,
             description
