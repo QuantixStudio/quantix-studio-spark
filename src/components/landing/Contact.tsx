@@ -29,7 +29,7 @@ export default function Contact() {
     }
     setIsSubmitting(true);
     try {
-      const response = await fetch("https://pivovarius.space/webhook/fd5bb622-d19d-4052-97df-0b65fc2c1273", {
+      const response = await fetch("https://n8n.ibs-logistics.store/webhook/fd5bb622-d19d-4052-97df-0b65fc2c1273", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
