@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 import { Button } from "@/components/ui/button";
@@ -69,9 +70,16 @@ export default function ProjectDetail() {
     setLightboxIndex(index);
     setLightboxOpen(true);
   };
+  const description = project.short_description || `${project.title} — project case study by Quantix Studio.`;
   return <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>{`${project.title} — Quantix Studio Portfolio`}</title>
+        <meta name="description" content={description} />
+        <link rel="canonical" href={`https://quantix-studio-spark.lovable.app/portfolio/${project.slug}`} />
+      </Helmet>
       <Navbar />
 
+      <main>
       <article className="container mx-auto px-4 py-16 max-w-4xl">
         <Link to="/portfolio" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors my-[20px]">
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -83,7 +91,7 @@ export default function ProjectDetail() {
               <CarouselContent>
                 {images.map((image: any, index: number) => <CarouselItem key={index}>
                     <div className="relative aspect-video bg-muted rounded-lg overflow-hidden cursor-pointer group" onClick={() => openLightbox(index)}>
-                      <img src={image.url} alt={image.alt || project.title} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" style={{
+                      <img src={image.url} alt={image.alt || `${project.title} project screenshot ${index + 1}`} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" style={{
                   imageRendering: "auto"
                 }} loading="lazy" />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
@@ -124,7 +132,7 @@ export default function ProjectDetail() {
                   {tool.logo_path && (
                     <img 
                       src={`https://tbdhzxarsshzoweyndha.supabase.co/storage/v1/object/public/tools_logos/${tool.logo_path}`}
-                      alt={tool.name}
+                      alt={`${tool.name} logo`}
                       className="w-6 h-6 object-contain bg-white rounded-[5px] p-1"
                     />
                   )}
@@ -156,6 +164,7 @@ export default function ProjectDetail() {
             </Button>}
         </div>
       </article>
+      </main>
 
       <div className="fixed bottom-8 right-8 z-50">
         <Button size="lg" className="shadow-lg" asChild>
@@ -169,7 +178,7 @@ export default function ProjectDetail() {
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
         <DialogContent className="max-w-7xl w-full p-0 bg-black/95">
           <div className="relative w-full h-[90vh] flex items-center justify-center">
-            {images[lightboxIndex] && <img src={images[lightboxIndex].url} alt={images[lightboxIndex].alt || project.title} className="max-w-full max-h-full object-contain" style={{
+            {images[lightboxIndex] && <img src={images[lightboxIndex].url} alt={images[lightboxIndex].alt || `${project.title} project screenshot`} className="max-w-full max-h-full object-contain" style={{
             imageRendering: "auto"
           }} />}
           </div>
