@@ -1,11 +1,18 @@
+import { Helmet } from "react-helmet-async";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 export default function Privacy() {
   return <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Privacy Policy — Quantix Studio</title>
+        <meta name="description" content="How Quantix Studio collects, uses, and protects the information you share with us." />
+        <link rel="canonical" href="https://quantix-studio-spark.lovable.app/privacy" />
+      </Helmet>
       <Navbar />
       
-      <div className="container mx-auto px-4 py-16 max-w-4xl">
+      <main className="container mx-auto px-4 py-16 max-w-4xl">
         <h1 className="text-4xl font-bold mb-8 my-[30px]">Privacy Policy</h1>
+        
         
         <div className="prose dark:prose-invert max-w-none">
           <p className="text-muted-foreground mb-6">
@@ -70,7 +77,7 @@ export default function Privacy() {
             </p>
           </section>
         </div>
-      </div>
+      </main>
 
       <Footer />
     </div>;

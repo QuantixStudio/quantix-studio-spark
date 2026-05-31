@@ -1,0 +1,9 @@
+# Quantix Studio
+
+> AI-powered web development and business automation studio. We build MVPs, web apps, and automations with React, Supabase, n8n, and OpenAI.
+
+## Pages
+
+- [Home](/): Studio overview, services, process, tools, testimonials, and contact.
+- [Portfolio](/portfolio): Selected client projects with categories and technologies used.
+- [Privacy Policy](/privacy): How we collect and use information.

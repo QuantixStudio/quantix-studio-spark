@@ -73,7 +73,7 @@ export default function FeaturedProjects() {
                         {mainImage ? (
                           <img
                             src={mainImage}
-                            alt={project.title}
+                            alt={`${project.title} project preview`}
                             className="w-full h-full object-cover"
                             style={{ imageRendering: "auto" }}
                             loading="lazy"
@@ -147,7 +147,7 @@ export default function FeaturedProjects() {
                         {mainImage ? (
                           <img
                             src={mainImage}
-                            alt={project.title}
+                            alt={`${project.title} project preview`}
                             className="w-full h-full object-cover"
                             style={{ imageRendering: "auto" }}
                             loading="lazy"
