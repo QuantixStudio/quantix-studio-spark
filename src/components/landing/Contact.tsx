@@ -74,22 +74,18 @@ export default function Contact() {
         </div>
       </FadeInUp>
 
-      <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
+      <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8 items-stretch">
         {/* Contact Info Card */}
-        <FadeInUp delay={0.1}>
-          <Card className="border">
-            <CardContent className="pt-6 pb-6 flex flex-col h-full">
+        <FadeInUp delay={0.1} className="h-full">
+          <Card className="border h-full flex flex-col">
+            <CardContent className="pt-6 pb-6 flex flex-col flex-1">
               <div className="flex-1">
                 <h3 className="text-xl font-semibold mb-4">Get in Touch</h3>
                 <p className="text-muted-foreground leading-relaxed mb-6">
                   Schedule a free consultation call to discuss your project, or send us
                   a message using the form.
-                  <br />
-                  <br />
-                  <br />
-                  <br />
                 </p>
-                
+
                 <div className="space-y-3 mb-6">
                   <div className="flex items-center gap-3 text-muted-foreground">
                     <Mail className="h-5 w-5 flex-shrink-0" />
@@ -97,9 +93,9 @@ export default function Contact() {
                   </div>
                   <div className="flex items-center gap-3">
                     <Linkedin className="h-5 w-5 flex-shrink-0 text-muted-foreground" />
-                    <a 
-                      href="https://www.linkedin.com/company/quantix-studio" 
-                      target="_blank" 
+                    <a
+                      href="https://www.linkedin.com/company/quantix-studio"
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="text-muted-foreground hover:text-primary transition-colors"
                     >
@@ -120,10 +116,10 @@ export default function Contact() {
         </FadeInUp>
 
         {/* Contact Form Card */}
-        <FadeInUp delay={0.2}>
-          <Card className="border">
-            <CardContent className="pt-6 pb-6">
-              <form onSubmit={handleSubmit} className="space-y-4">
+        <FadeInUp delay={0.2} className="h-full">
+          <Card className="border h-full flex flex-col">
+            <CardContent className="pt-6 pb-6 flex flex-col flex-1">
+              <form onSubmit={handleSubmit} className="flex flex-col flex-1 space-y-4">
                 <div>
                   <Input placeholder="Your Name" value={formData.name} onChange={e => setFormData({
                   ...formData,
@@ -138,14 +134,18 @@ export default function Contact() {
                 })} required />
                 </div>
 
-                <div>
-                  <Textarea placeholder="Tell us about your project..." value={formData.message} onChange={e => setFormData({
-                  ...formData,
-                  message: e.target.value
-                })} rows={6} required />
+                <div className="flex-1 flex flex-col">
+                  <Textarea
+                    placeholder="Tell us about your project..."
+                    value={formData.message}
+                    onChange={e => setFormData({ ...formData, message: e.target.value })}
+                    rows={6}
+                    required
+                    className="flex-1 min-h-[140px]"
+                  />
                 </div>
 
-                <Button type="submit" disabled={isSubmitting} className="w-full" size="lg">
+                <Button type="submit" disabled={isSubmitting} className="w-full mt-auto" size="lg">
                   {isSubmitting ? "Sending..." : <>
                       <Send className="mr-2 h-4 w-4" />
                       Send Message
