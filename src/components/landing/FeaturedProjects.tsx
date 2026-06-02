@@ -1,7 +1,5 @@
 import { useProjects } from "@/hooks/useProjects";
-import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -15,7 +13,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { getMainProjectImageUrl } from "@/lib/projectUtils";
+import { ProjectShowcaseCard } from "@/components/shared/ProjectShowcaseCard";
 
 export default function FeaturedProjects() {
   const { data: projects, isLoading } = useProjects(false, true);
@@ -30,7 +28,7 @@ export default function FeaturedProjects() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-80 w-full" />
+            <Skeleton key={i} className="h-[460px] w-full rounded-[28px]" />
           ))}
         </div>
       </section>
@@ -55,52 +53,11 @@ export default function FeaturedProjects() {
       {isMobile ? (
         <>
           <StaggerContainer className="space-y-6 max-w-lg mx-auto" staggerDelay={0.15}>
-            {displayProjects.map((project) => {
-              const mainImage = getMainProjectImageUrl(project);
-
-              return (
-                <StaggerItem key={project.id}>
-                  <Link
-                    to={`/portfolio/${project.slug}`}
-                    className="media-hover-trigger block group"
-                  >
-                    <Card className="overflow-hidden border transition-colors hover:border-accent">
-                      <div className="relative aspect-video bg-muted overflow-hidden">
-                        {mainImage ? (
-                          <img
-                            src={mainImage}
-                            alt={project.title}
-                            className="media-hover-target w-full h-full object-cover"
-                            style={{ imageRendering: "auto" }}
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                            No Image
-                          </div>
-                        )}
-                      </div>
-
-                      <CardContent className="pt-6">
-                        {project.project_category && (
-                          <Badge variant="secondary" className="mb-3">
-                            {project.project_category.name}
-                          </Badge>
-                        )}
-
-                        <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
-
-                        {project.key_metric && (
-                          <p className="text-accent font-medium text-sm">
-                            {project.key_metric}
-                          </p>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </Link>
-                </StaggerItem>
-              );
-            })}
+            {displayProjects.map((project) => (
+              <StaggerItem key={project.id}>
+                <ProjectShowcaseCard project={project} />
+              </StaggerItem>
+            ))}
           </StaggerContainer>
           
           {/* "View More Projects" button - mobile only */}
@@ -121,58 +78,17 @@ export default function FeaturedProjects() {
             align: "start",
             loop: true,
           }}
-          className="w-full max-w-6xl mx-auto"
+          className="mx-auto w-full max-w-6xl"
         >
           <CarouselContent>
-            {projects.map((project) => {
-              const mainImage = getMainProjectImageUrl(project);
-
-              return (
-                <CarouselItem key={project.id} className="md:basis-1/2 lg:basis-1/3">
-                  <Link
-                    to={`/portfolio/${project.slug}`}
-                    className="media-hover-trigger block group"
-                  >
-                    <Card className="overflow-hidden border transition-colors hover:border-accent">
-                      <div className="relative aspect-video bg-muted overflow-hidden">
-                        {mainImage ? (
-                          <img
-                            src={mainImage}
-                            alt={project.title}
-                            className="media-hover-target w-full h-full object-cover"
-                            style={{ imageRendering: "auto" }}
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                            No Image
-                          </div>
-                        )}
-                      </div>
-
-                      <CardContent className="pt-6">
-                        {project.project_category && (
-                          <Badge variant="secondary" className="mb-3">
-                            {project.project_category.name}
-                          </Badge>
-                        )}
-
-                        <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
-
-                        {project.key_metric && (
-                          <p className="text-accent font-medium text-sm">
-                            {project.key_metric}
-                          </p>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </Link>
-                </CarouselItem>
-              );
-            })}
+            {projects.map((project) => (
+              <CarouselItem key={project.id} className="md:basis-1/2 lg:basis-1/3">
+                <ProjectShowcaseCard project={project} className="h-full" />
+              </CarouselItem>
+            ))}
           </CarouselContent>
-          <CarouselPrevious />
-          <CarouselNext />
+          <CarouselPrevious className="-left-16 h-12 w-12 border-white/10 bg-white/[0.03] text-white hover:bg-white/[0.08]" />
+          <CarouselNext className="-right-16 h-12 w-12 border-white/10 bg-white/[0.03] text-white hover:bg-white/[0.08]" />
         </Carousel>
       )}
     </section>
