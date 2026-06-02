@@ -27,6 +27,11 @@ All colors MUST be HSL.
     --feature-card-icon-translate-y: -2px;
     --feature-card-icon-duration: 420ms;
     --feature-card-icon-easing: cubic-bezier(0.22, 1, 0.36, 1);
+    --media-hover-scale: 1.045;
+    --media-hover-translate-y: -2px;
+    --media-hover-duration: 420ms;
+    --media-hover-easing: cubic-bezier(0.22, 1, 0.36, 1);
+    --media-hover-overlay: 0.1;
     --process-card-background: 0 0% 9.4% !important; /* #181818 */
     --process-card-border: 0 0% 15.7% !important; /* #282828 */
     --process-card-title: 0 0% 97.3% !important; /* #F8F8F8 */
@@ -92,6 +97,11 @@ All colors MUST be HSL.
     --feature-card-icon-translate-y: -2px;
     --feature-card-icon-duration: 420ms;
     --feature-card-icon-easing: cubic-bezier(0.22, 1, 0.36, 1);
+    --media-hover-scale: 1.045;
+    --media-hover-translate-y: -2px;
+    --media-hover-duration: 420ms;
+    --media-hover-easing: cubic-bezier(0.22, 1, 0.36, 1);
+    --media-hover-overlay: 0.1;
     --process-card-background: 0 0% 9.4% !important; /* #181818 */
     --process-card-border: 0 0% 15.7% !important; /* #282828 */
     --process-card-title: 0 0% 97.3% !important; /* #F8F8F8 */
@@ -273,13 +283,52 @@ All colors MUST be HSL.
     box-shadow: var(--shadow-surface-sm);
   }
 
+  .media-hover-target {
+    transform: translate3d(0, 0, 0) scale(1);
+    transition:
+      transform var(--media-hover-duration) var(--media-hover-easing),
+      opacity var(--media-hover-duration) var(--media-hover-easing),
+      color var(--media-hover-duration) var(--media-hover-easing);
+    will-change: transform;
+  }
+
+  .media-hover-item {
+    transform: translate3d(0, 0, 0) scale(1);
+    transition:
+      transform var(--media-hover-duration) var(--media-hover-easing),
+      opacity var(--media-hover-duration) var(--media-hover-easing),
+      color var(--media-hover-duration) var(--media-hover-easing);
+    will-change: transform;
+  }
+
+  .media-hover-overlay {
+    opacity: 0;
+    transition:
+      opacity var(--media-hover-duration) var(--media-hover-easing),
+      background-color var(--media-hover-duration) var(--media-hover-easing);
+  }
+
+  .media-hover-trigger:hover .media-hover-target,
+  .media-hover-trigger:focus-within .media-hover-target {
+    transform: translate3d(0, var(--media-hover-translate-y), 0) scale(var(--media-hover-scale));
+  }
+
+  .media-hover-trigger:hover .media-hover-item,
+  .media-hover-trigger:focus-within .media-hover-item {
+    transform: translate3d(0, var(--media-hover-translate-y), 0) scale(var(--media-hover-scale));
+  }
+
+  .media-hover-trigger:hover .media-hover-overlay,
+  .media-hover-trigger:focus-within .media-hover-overlay {
+    opacity: 1;
+  }
+
   .icon-group-badge {
     background-color: hsl(var(--icon-group-background)) !important;
     border-width: 1px;
     border-style: solid;
     border-color: hsl(var(--icon-group-border)) !important;
     color: hsl(var(--icon-group-foreground)) !important;
-    transform: translateZ(0) scale(1);
     transition:
       transform var(--icon-group-transition-duration) var(--icon-group-transition-easing),
       background-color var(--icon-group-transition-duration) var(--icon-group-transition-easing),
@@ -290,25 +339,18 @@ All colors MUST be HSL.
   .icon-group-badge-icon,
   .icon-group-badge svg {
     color: hsl(var(--icon-group-foreground)) !important;
-    transform: translateZ(0) scale(1);
     transition:
       transform var(--icon-group-transition-duration) var(--icon-group-transition-easing),
       color var(--icon-group-transition-duration) var(--icon-group-transition-easing);
   }
 
-  .icon-group:hover .icon-group-badge,
-  .icon-group:focus-within .icon-group-badge,
-  .icon-group-badge:hover,
-  .icon-group-badge:focus-visible {
+  .icon-group-trigger:hover .icon-group-badge,
+  .icon-group-trigger:focus-within .icon-group-badge {
     background-color: hsl(var(--icon-group-hover-background)) !important;
-    transform: translateZ(0) scale(var(--icon-group-scale));
   }
 
-  .icon-group:hover .icon-group-badge-icon,
-  .icon-group:focus-within .icon-group-badge-icon,
-  .icon-group-badge:hover .icon-group-badge-icon,
-  .icon-group-badge:focus-visible .icon-group-badge-icon {
-    transform: translateZ(0) scale(var(--icon-group-icon-scale));
+  .icon-group-trigger:hover .icon-group-badge-icon,
+  .icon-group-trigger:focus-within .icon-group-badge-icon {
   }
 
   .feature-card-surface {
@@ -332,7 +374,6 @@ All colors MUST be HSL.
 
   .feature-card-icon {
     display: inline-flex;
-    transform: translate3d(0, 0, 0) scale(1);
     transition:
       transform var(--feature-card-icon-duration) var(--feature-card-icon-easing),
       color var(--feature-card-icon-duration) var(--feature-card-icon-easing);
@@ -341,7 +382,6 @@ All colors MUST be HSL.
 
   .feature-card-icon svg,
   .feature-card-icon img {
-    transform: translate3d(0, 0, 0) scale(1);
     transition:
       transform var(--feature-card-icon-duration) var(--feature-card-icon-easing),
       color var(--feature-card-icon-duration) var(--feature-card-icon-easing);
@@ -350,14 +390,12 @@ All colors MUST be HSL.
 
   .feature-card-surface:hover .feature-card-icon,
   .feature-card-surface:focus-within .feature-card-icon {
-    transform: translate3d(0, var(--feature-card-icon-translate-y), 0) scale(var(--feature-card-icon-scale));
   }
 
   .feature-card-surface:hover .feature-card-icon svg,
   .feature-card-surface:focus-within .feature-card-icon svg,
   .feature-card-surface:hover .feature-card-icon img,
   .feature-card-surface:focus-within .feature-card-icon img {
-    transform: translate3d(0, var(--feature-card-icon-translate-y), 0) scale(var(--feature-card-icon-scale));
   }
 
   .feature-card-tools {

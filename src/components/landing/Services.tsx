@@ -6,6 +6,7 @@ import { FadeInUp } from "@/components/animations/FadeInUp";
 import { StaggerContainer } from "@/components/animations/StaggerContainer";
 import { StaggerItem } from "@/components/animations/StaggerItem";
 import { FeatureCard } from "@/components/shared/FeatureCard";
+import { IconGroupBadge } from "@/components/shared/IconGroupBadge";
 import type { ServiceWithIcon } from "@/types/app";
 
 type DisplayService = Pick<
@@ -61,7 +62,7 @@ export default function Services() {
     if (!iconName) return null;
     const iconLibrary = LucideIcons as unknown as Record<string, LucideIcon>;
     const Icon = iconLibrary[iconName];
-    return Icon ? <Icon className="h-12 w-12" /> : null;
+    return Icon ? <IconGroupBadge icon={Icon} /> : null;
   };
 
   const parseServiceContent = (description: string) => {
@@ -83,11 +84,13 @@ export default function Services() {
   const renderServiceIcon = (service: DisplayService) => {
     if (service.service_icon?.icon_url) {
       return (
-        <img
-          src={service.service_icon.icon_url}
-          alt={service.service_icon.name}
-          className="h-12 w-12 object-contain"
-        />
+        <IconGroupBadge>
+          <img
+            src={service.service_icon.icon_url}
+            alt={service.service_icon.name}
+            className="icon-group-badge-icon h-12 w-12 object-contain"
+          />
+        </IconGroupBadge>
       );
     }
 
@@ -95,7 +98,7 @@ export default function Services() {
       return getIcon(service.service_icon.name);
     }
 
-    return <span className="text-2xl text-white">🔧</span>;
+    return <IconGroupBadge><span className="icon-group-badge-icon text-2xl text-white">🔧</span></IconGroupBadge>;
   };
 
   const list = (services && services.length ? services : fallbackServices);

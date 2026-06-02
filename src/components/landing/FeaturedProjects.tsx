@@ -62,7 +62,7 @@ export default function FeaturedProjects() {
                 <StaggerItem key={project.id}>
                   <Link
                     to={`/portfolio/${project.slug}`}
-                    className="block group"
+                    className="media-hover-trigger block group"
                   >
                     <Card className="overflow-hidden border transition-colors hover:border-accent">
                       <div className="relative aspect-video bg-muted overflow-hidden">
@@ -70,7 +70,7 @@ export default function FeaturedProjects() {
                           <img
                             src={mainImage}
                             alt={project.title}
-                            className="w-full h-full object-cover"
+                            className="media-hover-target w-full h-full object-cover"
                             style={{ imageRendering: "auto" }}
                             loading="lazy"
                           />
@@ -131,7 +131,7 @@ export default function FeaturedProjects() {
                 <CarouselItem key={project.id} className="md:basis-1/2 lg:basis-1/3">
                   <Link
                     to={`/portfolio/${project.slug}`}
-                    className="block group"
+                    className="media-hover-trigger block group"
                   >
                     <Card className="overflow-hidden border transition-colors hover:border-accent">
                       <div className="relative aspect-video bg-muted overflow-hidden">
@@ -139,7 +139,7 @@ export default function FeaturedProjects() {
                           <img
                             src={mainImage}
                             alt={project.title}
-                            className="w-full h-full object-cover"
+                            className="media-hover-target w-full h-full object-cover"
                             style={{ imageRendering: "auto" }}
                             loading="lazy"
                           />

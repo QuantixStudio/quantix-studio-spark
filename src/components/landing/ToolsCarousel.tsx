@@ -60,11 +60,11 @@ export default function ToolsCarousel() {
               key={`${tool.id}-${index}`}
               className="flex-shrink-0 w-[180px]"
             >
-              <div className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 h-[120px] flex items-center justify-center overflow-hidden p-4">
+              <div className="media-hover-trigger bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 h-[120px] flex items-center justify-center overflow-hidden p-4">
                 <img
                   src={tool.logoUrl || "/placeholder.svg"}
                   alt={`${tool.name} logo`}
-                  className="h-full w-full object-contain opacity-80 transition-opacity duration-300 hover:opacity-100"
+                  className="media-hover-target h-full w-full object-contain opacity-80 transition-opacity duration-300 hover:opacity-100"
                   loading="lazy"
                   onError={(e) => {
                     e.currentTarget.src = "/placeholder.svg";

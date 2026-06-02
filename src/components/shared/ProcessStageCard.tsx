@@ -21,7 +21,7 @@ export function ProcessStageCard({
   className,
 }: ProcessStageCardProps) {
   return (
-    <article className={cn("process-stage-card flex h-full flex-col rounded-[28px] p-7 md:p-8", className)}>
+    <article className={cn("icon-group-trigger media-hover-trigger process-stage-card flex h-full flex-col rounded-[28px] p-7 md:p-8", className)}>
       <span className="process-stage-number">{number}</span>
 
       <div className="mb-7">

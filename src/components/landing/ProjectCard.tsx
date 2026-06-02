@@ -16,7 +16,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
   return (
     <Link
       to={`/portfolio/${project.slug}`}
-      className="block"
+      className="media-hover-trigger block"
     >
       <Card className="overflow-hidden group border transition-colors hover:border-accent">
         <div className="relative overflow-hidden aspect-video bg-muted">
@@ -24,7 +24,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             <img
               src={mainImage}
               alt={project.title}
-              className="w-full h-full object-cover"
+              className="media-hover-target w-full h-full object-cover"
               style={{ imageRendering: "auto" }}
               loading="lazy"
             />
@@ -54,14 +54,14 @@ export default function ProjectCard({ project }: ProjectCardProps) {
               {tools.map((tool) => (
                 <div 
                   key={tool.id} 
-                  className="flex items-center gap-1.5 px-2 py-1 border rounded-md bg-card hover:bg-accent/5 transition-colors"
+                  className="media-hover-trigger flex items-center gap-1.5 px-2 py-1 border rounded-md bg-card hover:bg-accent/5 transition-colors"
                   title={tool.name}
                 >
                   {tool.logo_path && (
                     <img 
                       src={getToolLogoUrl(tool.logo_path) || ""}
                       alt={tool.name}
-                      className="w-4 h-4 object-contain"
+                      className="media-hover-target w-4 h-4 object-contain"
                     />
                   )}
                   <span className="text-xs font-medium">{tool.name}</span>

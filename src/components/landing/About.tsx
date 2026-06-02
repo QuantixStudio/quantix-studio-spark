@@ -22,7 +22,7 @@ export default function About() {
         </FadeInUp>
 
         <StaggerContainer className="grid md:grid-cols-3 gap-8" staggerDelay={0.15}>
-          <StaggerItem className="text-center space-y-4 group">
+          <StaggerItem className="icon-group-trigger media-hover-trigger text-center space-y-4 group">
             <IconGroupBadge icon={Zap} />
             <h3 className="text-xl font-semibold">3× Faster</h3>
             <p className="text-muted-foreground">
@@ -30,7 +30,7 @@ export default function About() {
             </p>
           </StaggerItem>
 
-          <StaggerItem className="text-center space-y-4 group">
+          <StaggerItem className="icon-group-trigger media-hover-trigger text-center space-y-4 group">
             <IconGroupBadge icon={Target} />
             <h3 className="text-xl font-semibold">AI-Powered</h3>
             <p className="text-muted-foreground">
@@ -38,7 +38,7 @@ export default function About() {
             </p>
           </StaggerItem>
 
-          <StaggerItem className="text-center space-y-4 group">
+          <StaggerItem className="icon-group-trigger media-hover-trigger text-center space-y-4 group">
             <IconGroupBadge icon={Shield} />
             <h3 className="text-xl font-semibold">Secure & Scalable</h3>
             <p className="text-muted-foreground">
