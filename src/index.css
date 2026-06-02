@@ -27,6 +27,20 @@ All colors MUST be HSL.
     --feature-card-icon-translate-y: -2px;
     --feature-card-icon-duration: 420ms;
     --feature-card-icon-easing: cubic-bezier(0.22, 1, 0.36, 1);
+    --carousel-duration: 96s;
+    --carousel-gap: 2rem;
+    --carousel-mask-stop: 12%;
+    --carousel-card-background: 0 0% 97.3%;
+    --carousel-card-foreground: 0 0% 18%;
+    --carousel-card-border: 0 0% 100%;
+    --carousel-card-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
+    --carousel-card-shadow-hover: 0 20px 44px rgba(0, 0, 0, 0.28);
+    --carousel-card-scale: 1.028;
+    --carousel-card-translate-y: -3px;
+    --carousel-card-duration: 380ms;
+    --carousel-card-easing: cubic-bezier(0.22, 1, 0.36, 1);
+    --carousel-logo-scale: 1.69;
+    --carousel-logo-scale-hover: 1.73;
     --media-hover-scale: 1.045;
     --media-hover-translate-y: -2px;
     --media-hover-duration: 420ms;
@@ -97,6 +111,20 @@ All colors MUST be HSL.
     --feature-card-icon-translate-y: -2px;
     --feature-card-icon-duration: 420ms;
     --feature-card-icon-easing: cubic-bezier(0.22, 1, 0.36, 1);
+    --carousel-duration: 96s;
+    --carousel-gap: 2rem;
+    --carousel-mask-stop: 12%;
+    --carousel-card-background: 0 0% 97.3%;
+    --carousel-card-foreground: 0 0% 18%;
+    --carousel-card-border: 0 0% 100%;
+    --carousel-card-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
+    --carousel-card-shadow-hover: 0 20px 44px rgba(0, 0, 0, 0.28);
+    --carousel-card-scale: 1.028;
+    --carousel-card-translate-y: -3px;
+    --carousel-card-duration: 380ms;
+    --carousel-card-easing: cubic-bezier(0.22, 1, 0.36, 1);
+    --carousel-logo-scale: 1.69;
+    --carousel-logo-scale-hover: 1.73;
     --media-hover-scale: 1.045;
     --media-hover-translate-y: -2px;
     --media-hover-duration: 420ms;
@@ -406,6 +434,85 @@ All colors MUST be HSL.
     color: hsl(var(--feature-card-description)) !important;
   }
 
+  .marquee-viewport {
+    position: relative;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent 0,
+      black var(--carousel-mask-stop),
+      black calc(100% - var(--carousel-mask-stop)),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      90deg,
+      transparent 0,
+      black var(--carousel-mask-stop),
+      black calc(100% - var(--carousel-mask-stop)),
+      transparent 100%
+    );
+  }
+
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    align-items: center;
+    gap: var(--carousel-gap);
+    animation: scroll-left var(--carousel-duration) linear infinite;
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .marquee-group {
+    display: flex;
+    align-items: center;
+    gap: var(--carousel-gap);
+    padding-inline-end: var(--carousel-gap);
+  }
+
+  .marquee-card {
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.9), rgb(255 255 255 / 1) 48%),
+      hsl(var(--carousel-card-background));
+    border: 1px solid hsl(var(--carousel-card-border) / 0.16);
+    box-shadow: var(--carousel-card-shadow);
+    color: hsl(var(--carousel-card-foreground));
+    transition:
+      transform var(--carousel-card-duration) var(--carousel-card-easing),
+      box-shadow var(--carousel-card-duration) var(--carousel-card-easing),
+      border-color var(--carousel-card-duration) var(--carousel-card-easing);
+    transform: translate3d(0, 0, 0) scale(1);
+    will-change: transform;
+  }
+
+  .marquee-card:hover,
+  .marquee-card:focus-within {
+    transform: translate3d(0, var(--carousel-card-translate-y), 0) scale(var(--carousel-card-scale));
+    box-shadow: var(--carousel-card-shadow-hover);
+    border-color: hsl(var(--carousel-card-border) / 0.3);
+  }
+
+  .marquee-logo {
+    opacity: 0.88;
+    filter: saturate(0.96) contrast(1.02);
+    transition:
+      transform var(--carousel-card-duration) var(--carousel-card-easing),
+      opacity var(--carousel-card-duration) var(--carousel-card-easing),
+      filter var(--carousel-card-duration) var(--carousel-card-easing);
+    transform: translate3d(0, 0, 0) scale(var(--carousel-logo-scale));
+    transform-origin: center;
+    will-change: transform;
+  }
+
+  .marquee-card:hover .marquee-logo,
+  .marquee-card:focus-within .marquee-logo {
+    opacity: 1;
+    filter: saturate(1.02) contrast(1.04);
+    transform: translate3d(0, -1px, 0) scale(var(--carousel-logo-scale-hover));
+  }
+
   .process-stage-card {
     position: relative;
     background:
@@ -586,10 +693,8 @@ All colors MUST be HSL.
   }
 
   .animate-scroll-left {
-    animation: scroll-left 40s linear infinite;
-  }
-
-  .animate-scroll-left:hover {
-    animation-play-state: paused;
+    animation: scroll-left var(--carousel-duration) linear infinite;
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
   }
 }

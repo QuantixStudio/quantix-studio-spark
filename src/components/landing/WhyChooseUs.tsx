@@ -36,7 +36,7 @@ export default function WhyChooseUs() {
   return (
     <section className="section-container bg-muted/30">
       <FadeInUp>
-        <div className="text-center mb-16">
+        <div className="mb-20 text-center">
           <h2 className="section-title">Why Choose Quantix Studio</h2>
           <p className="section-subtitle">
             We combine cutting-edge technology with proven development practices
@@ -50,6 +50,12 @@ export default function WhyChooseUs() {
             <StaggerItem key={idx}>
               <FeatureCard
                 align="center"
+                className="min-h-[300px]"
+                contentClassName="px-8 pb-8 pt-9"
+                iconWrapperClassName="mb-7 h-14"
+                titleWrapperClassName="mb-4 min-h-0"
+                toolsWrapperClassName="mb-0 min-h-0"
+                descriptionWrapperClassName="mt-auto pt-8"
                 icon={<IconGroupBadge icon={feature.icon} className="mx-auto" />}
                 title={feature.title}
                 description={feature.description}

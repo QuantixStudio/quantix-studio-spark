@@ -19,18 +19,12 @@ export default function ToolsCarousel() {
       }));
   }, [tools]);
 
-  // Duplicate array exactly 2x for seamless infinite loop
-  const duplicatedTools = useMemo(() => {
-    if (featuredTools.length === 0) return [];
-    return [...featuredTools, ...featuredTools];
-  }, [featuredTools]);
-
   // Loading state
   if (isLoading) {
     return (
-      <div className="flex gap-8 items-center justify-center py-8">
+      <div className="flex items-center justify-center gap-8 py-8">
         {[1, 2, 3, 4, 5, 6].map((i) => (
-          <Skeleton key={i} className="h-[120px] w-[180px] rounded-2xl" />
+          <Skeleton key={i} className="h-[112px] w-[208px] rounded-[28px]" />
         ))}
       </div>
     );
@@ -47,33 +41,31 @@ export default function ToolsCarousel() {
   }
 
   return (
-    <div className="relative w-full overflow-hidden">
-      {/* Gradient fade overlays */}
-      <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-[#0F0F0F] via-[#0F0F0F]/80 to-transparent z-10 pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[#0F0F0F] via-[#0F0F0F]/80 to-transparent z-10 pointer-events-none" />
-
-      {/* CSS-animated continuous scroll */}
-      <div className="py-4">
-        <div className="flex gap-8 items-center animate-scroll-left">
-          {duplicatedTools.map((tool, index) => (
-            <div
-              key={`${tool.id}-${index}`}
-              className="flex-shrink-0 w-[180px]"
-            >
-              <div className="media-hover-trigger bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 h-[120px] flex items-center justify-center overflow-hidden p-4">
-                <img
-                  src={tool.logoUrl || "/placeholder.svg"}
-                  alt={`${tool.name} logo`}
-                  className="media-hover-target h-full w-full object-contain opacity-80 transition-opacity duration-300 hover:opacity-100"
-                  loading="lazy"
-                  onError={(e) => {
-                    e.currentTarget.src = "/placeholder.svg";
-                  }}
-                />
+    <div className="marquee-viewport relative w-full py-4">
+      <div className="marquee-track">
+        {[0, 1].map((groupIndex) => (
+          <div
+            key={groupIndex}
+            className="marquee-group"
+            aria-hidden={groupIndex === 1}
+          >
+            {featuredTools.map((tool) => (
+              <div key={`${groupIndex}-${tool.id}`} className="w-[208px] flex-shrink-0">
+                <div className="marquee-card media-hover-trigger flex h-[112px] items-center justify-center rounded-[28px] px-3">
+                  <img
+                    src={tool.logoUrl || "/placeholder.svg"}
+                    alt={`${tool.name} logo`}
+                    className="marquee-logo media-hover-target h-[78px] w-full object-contain"
+                    loading="lazy"
+                    onError={(e) => {
+                      e.currentTarget.src = "/placeholder.svg";
+                    }}
+                  />
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ))}
       </div>
     </div>
   );
