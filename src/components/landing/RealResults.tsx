@@ -1,27 +1,50 @@
 import { FadeInUp } from "@/components/animations/FadeInUp";
 
+const results = [
+  {
+    value: "20+",
+    label: "Projects Delivered",
+  },
+  {
+    value: "4 weeks",
+    label: "Average MVP Timeline",
+  },
+  {
+    value: "35+",
+    label: "Automated Workflows",
+  },
+];
+
 export default function RealResults() {
   return (
     <section className="section-container bg-muted/30">
-      <FadeInUp>
-        <div className="text-center">
-          <h2 className="text-2xl md:text-3xl font-semibold mb-6">Real Results</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
-            <div>
-              <p className="text-4xl font-bold text-accent mb-2">20+</p>
-              <p className="text-muted-foreground">Projects Delivered</p>
-            </div>
-            <div>
-              <p className="text-4xl font-bold text-accent mb-2">4 weeks</p>
-              <p className="text-muted-foreground">Average MVP Timeline</p>
-            </div>
-            <div>
-              <p className="text-4xl font-bold text-accent mb-2">35+</p>
-              <p className="text-muted-foreground">Automated Workflows</p>
-            </div>
+      <div className="mx-auto max-w-5xl">
+        <FadeInUp>
+          <div className="mb-12 text-center md:mb-14">
+            <h2 className="text-3xl font-semibold tracking-tight text-white md:text-5xl">
+              Real Results
+            </h2>
+          </div>
+        </FadeInUp>
+        <div className="overflow-hidden rounded-[32px]">
+          <div className="grid grid-cols-1 divide-y divide-white/6 md:grid-cols-3 md:divide-x md:divide-y-0">
+            {results.map((result) => (
+              <div
+                key={result.label}
+                className="px-8 py-10 text-center md:px-10 md:py-12"
+              >
+                <div className="mx-auto mb-5 h-px w-12 bg-white/10" />
+                <p className="mb-3 text-5xl font-semibold tracking-[-0.05em] text-white md:text-6xl">
+                  {result.value}
+                </p>
+                <p className="mx-auto max-w-[14ch] text-base font-medium leading-snug text-[hsl(var(--copy-foreground))] md:text-lg">
+                  {result.label}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
-      </FadeInUp>
+      </div>
     </section>
   );
 }
