@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { getErrorMessage } from "@/lib/errorUtils";
+import { mapProjectWithTools } from "@/lib/projectUtils";
 import { deleteAllProjectImages } from "@/lib/storageUtils";
 import { toast } from "sonner";
 import {
@@ -31,21 +33,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-interface Project {
-  id: string;
-  title: string;
-  slug: string;
-  short_description: string;
-  cover_url: string | null;
-  published: boolean;
-  created_at: string;
-  project_category: { name: string } | null;
-}
+import { StatePanel } from "@/components/shared/StatePanel";
+import type { EditableProject, ProjectWithTools, RawProjectWithCategory, Tool } from "@/types/app";
 
 interface ProjectsTableProps {
-  projects: Project[];
-  onEdit: (project: any) => void;
+  projects: ProjectWithTools[];
+  onEdit: (project: EditableProject) => void;
 }
 
 export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) {
@@ -57,22 +50,41 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
   const handleEdit = async (projectId: string) => {
     setIsFetching(true);
     try {
-      const { data, error } = await supabase
+      const { data: projectData, error } = await supabase
         .from("projects")
         .select(`
           *,
-          project_category (id, name, description),
-          project_technologies (
-            technologies (id, name)
+          project_category:project_category!projects_category_id_fkey (
+            id,
+            name,
+            description
           )
         `)
         .eq("id", projectId)
         .single();
 
       if (error) throw error;
-      onEdit(data);
-    } catch (error: any) {
-      toast.error("Failed to load project");
+
+      const [{ data: projectTech, error: projectTechError }, { data: allToolsData, error: allToolsError }] =
+        await Promise.all([
+          supabase
+            .from("project_technologies")
+            .select("tools")
+            .eq("project_id", projectId)
+            .maybeSingle(),
+          supabase.from("tools").select("*"),
+        ]);
+
+      if (projectTechError) throw projectTechError;
+      if (allToolsError) throw allToolsError;
+
+      const toolIds = projectTech?.tools ?? [];
+      const allTools = (allToolsData ?? []) as Tool[];
+      const projectTools = allTools.filter((tool) => toolIds.includes(tool.id));
+
+      onEdit(mapProjectWithTools(projectData as RawProjectWithCategory, projectTools));
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to load project"));
     } finally {
       setIsFetching(false);
     }
@@ -95,8 +107,8 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
       toast.success("Project deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       setDeleteId(null);
-    } catch (error: any) {
-      toast.error(error.message || "Failed to delete project");
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to delete project"));
     } finally {
       setIsDeleting(false);
     }
@@ -104,8 +116,14 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
 
   return (
     <>
-      <div className="rounded-md border">
-        <Table>
+      {projects.length === 0 ? (
+        <StatePanel
+          title="No projects yet"
+          description="Create your first project to populate the public portfolio and featured work sections."
+        />
+      ) : (
+      <div className="table-shell">
+        <Table className="min-w-[720px]">
           <TableHeader>
             <TableRow>
               <TableHead className="w-20">Cover</TableHead>
@@ -117,14 +135,7 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
             </TableRow>
           </TableHeader>
           <TableBody>
-            {projects.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center py-8">
-                  <p className="text-muted-foreground">No projects found</p>
-                </TableCell>
-              </TableRow>
-            ) : (
-              projects.map((project) => (
+            {projects.map((project) => (
                 <TableRow key={project.id}>
                   <TableCell>
                     {project.cover_url ? (
@@ -139,7 +150,12 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
                       </div>
                     )}
                   </TableCell>
-                  <TableCell className="font-medium">{project.title}</TableCell>
+                  <TableCell className="font-medium">
+                    <div className="space-y-1">
+                      <p>{project.title}</p>
+                      <p className="max-w-xs text-xs text-muted-foreground line-clamp-2">{project.short_description}</p>
+                    </div>
+                  </TableCell>
                   <TableCell>{project.project_category?.name || "—"}</TableCell>
                   <TableCell>
                     <Badge variant={project.published ? "default" : "secondary"}>
@@ -147,7 +163,7 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    {new Date(project.created_at).toLocaleDateString()}
+                    {project.created_at ? new Date(project.created_at).toLocaleDateString() : "—"}
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
@@ -173,11 +189,11 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
                     </DropdownMenu>
                   </TableCell>
                 </TableRow>
-              ))
-            )}
+              ))}
           </TableBody>
         </Table>
       </div>
+      )}
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>

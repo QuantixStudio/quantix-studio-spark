@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import Navbar from "@/components/landing/Navbar";
+import { getErrorMessage } from "@/lib/errorUtils";
 
 const signUpSchema = z.object({
   fullName: z.string().trim().min(2, "Name must be at least 2 characters").max(100, "Name too long"),
@@ -79,7 +80,7 @@ export default function Auth() {
         });
         setMode("signin");
       }
-    } catch (error: any) {
+    } catch (error) {
       if (error instanceof z.ZodError) {
         toast({
           variant: "destructive",
@@ -90,7 +91,7 @@ export default function Auth() {
         toast({
           variant: "destructive",
           title: "Error",
-          description: error.message || "An error occurred. Please try again.",
+          description: getErrorMessage(error, "An error occurred. Please try again."),
         });
       }
     } finally {
@@ -101,8 +102,8 @@ export default function Auth() {
   return (
     <>
       <Navbar />
-      <div className="flex min-h-screen items-center justify-center p-4 bg-muted/30">
-        <Card className="w-full max-w-md border">
+      <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4 pt-24">
+        <Card className="admin-surface w-full max-w-md">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
             <div className="h-12 w-12 rounded-xl border-2 border-accent flex items-center justify-center text-accent font-bold text-xl">
@@ -119,6 +120,9 @@ export default function Auth() {
             {mode === "signup" && "Create your admin account"}
             {mode === "reset" && "Enter your email to reset your password"}
           </CardDescription>
+          <p className="text-center text-xs text-muted-foreground">
+            Use the same credentials you manage through Supabase authentication.
+          </p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">

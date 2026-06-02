@@ -2,6 +2,7 @@ import { Search, Palette, Workflow, Rocket } from "lucide-react";
 import { FadeInUp } from "@/components/animations/FadeInUp";
 import { StaggerContainer } from "@/components/animations/StaggerContainer";
 import { StaggerItem } from "@/components/animations/StaggerItem";
+import { ProcessStageCard } from "@/components/shared/ProcessStageCard";
 
 export default function Process() {
   const steps = [
@@ -46,23 +47,17 @@ export default function Process() {
         </div>
       </FadeInUp>
 
-      <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto" staggerDelay={0.1}>
+      <StaggerContainer className="mx-auto grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-2 xl:gap-8" staggerDelay={0.1}>
         {steps.map((step, idx) => {
-          const Icon = step.icon;
           return (
-            <StaggerItem key={idx} className="text-center relative group">
-              {idx < steps.length - 1 && (
-                <div className="hidden lg:block absolute top-12 left-[60%] w-[80%] h-0.5 bg-accent/30" />
-              )}
-              <div className="mb-3">
-                <span className="text-4xl font-bold text-accent/30">{step.number}</span>
-              </div>
-              <div className="relative z-10 inline-flex items-center justify-center w-16 h-16 rounded-full bg-accent/10 border-2 border-accent mb-4 transition-all duration-300 group-hover:scale-110 group-hover:bg-accent/20">
-                <Icon className="h-8 w-8 text-accent" />
-              </div>
-              <h3 className="text-lg font-semibold mb-2">{step.title}</h3>
-              <p className="text-sm text-accent/80 mb-2">{step.subtitle}</p>
-              <p className="text-sm text-muted-foreground [text-align:justify] [text-justify:inter-word]">{step.description}</p>
+            <StaggerItem key={idx} className={idx % 2 === 1 ? "xl:translate-y-8" : ""}>
+              <ProcessStageCard
+                icon={step.icon}
+                number={step.number}
+                title={step.title}
+                subtitle={step.subtitle}
+                description={step.description}
+              />
             </StaggerItem>
           );
         })}

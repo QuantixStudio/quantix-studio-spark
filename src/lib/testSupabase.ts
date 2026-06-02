@@ -1,4 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
+import { getErrorMessage } from "@/lib/errorUtils";
+import type { UserRole } from "@/types/app";
 
 /**
  * Comprehensive Supabase connection and configuration test
@@ -25,8 +27,8 @@ export async function testSupabase() {
     
     if (error) throw error;
     console.log("   ✅ Database connection successful");
-  } catch (error: any) {
-    console.error("   ❌ Database connection failed:", error.message);
+  } catch (error) {
+    console.error("   ❌ Database connection failed:", getErrorMessage(error));
     return;
   }
 
@@ -43,8 +45,8 @@ export async function testSupabase() {
       console.log("   Note: Some tests require authentication");
       return;
     }
-  } catch (error: any) {
-    console.error("   ❌ Auth check failed:", error.message);
+  } catch (error) {
+    console.error("   ❌ Auth check failed:", getErrorMessage(error));
     return;
   }
 
@@ -64,8 +66,8 @@ export async function testSupabase() {
       console.log("   Name:", data.full_name || "Not set");
       console.log("   Email:", data.email);
     }
-  } catch (error: any) {
-    console.error("   ❌ Profile access failed:", error.message);
+  } catch (error) {
+    console.error("   ❌ Profile access failed:", getErrorMessage(error));
   }
 
   // Test 5: Role System Check
@@ -74,7 +76,7 @@ export async function testSupabase() {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       const { data: roleData, error } = await supabase
-        .from("user_roles" as any)
+        .from("user_roles")
         .select("role")
         .eq("user_id", user.id);
       
@@ -82,10 +84,9 @@ export async function testSupabase() {
         console.log("   ⚠️  user_roles table not accessible:", error.message);
       } else if (roleData && roleData.length > 0) {
         console.log("   ✅ Roles found:");
-        roleData.forEach((r: any) => console.log("      -", r.role));
+        roleData.forEach((role: Pick<UserRole, "role">) => console.log("      -", role.role));
         
         // Test has_role() function
-        // @ts-ignore - has_role function not in types yet
         const { data: isAdmin, error: roleError } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
         
         if (!roleError) {
@@ -96,8 +97,8 @@ export async function testSupabase() {
         console.log("   Action: Trigger should assign 'user' role on signup");
       }
     }
-  } catch (error: any) {
-    console.error("   ❌ Role check failed:", error.message);
+  } catch (error) {
+    console.error("   ❌ Role check failed:", getErrorMessage(error));
   }
 
   // Test 6: Security Verification
@@ -118,16 +119,22 @@ export async function testSupabase() {
         console.log("   ✅ Secure: 'role' column removed from profiles");
       }
     }
-  } catch (error: any) {
-    console.error("   ❌ Security check failed:", error.message);
+  } catch (error) {
+    console.error("   ❌ Security check failed:", getErrorMessage(error));
   }
 
   console.log("\n" + "=".repeat(60));
   console.log("🎉 Supabase configuration test complete!\n");
 }
 
+declare global {
+  interface Window {
+    testSupabase?: typeof testSupabase;
+  }
+}
+
 // Auto-expose to window for easy console access
 if (typeof window !== "undefined") {
-  (window as any).testSupabase = testSupabase;
+  window.testSupabase = testSupabase;
   console.log("💡 Tip: Run 'testSupabase()' in console to check configuration");
 }

@@ -35,7 +35,7 @@ export function AppSidebar() {
       <SidebarContent className="bg-sidebar">
         <div className="px-6 py-8">
           <div className={`flex items-center gap-3 transition-all duration-200 ${isCollapsed ? "justify-center" : ""}`}>
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-bold text-lg shadow-lg">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-gradient-to-br from-white to-neutral-300 text-primary-foreground shadow-lg">
               Q
             </div>
             {!isCollapsed && (
@@ -62,16 +62,16 @@ export function AppSidebar() {
                         `group relative flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-300 overflow-hidden ${
                           isActive
                             ? "text-white shadow-lg"
-                            : "text-sidebar-foreground/60 hover:text-sidebar-foreground/90"
+                            : "text-sidebar-foreground/65 hover:text-sidebar-foreground/95"
                         }`
                       }
                     >
                       {({ isActive }) => (
                         <>
                           {isActive && (
-                            <div className="absolute inset-0 bg-gradient-to-r from-white/5 via-white/20 to-white/30 rounded-xl" />
+                            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-white/5 via-white/15 to-white/25" />
                           )}
-                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-white/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-white/5 to-white/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                           <item.icon className={`relative z-10 h-5 w-5 transition-all duration-300 ${isActive ? "scale-105" : "group-hover:scale-110"}`} />
                           {!isCollapsed && (
                             <span className={`relative z-10 text-sm transition-all duration-300 ${isActive ? "font-medium" : "font-normal"}`}>

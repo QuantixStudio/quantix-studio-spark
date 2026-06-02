@@ -4,10 +4,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
 import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -17,6 +19,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormDescription,
   FormMessage,
 } from "@/components/ui/form";
 import { MultiSelect } from "@/components/ui/multi-select";
@@ -25,9 +28,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import LogoUploader from "./LogoUploader";
-import { Tool } from "@/hooks/useTools";
 import { compressImage } from "@/lib/imageUtils";
+import { getErrorMessage } from "@/lib/errorUtils";
 import { deleteToolLogo, getToolLogoUrl } from "@/lib/toolStorageUtils";
+import type { Tool } from "@/types/app";
 
 const getCategoryColor = (category: string) => {
   switch (category) {
@@ -188,7 +192,7 @@ export default function ToolFormModal({
         }
 
         const { error } = await supabase
-          .from("tools" as any)
+          .from("tools")
           .update({
             name: values.name,
             slug: values.slug,
@@ -197,7 +201,7 @@ export default function ToolFormModal({
             website_url: values.website_url || null,
             logo_path: logoPath,
             is_featured: values.is_featured,
-          })
+          } satisfies TablesUpdate<"tools">)
           .eq("id", tool.id);
 
         if (error) throw error;
@@ -206,7 +210,7 @@ export default function ToolFormModal({
       } else {
         // Create new tool
         const { data: newTool, error: insertError } = await supabase
-          .from("tools" as any)
+          .from("tools")
           .insert({
             name: values.name,
             slug: values.slug,
@@ -214,20 +218,20 @@ export default function ToolFormModal({
             description: values.description || null,
             website_url: values.website_url || null,
             is_featured: values.is_featured,
-          })
-          .select()
+          } satisfies TablesInsert<"tools">)
+          .select("id")
           .single();
 
         if (insertError) throw insertError;
 
         // Upload logo if provided
         if (logoFile && newTool) {
-          const logoPath = await uploadLogo((newTool as any).id);
+          const logoPath = await uploadLogo(newTool.id);
           if (logoPath) {
             await supabase
-              .from("tools" as any)
+              .from("tools")
               .update({ logo_path: logoPath })
-              .eq("id", (newTool as any).id);
+              .eq("id", newTool.id);
           }
         }
 
@@ -238,7 +242,7 @@ export default function ToolFormModal({
       onClose();
     } catch (error) {
       console.error("Submit error:", error);
-      toast.error("Failed to save tool");
+      toast.error(getErrorMessage(error, "Failed to save tool"));
     } finally {
       setIsLoading(false);
     }
@@ -246,13 +250,16 @@ export default function ToolFormModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto rounded-2xl border bg-card/95">
         <DialogHeader>
           <DialogTitle>{tool ? "Edit Tool" : "Add New Tool"}</DialogTitle>
+          <DialogDescription>
+            Tools power your public stack, project metadata, and featured logo carousel.
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pb-1">
             <FormItem>
               <FormLabel>Logo</FormLabel>
               <FormControl>
@@ -277,6 +284,7 @@ export default function ToolFormModal({
                       placeholder="e.g., Bubble"
                     />
                   </FormControl>
+                  <FormDescription>Choose the product name visitors will recognize instantly.</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -291,6 +299,7 @@ export default function ToolFormModal({
                   <FormControl>
                     <Input {...field} placeholder="e.g., bubble" />
                   </FormControl>
+                  <FormDescription>Used for clean URLs and internal references.</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -387,16 +396,17 @@ export default function ToolFormModal({
               )}
             />
 
-            <div className="flex gap-3 justify-end">
+            <div className="flex flex-col-reverse gap-2 border-t border-border/70 pt-4 sm:flex-row sm:justify-end">
               <Button
                 type="button"
                 variant="outline"
                 onClick={onClose}
                 disabled={isLoading}
+                className="w-full sm:w-auto"
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isLoading}>
+              <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
                 {isLoading ? "Saving..." : tool ? "Update Tool" : "Create Tool"}
               </Button>
             </div>

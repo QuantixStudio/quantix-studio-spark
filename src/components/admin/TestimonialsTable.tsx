@@ -8,8 +8,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Testimonial } from "@/hooks/useAdminTestimonials";
+import { getErrorMessage } from "@/lib/errorUtils";
 import { deleteTestimonialAvatar, getTestimonialAvatarUrl } from "@/lib/testimonialStorageUtils";
+import { StatePanel } from "@/components/shared/StatePanel";
+import type { Testimonial } from "@/types/app";
 import { format } from "date-fns";
 
 interface TestimonialsTableProps {
@@ -61,7 +63,7 @@ export default function TestimonialsTable({ testimonials, onEdit }: Testimonials
       queryClient.invalidateQueries({ queryKey: ["testimonials"] });
     } catch (error) {
       console.error("Delete error:", error);
-      toast.error("Failed to delete testimonial");
+      toast.error(getErrorMessage(error, "Failed to delete testimonial"));
     } finally {
       setIsDeleting(false);
       setDeleteId(null);
@@ -84,18 +86,17 @@ export default function TestimonialsTable({ testimonials, onEdit }: Testimonials
 
   if (testimonials.length === 0) {
     return (
-      <div className="text-center py-12 border rounded-lg">
-        <p className="text-muted-foreground">
-          No testimonials found. Add your first testimonial to get started.
-        </p>
-      </div>
+      <StatePanel
+        title="No testimonials yet"
+        description="Add social proof with customer feedback, ratings, and avatars so the landing page feels trustworthy and complete."
+      />
     );
   }
 
   return (
     <>
-      <div className="border rounded-lg overflow-hidden">
-        <Table>
+      <div className="table-shell">
+        <Table className="min-w-[780px]">
           <TableHeader>
             <TableRow>
               <TableHead className="w-16">Avatar</TableHead>
@@ -124,7 +125,12 @@ export default function TestimonialsTable({ testimonials, onEdit }: Testimonials
                     </div>
                   )}
                 </TableCell>
-                <TableCell className="font-medium">{testimonial.name}</TableCell>
+                <TableCell className="font-medium">
+                  <div className="space-y-1">
+                    <p>{testimonial.name}</p>
+                    <p className="max-w-xs text-xs text-muted-foreground line-clamp-2">{testimonial.feedback}</p>
+                  </div>
+                </TableCell>
                 <TableCell>
                   {testimonial.company || (
                     <span className="text-xs text-muted-foreground">-</span>

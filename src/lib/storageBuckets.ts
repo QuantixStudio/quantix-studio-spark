@@ -1,0 +1,9 @@
+export const STORAGE_BUCKETS = {
+  avatars: "avatars",
+  portfolio: "portfolio",
+  testimonialsAvatars: "testimonials_avatars",
+  toolsLogos: "tools_logos",
+} as const;
+
+// NOTE: `tools_logos` is used by the app code, but it is not represented
+// in the local Supabase migrations currently committed in this repository.

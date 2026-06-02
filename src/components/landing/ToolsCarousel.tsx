@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useTools } from "@/hooks/useTools";
 import { getToolLogoUrl } from "@/lib/toolStorageUtils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { StatePanel } from "@/components/shared/StatePanel";
 
 export default function ToolsCarousel() {
   const { data: tools, isLoading } = useTools();
@@ -29,7 +30,7 @@ export default function ToolsCarousel() {
     return (
       <div className="flex gap-8 items-center justify-center py-8">
         {[1, 2, 3, 4, 5, 6].map((i) => (
-          <Skeleton key={i} className="h-[120px] w-[180px] bg-gray-200 rounded-2xl" />
+          <Skeleton key={i} className="h-[120px] w-[180px] rounded-2xl" />
         ))}
       </div>
     );
@@ -38,9 +39,10 @@ export default function ToolsCarousel() {
   // Empty state
   if (featuredTools.length === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-500">No featured tools available yet</p>
-      </div>
+      <StatePanel
+        title="No featured tools yet"
+        description="Mark a few tools as featured in the admin area and they will appear here automatically."
+      />
     );
   }
 
@@ -62,7 +64,7 @@ export default function ToolsCarousel() {
                 <img
                   src={tool.logoUrl || "/placeholder.svg"}
                   alt={`${tool.name} logo`}
-                  className="w-full h-full object-cover opacity-80 hover:opacity-100 transition-opacity duration-300"
+                  className="h-full w-full object-contain opacity-80 transition-opacity duration-300 hover:opacity-100"
                   loading="lazy"
                   onError={(e) => {
                     e.currentTarget.src = "/placeholder.svg";

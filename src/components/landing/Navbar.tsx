@@ -24,7 +24,7 @@ import { Menu, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
 // import { useProfileModal } from "@/hooks/useProfileModal"; // Auth UI disabled
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 // import AuthModal from "@/components/modals/AuthModal"; // Auth UI disabled
 // import ProfileEditModal from "@/components/modals/ProfileEditModal"; // Auth UI disabled
 // import {
@@ -40,6 +40,7 @@ import { Link } from "react-router-dom";
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('');
+  const [isAtTop, setIsAtTop] = useState(true);
   // const [authModalOpen, setAuthModalOpen] = useState(false); // Auth UI disabled
   // const [profileModalOpen, setProfileModalOpen] = useState(false); // Auth UI disabled
   const {
@@ -49,6 +50,8 @@ export default function Navbar() {
   const {
     data: roleData
   } = useUserRole();
+  const navigate = useNavigate();
+  const location = useLocation();
   // const { isOpen: autoProfileOpen, openModal, closeModal: closeAutoModal } = useProfileModal(); // Auth UI disabled
 
   // const [profile, setProfile] = useState<any>(null); // Auth UI disabled
@@ -84,31 +87,65 @@ export default function Navbar() {
     });
     return () => observer.disconnect();
   }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsAtTop(window.scrollY < 24);
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToSection = (id: string) => {
+    requestAnimationFrame(() => {
+      const element = document.getElementById(id);
+      if (!element) return;
+
+      const offset = 80;
+      const y = element.getBoundingClientRect().top + window.scrollY - offset;
+
+      window.scrollTo({
+        top: y,
+        behavior: "smooth",
+      });
+    });
+  };
+
   const handleNavigation = (target: string) => {
-    // Close mobile menu first
     setIsOpen(false);
 
-    // Handle HOME - always navigate to landing page
     if (target === "home") {
-      window.location.href = '/';
+      if (location.pathname === "/") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        navigate("/");
+      }
       return;
     }
 
-    // Handle PORTFOLIO - always navigate to portfolio page
     if (target === "portfolio") {
-      window.location.href = '/portfolio';
+      navigate("/portfolio");
       return;
     }
 
-    // Handle SERVICES - always navigate to home with services hash
     if (target === "services") {
-      window.location.href = '/#services';
+      if (location.pathname === "/") {
+        scrollToSection("services");
+      } else {
+        navigate("/#services");
+      }
       return;
     }
 
-    // Handle CONTACT - always navigate to home with contact hash
     if (target === "contact") {
-      window.location.href = '/#contact';
+      if (location.pathname === "/") {
+        scrollToSection("contact");
+      } else {
+        navigate("/#contact");
+      }
       return;
     }
   };
@@ -117,8 +154,8 @@ export default function Navbar() {
     setIsOpen(false);
   };
   return <>
-      <nav className="fixed top-0 left-0 right-0 z-50 glass">
-        <div className="container mx-auto px-4">
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isAtTop ? "bg-background/45 backdrop-blur-xl" : "glass shadow-sm"}`}>
+        <div className="container mx-auto px-5 sm:px-6 md:px-8">
           <div className="relative flex items-center justify-between h-16">
             {/* Logo - Fixed left */}
             <div className="flex-shrink-0">
@@ -129,13 +166,13 @@ export default function Navbar() {
 
             {/* Desktop Navigation - Centered */}
             <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-8">
-              <button onClick={() => handleNavigation("home")} className={`nav-link cursor-pointer transition-colors ${activeSection === '' && window.location.pathname === '/' && window.scrollY === 0 ? 'text-accent font-medium' : 'text-foreground/80 hover:text-foreground'}`}>
+              <button onClick={() => handleNavigation("home")} className={`nav-link cursor-pointer transition-colors ${activeSection === '' && location.pathname === '/' && isAtTop ? 'text-accent font-medium' : 'text-foreground/80 hover:text-foreground'}`}>
                 Home
               </button>
               <button onClick={() => handleNavigation("services")} className={`nav-link cursor-pointer transition-colors ${activeSection === 'services' ? 'text-accent font-medium' : 'text-foreground/80 hover:text-foreground'}`}>
                 Services
               </button>
-            <button onClick={() => handleNavigation("portfolio")} className={`nav-link cursor-pointer transition-colors ${window.location.pathname === '/portfolio' ? 'text-accent font-medium' : 'text-foreground/80 hover:text-foreground'}`}>
+            <button onClick={() => handleNavigation("portfolio")} className={`nav-link cursor-pointer transition-colors ${location.pathname === '/portfolio' ? 'text-accent font-medium' : 'text-foreground/80 hover:text-foreground'}`}>
               Portfolio
             </button>
               <button onClick={() => handleNavigation("contact")} className={`nav-link cursor-pointer transition-colors ${activeSection === 'contact' ? 'text-accent font-medium' : 'text-foreground/80 hover:text-foreground'}`}>
@@ -186,26 +223,28 @@ export default function Navbar() {
 
             {/* Mobile Menu Button */}
             <div className="md:hidden">
-              <button onClick={() => setIsOpen(!isOpen)} className="p-2 rounded-lg hover:bg-accent/10 transition-colors" aria-label="Toggle menu">
+              <button onClick={() => setIsOpen(!isOpen)} className="p-2 rounded-lg hover:bg-accent/10 transition-colors" aria-label="Toggle menu" aria-expanded={isOpen}>
                 {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </button>
             </div>
           </div>
 
           {/* Mobile Menu */}
-          {isOpen && <div className="md:hidden py-4 space-y-2 animate-fade-in">
-              <button onClick={() => handleNavigation("home")} className={`block w-full text-left px-4 py-3 rounded-lg transition-colors ${activeSection === '' && window.location.pathname === '/' && window.scrollY === 0 ? 'text-accent font-medium bg-accent/10' : 'text-foreground/80 hover:text-foreground hover:bg-accent/10'}`}>
+          {isOpen && <div className="animate-fade-in border-t border-border/70 py-4 md:hidden">
+              <div className="space-y-2 rounded-2xl border border-border/60 bg-card/70 p-2">
+              <button onClick={() => handleNavigation("home")} className={`block w-full text-left px-4 py-3 rounded-xl transition-colors ${activeSection === '' && location.pathname === '/' && isAtTop ? 'text-accent font-medium bg-accent/10' : 'text-foreground/80 hover:text-foreground hover:bg-accent/10'}`}>
                 Home
               </button>
-              <button onClick={() => handleNavigation("portfolio")} className={`block w-full text-left px-4 py-3 rounded-lg transition-colors ${window.location.pathname === '/portfolio' ? 'text-accent font-medium bg-accent/10' : 'text-foreground/80 hover:text-foreground hover:bg-accent/10'}`}>
+              <button onClick={() => handleNavigation("portfolio")} className={`block w-full text-left px-4 py-3 rounded-xl transition-colors ${location.pathname === '/portfolio' ? 'text-accent font-medium bg-accent/10' : 'text-foreground/80 hover:text-foreground hover:bg-accent/10'}`}>
                 Portfolio
               </button>
-              <button onClick={() => handleNavigation("services")} className={`block w-full text-left px-4 py-3 rounded-lg transition-colors ${activeSection === 'services' ? 'text-accent font-medium bg-accent/10' : 'text-foreground/80 hover:text-foreground hover:bg-accent/10'}`}>
+              <button onClick={() => handleNavigation("services")} className={`block w-full text-left px-4 py-3 rounded-xl transition-colors ${activeSection === 'services' ? 'text-accent font-medium bg-accent/10' : 'text-foreground/80 hover:text-foreground hover:bg-accent/10'}`}>
                 Services
               </button>
-              <button onClick={() => handleNavigation("contact")} className={`block w-full text-left px-4 py-3 rounded-lg transition-colors ${activeSection === 'contact' ? 'text-accent font-medium bg-accent/10' : 'text-foreground/80 hover:text-foreground hover:bg-accent/10'}`}>
+              <button onClick={() => handleNavigation("contact")} className={`block w-full text-left px-4 py-3 rounded-xl transition-colors ${activeSection === 'contact' ? 'text-accent font-medium bg-accent/10' : 'text-foreground/80 hover:text-foreground hover:bg-accent/10'}`}>
                 Contact
               </button>
+              </div>
               {/* AUTHENTICATION DISABLED FOR PUBLIC - Admin access via /auth only
                {user ? (
                 <>

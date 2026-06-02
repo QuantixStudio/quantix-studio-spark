@@ -5,6 +5,8 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Bell, Mail, Shield, Smartphone } from "lucide-react";
+import { PageHeader } from "@/components/shared/PageHeader";
+import { StatePanel } from "@/components/shared/StatePanel";
 
 export default function Settings() {
   const { toast } = useToast();
@@ -22,14 +24,20 @@ export default function Settings() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold mb-2">Settings</h1>
-        <p className="text-muted-foreground">
-          Manage your application preferences and security settings.
-        </p>
-      </div>
+      <PageHeader
+        eyebrow="Preferences"
+        title="Settings"
+        description="Review notification and security preferences for the admin workspace."
+      />
 
-      <Card className="glass">
+      <StatePanel
+        icon={Shield}
+        title="Settings are currently local-only"
+        description="These controls are present for UX completeness, but they are not yet synced to a persisted backend settings model."
+        align="left"
+      />
+
+      <Card className="admin-surface">
         <CardHeader>
           <CardTitle>
             <Bell className="inline h-5 w-5 mr-2" />
@@ -40,7 +48,7 @@ export default function Settings() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="email-notifications">Email Notifications</Label>
               <p className="text-sm text-muted-foreground">
@@ -54,7 +62,7 @@ export default function Settings() {
             />
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="push-notifications">Push Notifications</Label>
               <p className="text-sm text-muted-foreground">
@@ -68,7 +76,7 @@ export default function Settings() {
             />
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="marketing-emails">Marketing Emails</Label>
               <p className="text-sm text-muted-foreground">
@@ -84,7 +92,7 @@ export default function Settings() {
         </CardContent>
       </Card>
 
-      <Card className="glass">
+      <Card className="admin-surface">
         <CardHeader>
           <CardTitle>
             <Shield className="inline h-5 w-5 mr-2" />
@@ -95,7 +103,7 @@ export default function Settings() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="two-factor">Two-Factor Authentication</Label>
               <p className="text-sm text-muted-foreground">
@@ -119,7 +127,7 @@ export default function Settings() {
       </Card>
 
       <div className="flex justify-end">
-        <Button onClick={handleSave}>Save All Settings</Button>
+        <Button onClick={handleSave} className="w-full sm:w-auto">Save All Settings</Button>
       </div>
     </div>
   );

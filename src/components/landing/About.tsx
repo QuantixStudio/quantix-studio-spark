@@ -2,6 +2,7 @@ import { Target, Zap, Shield } from "lucide-react";
 import { FadeInUp } from "@/components/animations/FadeInUp";
 import { StaggerContainer } from "@/components/animations/StaggerContainer";
 import { StaggerItem } from "@/components/animations/StaggerItem";
+import { IconGroupBadge } from "@/components/shared/IconGroupBadge";
 
 export default function About() {
   return (
@@ -22,9 +23,7 @@ export default function About() {
 
         <StaggerContainer className="grid md:grid-cols-3 gap-8" staggerDelay={0.15}>
           <StaggerItem className="text-center space-y-4 group">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-accent transition-all duration-300 group-hover:scale-110 group-hover:bg-accent/20">
-              <Zap className="h-8 w-8 text-accent" />
-            </div>
+            <IconGroupBadge icon={Zap} />
             <h3 className="text-xl font-semibold">3× Faster</h3>
             <p className="text-muted-foreground">
               Automation-first approach & no-code speed
@@ -32,9 +31,7 @@ export default function About() {
           </StaggerItem>
 
           <StaggerItem className="text-center space-y-4 group">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-accent transition-all duration-300 group-hover:scale-110 group-hover:bg-accent/20">
-              <Target className="h-8 w-8 text-accent" />
-            </div>
+            <IconGroupBadge icon={Target} />
             <h3 className="text-xl font-semibold">AI-Powered</h3>
             <p className="text-muted-foreground">
               Assistant bots, smart routing, GPT workflows
@@ -42,9 +39,7 @@ export default function About() {
           </StaggerItem>
 
           <StaggerItem className="text-center space-y-4 group">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-accent transition-all duration-300 group-hover:scale-110 group-hover:bg-accent/20">
-              <Shield className="h-8 w-8 text-accent" />
-            </div>
+            <IconGroupBadge icon={Shield} />
             <h3 className="text-xl font-semibold">Secure & Scalable</h3>
             <p className="text-muted-foreground">
               Privacy rules, RLS, GDPR-ready

@@ -1,40 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-
-interface ProjectCategory {
-  id: string;
-  name: string;
-  description: string | null;
-}
-
-interface Tool {
-  id: string;
-  name: string;
-  slug: string;
-  logo_path: string | null;
-  categories: string[];
-  description: string | null;
-  website_url: string | null;
-}
-
-interface ProjectDetail {
-  id: string;
-  title: string;
-  slug: string;
-  short_description: string;
-  full_description: string | null;
-  cover_url: string | null;
-  demo_url: string | null;
-  github_url: string | null;
-  project_category: ProjectCategory | null;
-  project_tools: Tool[];
-}
+import { mapProjectWithTools } from "@/lib/projectUtils";
+import type { ProjectWithTools, RawProjectWithCategory, Tool } from "@/types/app";
 
 export function useProjectDetail(slug: string) {
   return useQuery({
     queryKey: ["project", slug],
     queryFn: async () => {
-      const { data: project, error } = await supabase
+      const { data: projectData, error } = await supabase
         .from("projects")
         .select(`
           *,
@@ -49,27 +22,33 @@ export function useProjectDetail(slug: string) {
         .maybeSingle();
 
       if (error) throw error;
-      if (!project) return null;
+      if (!projectData) return null;
 
       // Fetch tools for this project
-      const { data: projectTech } = await supabase
+      const { data: projectTech, error: projectTechError } = await supabase
         .from("project_technologies")
         .select("tools")
-        .eq("project_id", project.id)
+        .eq("project_id", projectData.id)
         .maybeSingle();
+      if (projectTechError) throw projectTechError;
 
       const toolIds = projectTech?.tools || [];
 
-      // Fetch all tools that match the IDs
-      const { data: tools } = await supabase
-        .from("tools")
-        .select("*")
-        .in("id", toolIds.length > 0 ? toolIds : ['00000000-0000-0000-0000-000000000000']); // Avoid empty array error
+      let projectTools: Tool[] = [];
 
-      return {
-        ...project,
-        project_tools: tools || [],
-      } as ProjectDetail;
+      if (toolIds.length > 0) {
+        const { data: toolsData, error: toolsError } = await supabase
+          .from("tools")
+          .select("*")
+          .in("id", toolIds);
+        if (toolsError) throw toolsError;
+        projectTools = (toolsData ?? []) as Tool[];
+      }
+
+      return mapProjectWithTools(
+        projectData as RawProjectWithCategory,
+        projectTools,
+      ) as ProjectWithTools;
     },
     enabled: !!slug,
   });

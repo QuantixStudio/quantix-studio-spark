@@ -6,9 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, User as UserIcon, Shield } from "lucide-react";
+import { Mail, User as UserIcon } from "lucide-react";
 import { z } from "zod";
+import { getErrorMessage } from "@/lib/errorUtils";
+import { PageHeader } from "@/components/shared/PageHeader";
+import type { Profile as UserProfile } from "@/types/app";
 
 const profileSchema = z.object({
   full_name: z.string().trim().min(2, "Name must be at least 2 characters").max(100, "Name too long"),
@@ -20,7 +24,7 @@ export default function Profile() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
 
@@ -69,7 +73,7 @@ export default function Profile() {
         title: "Profile updated",
         description: "Your profile has been successfully updated.",
       });
-    } catch (error: any) {
+    } catch (error) {
       if (error instanceof z.ZodError) {
         toast({
           variant: "destructive",
@@ -80,7 +84,7 @@ export default function Profile() {
         toast({
           variant: "destructive",
           title: "Error",
-          description: error.message || "Failed to update profile.",
+          description: getErrorMessage(error, "Failed to update profile."),
         });
       }
     } finally {
@@ -90,8 +94,9 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      <div className="space-y-6">
+        <Skeleton className="h-20 w-full" />
+        <Skeleton className="h-[420px] w-full rounded-2xl" />
       </div>
     );
   }
@@ -105,16 +110,15 @@ export default function Profile() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold mb-2">Profile</h1>
-        <p className="text-muted-foreground">
-          Manage your account information and preferences.
-        </p>
-      </div>
+      <PageHeader
+        eyebrow="Account"
+        title="Profile"
+        description="Manage the core contact details tied to your admin access."
+      />
 
-      <Card className="border">
+      <Card className="admin-surface">
         <CardHeader>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
             <Avatar className="h-20 w-20">
               <AvatarFallback className="text-2xl bg-accent text-background">
                 {initials}
@@ -157,7 +161,7 @@ export default function Profile() {
 
           {/* Role field removed for security - roles now managed via user_roles table */}
 
-            <Button type="submit" disabled={saving}>
+            <Button type="submit" disabled={saving} className="w-full sm:w-auto">
               {saving ? (
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
               ) : (

@@ -1,37 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-
-interface ProjectCategory {
-  id: string;
-  name: string;
-  description: string | null;
-}
-
-interface Tool {
-  id: string;
-  name: string;
-  slug: string;
-  logo_path: string | null;
-  categories: string[];
-  description: string | null;
-  website_url: string | null;
-}
-
-interface Project {
-  id: string;
-  title: string;
-  slug: string;
-  short_description: string;
-  cover_url: string | null;
-  images: any[] | null;
-  key_metric: string | null;
-  show_on_home: boolean;
-  published: boolean;
-  created_at: string;
-  category_id: string | null;
-  project_category: ProjectCategory | null;
-  project_tools: Tool[];
-}
+import { mapProjectWithTools } from "@/lib/projectUtils";
+import type { ProjectWithTools, RawProjectWithCategory, Tool } from "@/types/app";
 
 export function useProjects(adminMode = false, featuredOnly = false) {
   return useQuery({
@@ -70,34 +40,36 @@ export function useProjects(adminMode = false, featuredOnly = false) {
         query = query.limit(12);
       }
 
-      const { data: projects, error } = await query;
+      const { data: projectsData, error } = await query;
       if (error) throw error;
 
       // Fetch all tools
-      const { data: allTools } = await supabase
+      const { data: allToolsData, error: allToolsError } = await supabase
         .from("tools")
         .select("*");
+      if (allToolsError) throw allToolsError;
+
+      const projects = (projectsData ?? []) as RawProjectWithCategory[];
+      const allTools = (allToolsData ?? []) as Tool[];
 
       // For each project, get its tools from project_technologies
       const projectsWithTools = await Promise.all(
-        (projects || []).map(async (project) => {
-          const { data: projectTech } = await supabase
+        projects.map(async (project) => {
+          const { data: projectTech, error: projectTechError } = await supabase
             .from("project_technologies")
             .select("tools")
             .eq("project_id", project.id)
             .maybeSingle();
+          if (projectTechError) throw projectTechError;
 
           const toolIds = projectTech?.tools || [];
-          const projectTools = allTools?.filter(tool => toolIds.includes(tool.id)) || [];
+          const projectTools = allTools.filter((tool) => toolIds.includes(tool.id));
 
-          return {
-            ...project,
-            project_tools: projectTools,
-          };
+          return mapProjectWithTools(project, projectTools);
         })
       );
 
-      return projectsWithTools as Project[];
+      return projectsWithTools as ProjectWithTools[];
     },
   });
 }

@@ -1,16 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-
-interface Testimonial {
-  id: string;
-  name: string;
-  company: string | null;
-  position: string | null;
-  feedback: string;
-  avatar_url: string | null;
-  rating: number | null;
-  order_index: number;
-}
+import type { Testimonial } from "@/types/app";
 
 export function useTestimonials() {
   return useQuery({
@@ -23,7 +13,7 @@ export function useTestimonials() {
         .order("order_index", { ascending: true });
 
       if (error) throw error;
-      return data as Testimonial[];
+      return (data ?? []) as Testimonial[];
     },
   });
 }

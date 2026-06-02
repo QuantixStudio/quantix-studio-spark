@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { getErrorMessage } from "@/lib/errorUtils";
 
 const signInSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -83,8 +84,8 @@ export default function AuthModal({
         toast.success("Password reset email sent!");
         setMode("signin");
       }
-    } catch (error: any) {
-      toast.error(error.message || "An error occurred");
+    } catch (error) {
+      toast.error(getErrorMessage(error, "An error occurred"));
     } finally {
       setIsLoading(false);
     }

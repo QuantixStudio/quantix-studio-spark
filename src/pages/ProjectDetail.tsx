@@ -7,8 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { ExternalLink, Github, ArrowLeft, Mail } from "lucide-react";
+import { ExternalLink, Github, ArrowLeft, Mail, FolderSearch } from "lucide-react";
 import { useProjectDetail } from "@/hooks/useProjectDetail";
+import { getProjectImages } from "@/lib/projectUtils";
+import { getToolLogoUrl } from "@/lib/toolStorageUtils";
+import { StatePanel } from "@/components/shared/StatePanel";
+
 export default function ProjectDetail() {
   const {
     slug
@@ -24,16 +28,17 @@ export default function ProjectDetail() {
   if (isLoading) {
     return <div className="min-h-screen bg-background">
         <Navbar />
-        <article className="container mx-auto px-4 py-16 max-w-4xl">
-          <Skeleton className="w-full h-96 rounded-lg mb-8" />
-          <Skeleton className="h-8 w-32 mb-4" />
-          <Skeleton className="h-12 w-3/4 mb-6" />
+        <article className="container mx-auto max-w-5xl px-5 py-20 sm:px-6 md:px-8">
+          <Skeleton className="mb-6 h-5 w-32" />
+          <Skeleton className="mb-8 aspect-video w-full rounded-2xl" />
+          <Skeleton className="mb-4 h-8 w-32" />
+          <Skeleton className="mb-6 h-12 w-3/4" />
           <div className="flex gap-2 mb-8">
             <Skeleton className="h-8 w-24" />
             <Skeleton className="h-8 w-24" />
             <Skeleton className="h-8 w-24" />
           </div>
-          <Skeleton className="h-48 w-full" />
+          <Skeleton className="h-48 w-full rounded-2xl" />
         </article>
         <Footer />
       </div>;
@@ -41,30 +46,30 @@ export default function ProjectDetail() {
   if (!project) {
     return <div className="min-h-screen bg-background flex flex-col">
         <Navbar />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold mb-4">Project Not Found</h1>
-            <p className="text-muted-foreground mb-8">
-              The project you're looking for doesn't exist or has been removed.
-            </p>
-            <Button asChild>
-              <Link to="/">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Home
-              </Link>
-            </Button>
+        <div className="flex-1 px-5 py-24 sm:px-6 md:px-8">
+          <div className="mx-auto max-w-3xl">
+            <StatePanel
+              icon={FolderSearch}
+              title="Project not found"
+              description="The project you're looking for doesn't exist, has been unpublished, or the link is no longer valid."
+              action={
+                <Button asChild>
+                  <Link to="/portfolio">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Portfolio
+                  </Link>
+                </Button>
+              }
+            />
           </div>
         </div>
         <Footer />
       </div>;
   }
-  const projectData = project as any;
-  const images = projectData.images && Array.isArray(projectData.images) && projectData.images.length > 0 ? projectData.images.sort((a: any, b: any) => a.order - b.order) : project.cover_url ? [{
-    url: project.cover_url,
-    alt: project.title,
-    is_main: true,
-    order: 0
-  }] : [];
+  const images = getProjectImages(project.images, {
+    coverUrl: project.cover_url,
+    title: project.title,
+  });
   const openLightbox = (index: number) => {
     setLightboxIndex(index);
     setLightboxOpen(true);
@@ -72,8 +77,8 @@ export default function ProjectDetail() {
   return <div className="min-h-screen bg-background">
       <Navbar />
 
-      <article className="container mx-auto px-4 py-16 max-w-4xl">
-        <Link to="/portfolio" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors my-[20px]">
+      <article className="container mx-auto max-w-5xl px-5 py-20 sm:px-6 md:px-8">
+        <Link to="/portfolio" className="my-5 inline-flex items-center text-sm text-muted-foreground transition-colors hover:text-foreground">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Portfolio
         </Link>
@@ -81,8 +86,8 @@ export default function ProjectDetail() {
         {images.length > 0 && <div className="mb-8">
             <Carousel className="w-full">
               <CarouselContent>
-                {images.map((image: any, index: number) => <CarouselItem key={index}>
-                    <div className="relative aspect-video bg-muted rounded-lg overflow-hidden cursor-pointer group" onClick={() => openLightbox(index)}>
+                {images.map((image, index) => <CarouselItem key={index}>
+                    <div className="group relative aspect-video cursor-pointer overflow-hidden rounded-2xl bg-muted" onClick={() => openLightbox(index)}>
                       <img src={image.url} alt={image.alt || project.title} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" style={{
                   imageRendering: "auto"
                 }} loading="lazy" />
@@ -99,15 +104,15 @@ export default function ProjectDetail() {
             </Carousel>
           </div>}
 
-        <div className="mb-6">
+        <div className="mb-6 space-y-3">
           {project.project_category && <Badge variant="secondary" className="text-sm mb-3">
               {project.project_category.name}
             </Badge>}
-          <h1 className="text-4xl md:text-5xl font-bold">{project.title}</h1>
+          <h1 className="max-w-4xl text-4xl font-bold tracking-tight md:text-5xl">{project.title}</h1>
         </div>
 
-        {projectData.key_metric && <div className="mb-6 p-4 border border-accent rounded-lg bg-accent/5">
-            <p className="text-accent font-semibold">{projectData.key_metric}</p>
+        {project.key_metric && <div className="mb-6 rounded-2xl border border-accent/60 bg-accent/5 p-4">
+            <p className="text-accent font-semibold">{project.key_metric}</p>
           </div>}
 
         {project.project_tools && project.project_tools.length > 0 && (
@@ -119,11 +124,11 @@ export default function ProjectDetail() {
               {project.project_tools.map(tool => (
                 <div 
                   key={tool.id}
-                  className="flex items-center gap-2 px-3 py-2 border rounded-lg bg-card hover:bg-accent/5 transition-colors"
+                  className="flex items-center gap-2 rounded-xl border bg-card px-3 py-2 transition-colors hover:bg-accent/5"
                 >
                   {tool.logo_path && (
                     <img 
-                      src={`https://tbdhzxarsshzoweyndha.supabase.co/storage/v1/object/public/tools_logos/${tool.logo_path}`}
+                      src={getToolLogoUrl(tool.logo_path) || ""}
                       alt={tool.name}
                       className="w-6 h-6 object-contain bg-white rounded-[5px] p-1"
                     />
@@ -157,12 +162,12 @@ export default function ProjectDetail() {
         </div>
       </article>
 
-      <div className="fixed bottom-8 right-8 z-50">
-        <Button size="lg" className="shadow-lg" asChild>
-          <a href="/#contact">
+      <div className="fixed inset-x-4 bottom-4 z-50 sm:inset-x-auto sm:bottom-8 sm:right-8">
+        <Button size="lg" className="w-full shadow-lg sm:w-auto" asChild>
+          <Link to="/#contact">
             <Mail className="mr-2 h-5 w-5" />
             Request Similar Project
-          </a>
+          </Link>
         </Button>
       </div>
 

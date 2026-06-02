@@ -1,17 +1,24 @@
 import { useServices } from "@/hooks/useServices";
-import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import * as LucideIcons from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { FadeInUp } from "@/components/animations/FadeInUp";
 import { StaggerContainer } from "@/components/animations/StaggerContainer";
 import { StaggerItem } from "@/components/animations/StaggerItem";
+import { FeatureCard } from "@/components/shared/FeatureCard";
+import type { ServiceWithIcon } from "@/types/app";
+
+type DisplayService = Pick<
+  ServiceWithIcon,
+  "id" | "title" | "description" | "order_index" | "published" | "service_icon"
+>;
 export default function Services() {
   const {
     data: services,
     isLoading
   } = useServices();
 
-  const fallbackServices = [
+  const fallbackServices: DisplayService[] = [
     {
       id: "fallback-1",
       title: "No-Code Development",
@@ -52,8 +59,43 @@ export default function Services() {
 
   const getIcon = (iconName: string | null) => {
     if (!iconName) return null;
-    const Icon = LucideIcons[iconName as keyof typeof LucideIcons] as any;
-    return Icon ? <Icon className="h-12 w-12 text-accent" /> : null;
+    const iconLibrary = LucideIcons as unknown as Record<string, LucideIcon>;
+    const Icon = iconLibrary[iconName];
+    return Icon ? <Icon className="h-12 w-12" /> : null;
+  };
+
+  const parseServiceContent = (description: string) => {
+    if (!description.includes("Tools:")) {
+      return {
+        tools: undefined,
+        body: description,
+      };
+    }
+
+    const [toolsLine, ...bodyLines] = description.split("\n");
+
+    return {
+      tools: toolsLine.replace(/^Tools:\s*/i, ""),
+      body: bodyLines.join("\n").trim(),
+    };
+  };
+
+  const renderServiceIcon = (service: DisplayService) => {
+    if (service.service_icon?.icon_url) {
+      return (
+        <img
+          src={service.service_icon.icon_url}
+          alt={service.service_icon.name}
+          className="h-12 w-12 object-contain"
+        />
+      );
+    }
+
+    if (service.service_icon?.name) {
+      return getIcon(service.service_icon.name);
+    }
+
+    return <span className="text-2xl text-white">🔧</span>;
   };
 
   const list = (services && services.length ? services : fallbackServices);
@@ -67,46 +109,28 @@ export default function Services() {
         </div>
       </FadeInUp>
 
-      {isLoading ? <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {[1, 2, 3, 4].map(i => <Card key={i} className="hover-lift">
-              <CardContent className="pt-6">
-                <Skeleton className="h-12 w-12 rounded-lg mb-4" />
-                <Skeleton className="h-6 w-3/4 mb-2" />
-                <Skeleton className="h-20 w-full" />
-              </CardContent>
-            </Card>)}
+      {isLoading ? <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+          {[1, 2, 3, 4].map(i => <div key={i} className="feature-card-surface rounded-2xl p-8">
+              <Skeleton className="mb-6 h-12 w-12 rounded-lg" />
+              <Skeleton className="mb-4 h-6 w-3/4" />
+              <Skeleton className="mb-4 h-4 w-2/3" />
+              <Skeleton className="h-20 w-full" />
+            </div>)}
         </div> : <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8" staggerDelay={0.1}>
-          {list.map((service, index) => <StaggerItem key={service.id}>
-              <Card className="border transition-all duration-300 hover:border-accent hover:shadow-lg hover:shadow-accent/10 rounded-2xl flex flex-col h-full group">
-                <CardContent className="pt-6 flex-1 flex flex-col">
-                  {/* Icon Section - Fixed height */}
-                  <div className="h-12 mb-6 flex items-center transition-all duration-300 group-hover:scale-110">
-                    {service.service_icon?.icon_url ? <img src={service.service_icon.icon_url} alt={service.service_icon.name} className="h-12 w-12 object-contain" /> : service.service_icon?.name ? getIcon(service.service_icon.name) : <div className="h-12 w-12 bg-accent/10 rounded-lg flex items-center justify-center">
-                        <span className="text-2xl">🔧</span>
-                      </div>}
-                  </div>
+          {list.map((service) => {
+            const { tools, body } = parseServiceContent(service.description);
 
-                  {/* Title Section - Fixed height */}
-                  <div className="h-14 mb-4 flex items-start">
-                    <h3 className="text-xl font-semibold">{service.title}</h3>
-                  </div>
-
-                  {/* Tools Section - Fixed height */}
-                  <div className="h-10 mb-4">
-                    {service.description.includes("Tools:") && <p className="text-sm text-accent/80">
-                        {service.description.split("\n")[0].replace(/^Tools:\s*/i, "")}
-                      </p>}
-                  </div>
-
-                  {/* Description Section - Flexible height */}
-                  <div className="flex-1">
-                    <p className="text-muted-foreground leading-relaxed text-sm">
-                      {service.description.includes("Tools:") ? service.description.split("\n").slice(1).join("\n").trim() : service.description}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </StaggerItem>)}
+            return (
+              <StaggerItem key={service.id}>
+                <FeatureCard
+                  title={service.title}
+                  tools={tools}
+                  description={body}
+                  icon={renderServiceIcon(service)}
+                />
+              </StaggerItem>
+            );
+          })}
         </StaggerContainer>}
     </section>;
 }

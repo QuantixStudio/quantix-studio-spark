@@ -1,27 +1,32 @@
-import { useState } from "react";
 import { useProjects } from "@/hooks/useProjects";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ExternalLink } from "lucide-react";
-import FilterBar from "./FilterBar";
+import { FolderOpen } from "lucide-react";
 import { Link } from "react-router-dom";
+import { getMainProjectImageUrl } from "@/lib/projectUtils";
+import { StatePanel } from "@/components/shared/StatePanel";
 
 export default function ProjectGrid() {
-  const [activeFilter, setActiveFilter] = useState("all");
   const { data: projects, isLoading } = useProjects();
-
-  // Show all projects without filtering (FilterBar disabled)
-  const filteredProjects = projects;
 
   if (isLoading) {
     return (
-      <section className="section-container">
-        {/* FILTER BAR DISABLED - Showing all projects by default */}
-        {/* <FilterBar activeFilter={activeFilter} onFilterChange={setActiveFilter} /> */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <section className="container mx-auto px-5 py-12 sm:px-6 md:px-8">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Skeleton key={i} className="h-80 w-full" />
+            <div key={i} className="admin-surface overflow-hidden">
+              <Skeleton className="aspect-video w-full" />
+              <div className="space-y-4 p-6">
+                <Skeleton className="h-6 w-28" />
+                <Skeleton className="h-8 w-4/5" />
+                <Skeleton className="h-16 w-full" />
+                <div className="flex gap-2">
+                  <Skeleton className="h-6 w-16 rounded-full" />
+                  <Skeleton className="h-6 w-20 rounded-full" />
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       </section>
@@ -29,19 +34,11 @@ export default function ProjectGrid() {
   }
 
   return (
-    <section className="container mx-auto px-4 py-12">
-      {/* FILTER BAR DISABLED - Showing all projects by default */}
-      {/* <FilterBar activeFilter={activeFilter} onFilterChange={setActiveFilter} /> */}
-
-      {filteredProjects && filteredProjects.length > 0 ? (
+    <section className="container mx-auto px-5 py-12 sm:px-6 md:px-8">
+      {projects && projects.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {filteredProjects.map((project) => {
-            const images = project.images && Array.isArray(project.images) && project.images.length > 0
-              ? project.images
-              : project.cover_url
-              ? [{ url: project.cover_url, alt: project.title, is_main: true, order: 0 }]
-              : [];
-            const mainImage = images.find((img: any) => img.is_main)?.url || images[0]?.url;
+          {projects.map((project) => {
+            const mainImage = getMainProjectImageUrl(project);
             const tools = project.project_tools?.slice(0, 4) || [];
 
             return (
@@ -50,7 +47,7 @@ export default function ProjectGrid() {
                 to={`/portfolio/${project.slug}`}
                 className="block group"
               >
-                <Card className="overflow-hidden border transition-colors hover:border-accent h-full">
+                <Card className="admin-surface h-full overflow-hidden transition-colors hover:border-accent">
                   <div className="relative aspect-video bg-muted overflow-hidden">
                     {mainImage ? (
                       <img
@@ -85,7 +82,7 @@ export default function ProjectGrid() {
 
                     {tools.length > 0 && (
                       <div className="flex flex-wrap gap-2">
-                        {tools.map((tool: any) => (
+                        {tools.map((tool) => (
                           <Badge key={tool.id} variant="outline" className="text-xs">
                             {tool.name}
                           </Badge>
@@ -99,9 +96,11 @@ export default function ProjectGrid() {
           })}
         </div>
       ) : (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">No projects found for this filter.</p>
-        </div>
+        <StatePanel
+          icon={FolderOpen}
+          title="No projects published yet"
+          description="This portfolio is ready for new case studies. Publish a project in the admin area and it will appear here automatically."
+        />
       )}
     </section>
   );

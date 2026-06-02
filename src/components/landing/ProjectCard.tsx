@@ -1,47 +1,16 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
-
-interface Tool {
-  id: string;
-  name: string;
-  slug: string;
-  logo_path: string | null;
-  categories: string[];
-}
-
-interface ProjectCategory {
-  id: string;
-  name: string;
-  description: string | null;
-}
-
-interface Project {
-  id: string;
-  title: string;
-  slug: string;
-  short_description: string;
-  cover_url: string | null;
-  images: any[] | null;
-  key_metric: string | null;
-  show_on_home: boolean;
-  project_category: ProjectCategory | null;
-  project_tools: Tool[];
-}
+import { getMainProjectImageUrl } from "@/lib/projectUtils";
+import { getToolLogoUrl } from "@/lib/toolStorageUtils";
+import type { ProjectWithTools } from "@/types/app";
 
 interface ProjectCardProps {
-  project: Project;
+  project: ProjectWithTools;
 }
 
 export default function ProjectCard({ project }: ProjectCardProps) {
-  const images = project.images && Array.isArray(project.images) && project.images.length > 0
-    ? project.images
-    : project.cover_url
-    ? [{ url: project.cover_url, alt: project.title, is_main: true, order: 0 }]
-    : [];
-  const mainImage = images.find((img: any) => img.is_main)?.url || images[0]?.url;
-
+  const mainImage = getMainProjectImageUrl(project);
   const tools = project.project_tools?.slice(0, 4) || [];
 
   return (
@@ -90,7 +59,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 >
                   {tool.logo_path && (
                     <img 
-                      src={`https://tbdhzxarsshzoweyndha.supabase.co/storage/v1/object/public/tools_logos/${tool.logo_path}`}
+                      src={getToolLogoUrl(tool.logo_path) || ""}
                       alt={tool.name}
                       className="w-4 h-4 object-contain"
                     />

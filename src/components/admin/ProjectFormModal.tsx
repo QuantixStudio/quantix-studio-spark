@@ -4,11 +4,15 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
 import { deleteProjectImages } from "@/lib/storageUtils";
+import { getErrorMessage } from "@/lib/errorUtils";
+import { getProjectImages, serializeProjectImages } from "@/lib/projectUtils";
 import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -35,6 +39,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 import ImageUploader, { ProjectImage } from "./ImageUploader";
+import type { EditableProject, ProjectCategory, Tool } from "@/types/app";
 
 const projectSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -59,7 +64,7 @@ const projectSchema = z.object({
 interface ProjectFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  project?: any | null;
+  project?: EditableProject | null;
 }
 
 export default function ProjectFormModal({
@@ -70,8 +75,8 @@ export default function ProjectFormModal({
   const [isLoading, setIsLoading] = useState(false);
   const [images, setImages] = useState<ProjectImage[]>([]);
   const [originalImages, setOriginalImages] = useState<string[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
-  const [tools, setTools] = useState<any[]>([]);  // Changed from 'technologies' to 'tools'
+  const [categories, setCategories] = useState<ProjectCategory[]>([]);
+  const [tools, setTools] = useState<Tool[]>([]);
   const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof projectSchema>>({
@@ -87,14 +92,14 @@ export default function ProjectFormModal({
       published: project?.published || false,
       showOnHome: project?.show_on_home || false,
       keyMetric: project?.key_metric || "",
-      technologies: project?.project_tools?.map((tool: any) => tool.id) || [],  // Extract tool IDs from project_tools
+      technologies: project?.project_tools.map((tool) => tool.id) || [],
     },
   });
 
   useEffect(() => {
     if (isOpen) {
       fetchCategories();
-      fetchTools();  // Changed from fetchTechnologies
+      fetchTools();
 
       if (project) {
         form.reset({
@@ -108,17 +113,16 @@ export default function ProjectFormModal({
           published: project.published || false,
           showOnHome: project.show_on_home || false,
           keyMetric: project.key_metric || "",
-          technologies: project?.project_tools?.map((tool: any) => tool.id) || [],  // Extract tool IDs
+          technologies: project.project_tools.map((tool) => tool.id) || [],
         });
 
-        const projectImages = project.images && Array.isArray(project.images) && project.images.length > 0
-          ? project.images.sort((a: any, b: any) => a.order - b.order)
-          : project.cover_url
-          ? [{ url: project.cover_url, alt: project.title, is_main: true, order: 0 }]
-          : [];
+        const projectImages = getProjectImages(project.images, {
+          coverUrl: project.cover_url,
+          title: project.title,
+        });
 
         setImages(projectImages);
-        setOriginalImages(projectImages.map((img: any) => img.url));
+        setOriginalImages(projectImages.map((img) => img.url));
       } else {
         form.reset({
           title: "",
@@ -137,14 +141,14 @@ export default function ProjectFormModal({
         setOriginalImages([]);
       }
     }
-  }, [isOpen, project]);
+  }, [form, isOpen, project]);
 
   const fetchCategories = async () => {
     const { data } = await supabase
       .from("project_category")
       .select("*")
       .order("order_index");
-    if (data) setCategories(data);
+    if (data) setCategories(data as ProjectCategory[]);
   };
 
   const fetchTools = async () => {
@@ -152,7 +156,7 @@ export default function ProjectFormModal({
       .from("tools")
       .select("*")
       .order("name");
-    if (data) setTools(data);
+    if (data) setTools(data as Tool[]);
   };
 
   const generateSlug = (title: string) => {
@@ -210,7 +214,7 @@ export default function ProjectFormModal({
       return;
     }
 
-    let validatedImages = [...images];
+    const validatedImages = [...images];
     if (!validatedImages.some((img) => img.is_main)) {
       validatedImages[0].is_main = true;
       setImages(validatedImages);
@@ -222,7 +226,7 @@ export default function ProjectFormModal({
       let projectId = project?.id;
 
       if (!projectId) {
-        const insertData: any = { 
+        const insertData: TablesInsert<"projects"> = {
           title: values.title, 
           slug: values.slug,
           short_description: values.shortDescription,
@@ -241,7 +245,7 @@ export default function ProjectFormModal({
       const uploadedImages = await uploadImages(projectId);
       const mainImage = uploadedImages.find((img) => img.is_main) || uploadedImages[0];
 
-      const updateData: any = {
+      const updateData: TablesUpdate<"projects"> = {
         title: values.title,
         slug: values.slug,
         short_description: values.shortDescription,
@@ -252,7 +256,7 @@ export default function ProjectFormModal({
         published: values.published,
         show_on_home: values.showOnHome,
         key_metric: values.keyMetric || null,
-        images: uploadedImages,
+        images: serializeProjectImages(uploadedImages),
         cover_url: mainImage?.url || null,
       };
 
@@ -307,8 +311,8 @@ export default function ProjectFormModal({
       toast.success(project ? "Project updated!" : "Project created!");
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       onClose();
-    } catch (error: any) {
-      toast.error(error.message || "Failed to save project");
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to save project"));
     } finally {
       setIsLoading(false);
     }
@@ -318,13 +322,16 @@ export default function ProjectFormModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] overflow-y-auto rounded-2xl border bg-card/95 sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>{project ? "Edit Project" : "Create Project"}</DialogTitle>
+          <DialogDescription>
+            Keep this project polished for both the portfolio grid and the featured sections on the landing page.
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pb-1">
             <ImageUploader images={images} onChange={setImages} />
 
             <div className="space-y-4">
@@ -419,7 +426,7 @@ export default function ProjectFormModal({
                 )}
               />
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <FormField
                   control={form.control}
                   name="demoUrl"
@@ -569,17 +576,18 @@ export default function ProjectFormModal({
               />
             </div>
 
-            <div className="flex gap-2">
-              <Button type="submit" className="flex-1" disabled={isLoading}>
-                {isLoading ? "Saving..." : project ? "Update" : "Create"}
-              </Button>
+            <div className="flex flex-col-reverse gap-2 border-t border-border/70 pt-4 sm:flex-row sm:justify-end">
               <Button
                 type="button"
                 variant="ghost"
                 onClick={onClose}
                 disabled={isLoading}
+                className="w-full sm:w-auto"
               >
                 Cancel
+              </Button>
+              <Button type="submit" className="w-full sm:w-auto" disabled={isLoading}>
+                {isLoading ? "Saving..." : project ? "Update Project" : "Create Project"}
               </Button>
             </div>
           </form>

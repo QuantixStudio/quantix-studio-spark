@@ -2,8 +2,15 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = "https://tbdhzxarsshzoweyndha.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRiZGh6eGFyc3Noem93ZXluZGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAxODUxMjUsImV4cCI6MjA3NTc2MTEyNX0.r7-22ytfwU65i-hqpoaCY4NfxRXRbzQq19GYFUcY8Os";
+const DEFAULT_SUPABASE_URL = "https://tbdhzxarsshzoweyndha.supabase.co";
+const DEFAULT_SUPABASE_PUBLISHABLE_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRiZGh6eGFyc3Noem93ZXluZGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAxODUxMjUsImV4cCI6MjA3NTc2MTEyNX0.r7-22ytfwU65i-hqpoaCY4NfxRXRbzQq19GYFUcY8Os";
+
+// Keep runtime behavior stable by falling back to the current project defaults
+// when env variables are not injected by the hosting environment.
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL;
+const SUPABASE_PUBLISHABLE_KEY =
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || DEFAULT_SUPABASE_PUBLISHABLE_KEY;
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";

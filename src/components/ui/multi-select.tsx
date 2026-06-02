@@ -35,7 +35,7 @@ export function MultiSelect({
 
   return (
     <Command className="overflow-visible bg-transparent">
-      <div className="group rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+      <div className="field-control group rounded-md border border-input px-3 py-2 text-sm ring-offset-background">
         <div className="flex flex-wrap gap-1">
           {value.map((item) => (
             <Badge
@@ -74,7 +74,7 @@ export function MultiSelect({
       </div>
       <div className="relative mt-2">
         {open && options.length > 0 ? (
-          <div className="absolute top-0 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in">
+          <div className="surface-panel absolute top-0 z-10 w-full rounded-md border bg-popover text-popover-foreground outline-none animate-in">
             <CommandList>
               <CommandEmpty>No results found.</CommandEmpty>
               <CommandGroup className="h-full overflow-auto">

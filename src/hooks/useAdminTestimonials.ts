@@ -1,18 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { Testimonial } from "@/types/app";
 
-export interface Testimonial {
-  id: string;
-  name: string;
-  company: string | null;
-  position: string | null;
-  feedback: string;
-  avatar_url: string | null;
-  rating: number | null;
-  order_index: number;
-  published: boolean;
-  created_at: string;
-}
+export type { Testimonial } from "@/types/app";
 
 export const useAdminTestimonials = () => {
   return useQuery({
@@ -25,7 +15,7 @@ export const useAdminTestimonials = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as Testimonial[];
+      return (data ?? []) as Testimonial[];
     },
   });
 };

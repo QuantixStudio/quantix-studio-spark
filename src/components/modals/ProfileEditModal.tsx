@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getErrorMessage } from "@/lib/errorUtils";
 
 const profileSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters"),
@@ -138,8 +139,8 @@ export default function ProfileEditModal({
 
       toast.success("Profile updated successfully!");
       onClose();
-    } catch (error: any) {
-      toast.error(error.message || "Failed to update profile");
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to update profile"));
     } finally {
       setIsLoading(false);
     }

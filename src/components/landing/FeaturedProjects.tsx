@@ -15,6 +15,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { getMainProjectImageUrl } from "@/lib/projectUtils";
 
 export default function FeaturedProjects() {
   const { data: projects, isLoading } = useProjects(false, true);
@@ -55,12 +56,7 @@ export default function FeaturedProjects() {
         <>
           <StaggerContainer className="space-y-6 max-w-lg mx-auto" staggerDelay={0.15}>
             {displayProjects.map((project) => {
-              const images = project.images && Array.isArray(project.images) && project.images.length > 0
-                ? project.images
-                : project.cover_url
-                ? [{ url: project.cover_url, alt: project.title, is_main: true, order: 0 }]
-                : [];
-              const mainImage = images.find((img: any) => img.is_main)?.url || images[0]?.url;
+              const mainImage = getMainProjectImageUrl(project);
 
               return (
                 <StaggerItem key={project.id}>
@@ -129,12 +125,7 @@ export default function FeaturedProjects() {
         >
           <CarouselContent>
             {projects.map((project) => {
-              const images = project.images && Array.isArray(project.images) && project.images.length > 0
-                ? project.images
-                : project.cover_url
-                ? [{ url: project.cover_url, alt: project.title, is_main: true, order: 0 }]
-                : [];
-              const mainImage = images.find((img: any) => img.is_main)?.url || images[0]?.url;
+              const mainImage = getMainProjectImageUrl(project);
 
               return (
                 <CarouselItem key={project.id} className="md:basis-1/2 lg:basis-1/3">

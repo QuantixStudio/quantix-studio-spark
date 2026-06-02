@@ -29,8 +29,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tool } from "@/hooks/useTools";
+import { getErrorMessage } from "@/lib/errorUtils";
 import { deleteToolLogo, getToolLogoUrl } from "@/lib/toolStorageUtils";
+import { StatePanel } from "@/components/shared/StatePanel";
+import type { Tool } from "@/types/app";
 import { format } from "date-fns";
 
 interface ToolsTableProps {
@@ -78,7 +80,7 @@ export default function ToolsTable({ tools, onEdit }: ToolsTableProps) {
 
   const handleEdit = async (toolId: string) => {
     const { data, error } = await supabase
-      .from("tools" as any)
+      .from("tools")
       .select("*")
       .eq("id", toolId)
       .single();
@@ -88,7 +90,7 @@ export default function ToolsTable({ tools, onEdit }: ToolsTableProps) {
       return;
     }
 
-    onEdit(data as unknown as Tool);
+    onEdit(data as Tool);
   };
 
   const handleDelete = async () => {
@@ -102,7 +104,7 @@ export default function ToolsTable({ tools, onEdit }: ToolsTableProps) {
         await deleteToolLogo(tool.logo_path);
       }
 
-      const { error } = await supabase.from("tools" as any).delete().eq("id", deleteId);
+      const { error } = await supabase.from("tools").delete().eq("id", deleteId);
 
       if (error) throw error;
 
@@ -110,7 +112,7 @@ export default function ToolsTable({ tools, onEdit }: ToolsTableProps) {
       queryClient.invalidateQueries({ queryKey: ["tools"] });
     } catch (error) {
       console.error("Delete error:", error);
-      toast.error("Failed to delete tool");
+      toast.error(getErrorMessage(error, "Failed to delete tool"));
     } finally {
       setIsDeleting(false);
       setDeleteId(null);
@@ -119,16 +121,17 @@ export default function ToolsTable({ tools, onEdit }: ToolsTableProps) {
 
   if (tools.length === 0) {
     return (
-      <div className="text-center py-12 border rounded-lg">
-        <p className="text-muted-foreground">No tools found. Add your first tool to get started.</p>
-      </div>
+      <StatePanel
+        title="No tools yet"
+        description="Add the platforms and services you actively use so project cards, logos, and featured stack sections stay up to date."
+      />
     );
   }
 
   return (
     <>
-      <div className="border rounded-lg overflow-hidden">
-        <Table>
+      <div className="table-shell">
+        <Table className="min-w-[760px]">
           <TableHeader>
             <TableRow>
               <TableHead className="w-20">Logo</TableHead>
@@ -157,7 +160,14 @@ export default function ToolsTable({ tools, onEdit }: ToolsTableProps) {
                     </div>
                   )}
                 </TableCell>
-                <TableCell className="font-medium">{tool.name}</TableCell>
+                <TableCell className="font-medium">
+                  <div className="space-y-1">
+                    <p>{tool.name}</p>
+                    {tool.description ? (
+                      <p className="max-w-xs text-xs text-muted-foreground line-clamp-2">{tool.description}</p>
+                    ) : null}
+                  </div>
+                </TableCell>
                 <TableCell>
                   {tool.categories && tool.categories.length > 0 ? (
                     <div className="flex flex-wrap gap-1">

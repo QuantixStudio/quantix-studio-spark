@@ -4,18 +4,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { getErrorMessage } from "@/lib/errorUtils";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import AvatarUploader from "./AvatarUploader";
-import { Testimonial } from "@/hooks/useAdminTestimonials";
 import { compressImage } from "@/lib/imageUtils";
 import { deleteTestimonialAvatar, getTestimonialAvatarUrl } from "@/lib/testimonialStorageUtils";
+import type { Testimonial } from "@/types/app";
 
 const testimonialSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(100),
@@ -181,7 +182,7 @@ export default function TestimonialFormModal({
       onClose();
     } catch (error) {
       console.error("Submit error:", error);
-      toast.error("Failed to save testimonial");
+      toast.error(getErrorMessage(error, "Failed to save testimonial"));
     } finally {
       setIsLoading(false);
     }
@@ -189,15 +190,18 @@ export default function TestimonialFormModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto rounded-2xl border bg-card/95">
         <DialogHeader>
           <DialogTitle>
             {testimonial ? "Edit Testimonial" : "Add New Testimonial"}
           </DialogTitle>
+          <DialogDescription>
+            Use specific, outcome-focused quotes that strengthen trust on the public site.
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pb-1">
             <FormItem>
               <FormLabel>Avatar</FormLabel>
               <FormControl>
@@ -223,7 +227,7 @@ export default function TestimonialFormModal({
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField
                 control={form.control}
                 name="company"
@@ -266,12 +270,13 @@ export default function TestimonialFormModal({
                       rows={5}
                     />
                   </FormControl>
+                  <FormDescription>Strong testimonials mention the problem solved or the outcome delivered.</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField
                 control={form.control}
                 name="rating"
@@ -345,16 +350,17 @@ export default function TestimonialFormModal({
               )}
             />
 
-            <div className="flex gap-3 justify-end">
+            <div className="flex flex-col-reverse gap-2 border-t border-border/70 pt-4 sm:flex-row sm:justify-end">
               <Button
                 type="button"
                 variant="outline"
                 onClick={onClose}
                 disabled={isLoading}
+                className="w-full sm:w-auto"
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isLoading}>
+              <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
                 {isLoading
                   ? "Saving..."
                   : testimonial

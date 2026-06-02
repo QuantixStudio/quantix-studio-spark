@@ -8,6 +8,7 @@ interface ScrollRevealOptions {
 export function useScrollReveal(options: ScrollRevealOptions = {}) {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const { threshold = 0.2, triggerOnce = false } = options;
 
   useEffect(() => {
     // Check if element is already visible on mount
@@ -16,7 +17,7 @@ export function useScrollReveal(options: ScrollRevealOptions = {}) {
       const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
       if (isInViewport) {
         setIsVisible(true);
-        if (options.triggerOnce) {
+        if (triggerOnce) {
           return; // Don't set up observer if already visible and triggerOnce is true
         }
       }
@@ -26,12 +27,12 @@ export function useScrollReveal(options: ScrollRevealOptions = {}) {
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
-          if (options.triggerOnce) {
+          if (triggerOnce) {
             observer.disconnect();
           }
         }
       },
-      { threshold: options.threshold || 0.2 }
+      { threshold }
     );
 
     if (ref.current) {
@@ -39,7 +40,7 @@ export function useScrollReveal(options: ScrollRevealOptions = {}) {
     }
 
     return () => observer.disconnect();
-  }, []);
+  }, [threshold, triggerOnce]);
 
   return { isVisible, ref };
 }
