@@ -948,7 +948,39 @@ All colors MUST be HSL.
   }
 
   .page-shell {
-    @apply mx-auto w-full max-w-6xl space-y-6 md:space-y-8;
+    @apply mx-auto flex w-full max-w-6xl flex-col gap-6 md:gap-8;
+  }
+
+  .page-stack {
+    @apply flex flex-col gap-6;
+  }
+
+  .content-stack {
+    @apply flex flex-col gap-4;
+  }
+
+  .content-stack-sm {
+    @apply flex flex-col gap-2;
+  }
+
+  .content-cluster {
+    @apply flex flex-wrap items-center gap-3;
+  }
+
+  .admin-loading-panel {
+    @apply flex flex-col gap-4 p-4;
+  }
+
+  .state-panel-icon {
+    @apply flex size-12 items-center justify-center rounded-2xl border border-border/70 bg-muted/60 text-muted-foreground;
+  }
+
+  .status-dot {
+    @apply mt-2 size-2 shrink-0 rounded-full;
+  }
+
+  .admin-metric-icon {
+    @apply size-4 text-accent;
   }
 
   .admin-surface {

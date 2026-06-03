@@ -60,6 +60,12 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
+## Project documentation
+
+- `AGENTS.md` documents repository-specific implementation rules and known gotchas.
+- `PROJECT_AUDIT.md` records the latest scalability audit, applied optimizations, and next recommended passes.
+- `DESIGN_SYSTEM.md` records the current visual system, global style primitives, and shared UI conventions.
+
 ## How can I deploy this project?
 
 Simply open [Lovable](https://lovable.dev/projects/e5f1a7ec-e152-4439-a46c-1891e1bdafec) and click on Share -> Publish.

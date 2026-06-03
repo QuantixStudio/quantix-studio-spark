@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -32,6 +32,12 @@ const RouteFallback = () => (
   </div>
 );
 
+const LegacyProjectRedirect = () => {
+  const { slug } = useParams();
+
+  return <Navigate to={slug ? `/portfolio/${slug}` : "/portfolio"} replace />;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
@@ -48,7 +54,7 @@ const App = () => (
                 <Route path="/portfolio" element={<Portfolio />} />
                 <Route path="/portfolio/:slug" element={<ProjectDetail />} />
                 <Route path="/privacy" element={<Privacy />} />
-                <Route path="/project/:slug" element={<Navigate to="/portfolio/:slug" replace />} />
+                <Route path="/project/:slug" element={<LegacyProjectRedirect />} />
                 <Route path="/auth" element={<Auth />} />
                 
                 {/* Protected Admin Routes */}

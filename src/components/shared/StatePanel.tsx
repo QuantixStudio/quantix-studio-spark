@@ -29,10 +29,10 @@ export function StatePanel({
           align === "center" ? "flex-col items-center text-center" : "flex-col text-left sm:flex-row sm:items-start",
         )}
       >
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border/70 bg-muted/60 text-muted-foreground">
-          <Icon className="h-5 w-5" />
+        <div className="state-panel-icon">
+          <Icon aria-hidden="true" />
         </div>
-        <div className="space-y-2">
+        <div className="content-stack-sm">
           <h2 className="text-lg font-semibold">{title}</h2>
           <p className="max-w-md text-sm leading-relaxed text-muted-foreground">{description}</p>
         </div>

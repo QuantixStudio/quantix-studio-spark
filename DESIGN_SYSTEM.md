@@ -1,6 +1,6 @@
 # Design System Snapshot
 
-Последняя проверка: 2026-06-01
+Последняя проверка: 2026-06-03
 
 ## Назначение
 
@@ -13,6 +13,10 @@
 - не допустить случайного дрейфа стилей
 
 Это не новый дизайн-гайд, а снимок фактической реализации.
+
+См. также:
+
+- `PROJECT_AUDIT.md` — архитектурный аудит, правила масштабирования и список применённых оптимизаций.
 
 ## Источники истины
 
@@ -158,6 +162,27 @@ font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif
 - `sm`: `24px`
 - `md+`: `32px`
 - vertical padding section: `80px`
+
+### Глобальные layout primitives
+
+После аудита 2026-06-03 в `src/index.css` зафиксированы semantic-классы для повторяемых layout-паттернов:
+
+| Класс | Назначение |
+|---|---|
+| `page-shell` | максимальная ширина и вертикальный rhythm admin shell |
+| `page-stack` | основной вертикальный стек страницы |
+| `content-stack` | стандартный стек контентных блоков |
+| `content-stack-sm` | компактный стек заголовков, описаний и meta-copy |
+| `content-cluster` | переносимый горизонтальный cluster действий или badges |
+| `admin-loading-panel` | loading-состояние для admin index/list страниц |
+| `state-panel-icon` | единая иконка для empty/error/info panels |
+| `status-dot` | маленький статусный marker в списках health checks |
+| `admin-metric-icon` | иконка metric card в dashboard |
+
+Правило:
+
+- Для новых повторяемых паттернов сначала проверить, нет ли уже semantic-класса или shared-компонента.
+- Для уникальной локальной подстройки можно использовать Tailwind utilities, но не копировать длинные className-кластеры между экранами.
 
 ### Часто встречающиеся layout-паттерны
 

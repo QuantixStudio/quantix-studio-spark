@@ -10,6 +10,7 @@ import { useProjects } from "@/hooks/useProjects";
 import { useTools } from "@/hooks/useTools";
 import { useAdminTestimonials } from "@/hooks/useAdminTestimonials";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { AdminMetricCard } from "@/components/shared/AdminMetricCard";
 import type { Profile } from "@/types/app";
 
 export default function Dashboard() {
@@ -41,7 +42,7 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="page-stack">
         <Skeleton className="h-20 w-full" />
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {[1, 2, 3, 4].map((item) => (
@@ -63,7 +64,7 @@ export default function Dashboard() {
   const publishedTestimonials = testimonials?.filter((testimonial) => testimonial.published).length ?? 0;
 
   return (
-    <div className="space-y-6">
+    <div className="page-stack">
       <PageHeader
         eyebrow="Workspace overview"
         title={`Welcome back, ${displayName}`}
@@ -71,49 +72,30 @@ export default function Dashboard() {
       />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <Card className="admin-surface">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Projects</CardTitle>
-            <Sparkles className="h-4 w-4 text-accent" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalProjects}</div>
-            <p className="text-xs text-muted-foreground">{publishedProjects} currently visible on the site</p>
-          </CardContent>
-        </Card>
-
-        <Card className="admin-surface">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Featured Tools</CardTitle>
-            <Wrench className="h-4 w-4 text-accent" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{featuredTools}</div>
-            <p className="text-xs text-muted-foreground">Displayed in the public tools carousel</p>
-          </CardContent>
-        </Card>
-
-        <Card className="admin-surface">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Testimonials</CardTitle>
-            <MessageSquare className="h-4 w-4 text-accent" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{publishedTestimonials}</div>
-            <p className="text-xs text-muted-foreground">Published pieces of social proof</p>
-          </CardContent>
-        </Card>
-
-        <Card className="admin-surface">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Profile readiness</CardTitle>
-            <Folder className="h-4 w-4 text-accent" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{profile?.bio ? "Complete" : "Needs bio"}</div>
-            <p className="text-xs text-muted-foreground">Keep your admin profile polished for internal handoffs</p>
-          </CardContent>
-        </Card>
+        <AdminMetricCard
+          title="Projects"
+          value={totalProjects}
+          description={`${publishedProjects} currently visible on the site`}
+          icon={Sparkles}
+        />
+        <AdminMetricCard
+          title="Featured Tools"
+          value={featuredTools}
+          description="Displayed in the public tools carousel"
+          icon={Wrench}
+        />
+        <AdminMetricCard
+          title="Testimonials"
+          value={publishedTestimonials}
+          description="Published pieces of social proof"
+          icon={MessageSquare}
+        />
+        <AdminMetricCard
+          title="Profile readiness"
+          value={profile?.bio ? "Complete" : "Needs bio"}
+          description="Keep your admin profile polished for internal handoffs"
+          icon={Folder}
+        />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
@@ -122,7 +104,7 @@ export default function Dashboard() {
             <CardTitle>Quick Actions</CardTitle>
             <CardDescription>Jump straight into the most common content updates</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="content-stack">
             <Button asChild variant="outline" className="h-auto w-full justify-start rounded-xl px-4 py-4 text-left">
               <Link to="/admin/projects">
                 <div>
@@ -155,23 +137,23 @@ export default function Dashboard() {
             <CardTitle>Content health checks</CardTitle>
             <CardDescription>High-value follow-ups surfaced from the current content state</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="content-stack">
             <div className="flex items-start gap-3">
-              <div className="h-2 w-2 mt-2 rounded-full bg-primary" />
+              <div className="status-dot bg-primary" />
               <div className="flex-1">
                 <p className="text-sm font-medium">Review unpublished work</p>
                 <p className="text-xs text-muted-foreground">{totalProjects - publishedProjects} project(s) are still drafts.</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <div className="h-2 w-2 mt-2 rounded-full bg-accent" />
+              <div className="status-dot bg-accent" />
               <div className="flex-1">
                 <p className="text-sm font-medium">Check featured tools</p>
                 <p className="text-xs text-muted-foreground">{featuredTools > 0 ? "Carousel has content ready for the landing page." : "No featured tools are currently selected."}</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <div className="h-2 w-2 mt-2 rounded-full bg-primary" />
+              <div className="status-dot bg-primary" />
               <div className="flex-1">
                 <p className="text-sm font-medium">Audit testimonial freshness</p>
                 <p className="text-xs text-muted-foreground">{publishedTestimonials} testimonial(s) are currently public.</p>
