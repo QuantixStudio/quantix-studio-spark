@@ -109,7 +109,7 @@ export default function Contact() {
                   </div>
                 </div>
 
-                <Button asChild className="mt-auto w-full" size="lg">
+                <Button variant="marketing" asChild className="mt-auto w-full" size="lg">
                   <a href="https://calendly.com/quantixstudio/30min" target="_blank" rel="noopener noreferrer">
                     <Calendar className="mr-2 h-5 w-5" />
                     Schedule a Call
@@ -164,7 +164,7 @@ export default function Contact() {
                     </p>
                   </div>
 
-                  <Button type="submit" disabled={isSubmitting} className="mt-auto w-full" size="lg" aria-busy={isSubmitting}>
+                  <Button variant="marketing" type="submit" disabled={isSubmitting} className="mt-auto w-full" size="lg" aria-busy={isSubmitting}>
                     {isSubmitting ? "Sending..." : <>
                         <Send className="mr-2 h-4 w-4" />
                         Send Message

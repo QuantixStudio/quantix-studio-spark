@@ -103,9 +103,15 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 0 0% 97.3% !important;
     --sidebar-border: 0 0% 15.7% !important;
     --sidebar-ring: 0 0% 97.3% !important;
+    --button-marketing-background: 0 0% 97.3% !important;
+    --button-marketing-foreground: 0 0% 7.8% !important;
+    --button-marketing-border: 0 0% 100% !important;
+    --button-marketing-hover-border: 0 0% 26% !important;
     --shadow-surface-sm: 0 1px 3px 0 #000000cc;
     --shadow-surface-md: 0 3px 10px 0 #000000cc;
     --shadow-input-focus: 0 0 0 1px hsl(var(--project-showcase-hover-border) / 0.72), 0 12px 32px rgba(0, 0, 0, 0.2);
+    --shadow-button-marketing: 0 10px 28px rgba(0, 0, 0, 0.16);
+    --shadow-button-marketing-hover: 0 16px 36px rgba(0, 0, 0, 0.22);
   }
 
   .dark {
@@ -201,9 +207,15 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 0 0% 97.3% !important;
     --sidebar-border: 0 0% 15.7% !important;
     --sidebar-ring: 0 0% 97.3% !important;
+    --button-marketing-background: 0 0% 97.3% !important;
+    --button-marketing-foreground: 0 0% 7.8% !important;
+    --button-marketing-border: 0 0% 100% !important;
+    --button-marketing-hover-border: 0 0% 26% !important;
     --shadow-surface-sm: 0 1px 3px 0 #000000cc;
     --shadow-surface-md: 0 3px 10px 0 #000000cc;
     --shadow-input-focus: 0 0 0 1px hsl(var(--project-showcase-hover-border) / 0.72), 0 12px 32px rgba(0, 0, 0, 0.2);
+    --shadow-button-marketing: 0 10px 28px rgba(0, 0, 0, 0.16);
+    --shadow-button-marketing-hover: 0 16px 36px rgba(0, 0, 0, 0.22);
   }
 }
 
@@ -264,6 +276,61 @@ All colors MUST be HSL.
 }
 
 @layer components {
+  .button-marketing {
+    min-height: 3.5rem;
+    border-radius: 1.125rem !important;
+    border: 1px solid hsl(var(--button-marketing-border) / 0.92);
+    background: linear-gradient(
+      180deg,
+      hsl(var(--button-marketing-background)) 0%,
+      hsl(var(--button-marketing-background) / 0.985) 100%
+    ) !important;
+    color: hsl(var(--button-marketing-foreground)) !important;
+    padding-inline: 1.75rem !important;
+    box-shadow: var(--shadow-button-marketing);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    transition:
+      transform 220ms ease,
+      box-shadow 220ms ease,
+      border-color 220ms ease,
+      background-color 220ms ease,
+      color 220ms ease;
+  }
+
+  .button-marketing svg {
+    transition: transform 220ms ease;
+  }
+
+  .button-marketing:hover:not(:disabled),
+  .button-marketing:focus-visible {
+    transform: translateY(-1px);
+    border-color: hsl(var(--button-marketing-hover-border) / 0.82);
+    background: linear-gradient(
+      180deg,
+      hsl(var(--button-marketing-background)) 0%,
+      hsl(var(--button-marketing-background)) 100%
+    ) !important;
+    box-shadow:
+      0 0 0 1px hsl(var(--button-marketing-hover-border) / 0.64),
+      var(--shadow-button-marketing-hover);
+  }
+
+  .button-marketing:hover:not(:disabled) svg,
+  .button-marketing:focus-visible svg {
+    transform: translate3d(0.5px, -0.5px, 0);
+  }
+
+  .button-marketing:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: var(--shadow-button-marketing);
+  }
+
+  .button-marketing:disabled {
+    box-shadow: none;
+  }
+
   .arrow-button {
     height: 3rem !important;
     width: 3rem !important;

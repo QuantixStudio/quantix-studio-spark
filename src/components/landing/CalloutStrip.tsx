@@ -37,7 +37,7 @@ export default function CalloutStrip({ className }: { className?: string }) {
         <p className="text-lg mb-8 opacity-90 text-white">
           Let's discuss your project requirements
         </p>
-        <Button size="lg" variant="outline" className="bg-white text-black hover:bg-white/90 border-none" onClick={handleOpenInquiry}>
+        <Button size="lg" variant="marketing" onClick={handleOpenInquiry}>
           Book a Discovery Call
         </Button>
       </div>

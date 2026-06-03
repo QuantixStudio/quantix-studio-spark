@@ -64,7 +64,7 @@ export default function FeaturedProjects() {
           <FadeInUp delay={0.5}>
             <div className="mt-8 text-center">
               <Link to="/portfolio">
-                <Button size="lg" className="w-full sm:w-auto">
+                <Button variant="marketing" size="lg" className="w-full sm:w-auto">
                   View More Projects
                 </Button>
               </Link>

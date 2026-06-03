@@ -34,15 +34,14 @@ export default function Hero() {
 
           <FadeInUp delay={0.4}>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" onClick={scrollToContact} className="text-base md:text-lg">
+              <Button variant="marketing" size="lg" onClick={scrollToContact}>
                 Book a Free Strategy Call
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <Button
+                variant="marketing"
                 size="lg"
-                variant="outline"
                 onClick={() => navigate("/portfolio")}
-                className="text-base md:text-lg bg-white text-black hover:bg-white/90"
               >
                 View Our Work
               </Button>
