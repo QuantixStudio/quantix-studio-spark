@@ -29,11 +29,13 @@ export default defineConfig(({ mode }) => ({
             return "motion";
           }
 
+          const normalizedId = id.split(path.sep).join("/");
+
           if (
             id.includes("@radix-ui") ||
             id.includes("cmdk") ||
             id.includes("embla-carousel") ||
-            id.includes("vaul")
+            normalizedId.includes("/node_modules/vaul/")
           ) {
             return "ui-vendor";
           }
