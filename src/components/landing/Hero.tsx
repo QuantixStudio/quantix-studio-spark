@@ -1,15 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FadeInUp } from "@/components/animations/FadeInUp";
+import { scrollToSection } from "@/lib/navigation";
 
 export default function Hero() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const scrollToContact = () => {
-    const element = document.getElementById("contact");
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+    if (location.pathname === "/") {
+      scrollToSection("contact");
+    } else {
+      navigate("/#contact");
     }
   };
  

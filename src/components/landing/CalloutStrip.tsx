@@ -1,32 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { scrollToSection } from "@/lib/navigation";
 
 export default function CalloutStrip({ className }: { className?: string }) {
   const navigate = useNavigate();
   const location = useLocation();
   const handleOpenInquiry = () => {
-    // If on portfolio page, navigate to home first
-    if (location.pathname === "/portfolio") {
+    if (location.pathname !== "/") {
       navigate("/#contact");
-      setTimeout(() => {
-        const contactSection = document.getElementById("contact");
-        if (contactSection) {
-          contactSection.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-          });
-        }
-      }, 100);
     } else {
-      // Already on home page, just scroll
-      const contactSection = document.getElementById("contact");
-      if (contactSection) {
-        contactSection.scrollIntoView({
-          behavior: "smooth",
-          block: "start"
-        });
-      }
+      scrollToSection("contact");
     }
   };
   return <section className={cn("bg-primary text-primary-foreground py-16", className)}>

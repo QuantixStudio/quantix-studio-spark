@@ -17,12 +17,13 @@
  * - Restore commented imports
  */
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import { useEffect, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
 // import { LogOut, User, LayoutDashboard } from "lucide-react"; // Auth UI disabled
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
+import { cn } from "@/lib/utils";
+import { getActiveLandingSection, hasReachedNavTarget, scrollToSection, type LandingNavSection } from "@/lib/navigation";
 // import { useProfileModal } from "@/hooks/useProfileModal"; // Auth UI disabled
 import { Link, useLocation, useNavigate } from "react-router-dom";
 // import AuthModal from "@/components/modals/AuthModal"; // Auth UI disabled
@@ -39,8 +40,10 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('');
+  const [activeSection, setActiveSection] = useState<LandingNavSection>("home");
   const [isAtTop, setIsAtTop] = useState(true);
+  const pendingNavTargetRef = useRef<LandingNavSection | null>(null);
+  const pendingNavTimeoutRef = useRef<number | null>(null);
   // const [authModalOpen, setAuthModalOpen] = useState(false); // Auth UI disabled
   // const [profileModalOpen, setProfileModalOpen] = useState(false); // Auth UI disabled
   const {
@@ -56,6 +59,24 @@ export default function Navbar() {
 
   // const [profile, setProfile] = useState<any>(null); // Auth UI disabled
 
+  const clearPendingNavTarget = () => {
+    pendingNavTargetRef.current = null;
+
+    if (pendingNavTimeoutRef.current) {
+      window.clearTimeout(pendingNavTimeoutRef.current);
+      pendingNavTimeoutRef.current = null;
+    }
+  };
+
+  const setPendingNavTarget = (target: LandingNavSection) => {
+    clearPendingNavTarget();
+    pendingNavTargetRef.current = target;
+    pendingNavTimeoutRef.current = window.setTimeout(() => {
+      pendingNavTargetRef.current = null;
+      pendingNavTimeoutRef.current = null;
+    }, 1400);
+  };
+
   // Fetch profile when user is available (disabled for public)
   // useState(() => {
   //   if (user) {
@@ -68,57 +89,53 @@ export default function Navbar() {
   //   }
   // });
 
-  // Track active section with Intersection Observer
   useEffect(() => {
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          setActiveSection(entry.target.id);
-        }
-      });
-    }, {
-      threshold: 0.3,
-      rootMargin: '-100px 0px -50% 0px'
-    });
-    const sections = ['services', 'contact'];
-    sections.forEach(id => {
-      const element = document.getElementById(id);
-      if (element) observer.observe(element);
-    });
-    return () => observer.disconnect();
-  }, []);
+    const syncNavigationState = () => {
+      const scrollY = window.scrollY;
+      setIsAtTop(scrollY < 24);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsAtTop(window.scrollY < 24);
+      if (location.pathname === "/") {
+        const pendingTarget = pendingNavTargetRef.current;
+
+        if (pendingTarget) {
+          setActiveSection(pendingTarget);
+
+          if (hasReachedNavTarget(pendingTarget, scrollY)) {
+            clearPendingNavTarget();
+          }
+
+          return;
+        }
+
+        setActiveSection(getActiveLandingSection(scrollY));
+      }
     };
 
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    if (location.pathname !== "/") {
+      setActiveSection("home");
+      clearPendingNavTarget();
+    }
 
-    return () => window.removeEventListener("scroll", handleScroll);
+    syncNavigationState();
+    window.addEventListener("scroll", syncNavigationState, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", syncNavigationState);
+    };
+  }, [location.pathname]);
+
+  useEffect(() => {
+    return () => {
+      clearPendingNavTarget();
+    };
   }, []);
-
-  const scrollToSection = (id: string) => {
-    requestAnimationFrame(() => {
-      const element = document.getElementById(id);
-      if (!element) return;
-
-      const offset = 80;
-      const y = element.getBoundingClientRect().top + window.scrollY - offset;
-
-      window.scrollTo({
-        top: y,
-        behavior: "smooth",
-      });
-    });
-  };
 
   const handleNavigation = (target: string) => {
     setIsOpen(false);
 
     if (target === "home") {
       if (location.pathname === "/") {
+        setPendingNavTarget("home");
         window.scrollTo({ top: 0, behavior: "smooth" });
       } else {
         navigate("/");
@@ -127,12 +144,18 @@ export default function Navbar() {
     }
 
     if (target === "portfolio") {
-      navigate("/portfolio");
+      if (location.pathname === "/") {
+        setPendingNavTarget("portfolio");
+        scrollToSection("featured-work");
+      } else {
+        navigate("/#featured-work");
+      }
       return;
     }
 
     if (target === "services") {
       if (location.pathname === "/") {
+        setPendingNavTarget("services");
         scrollToSection("services");
       } else {
         navigate("/#services");
@@ -142,6 +165,7 @@ export default function Navbar() {
 
     if (target === "contact") {
       if (location.pathname === "/") {
+        setPendingNavTarget("contact");
         scrollToSection("contact");
       } else {
         navigate("/#contact");
@@ -153,6 +177,21 @@ export default function Navbar() {
     await signOut();
     setIsOpen(false);
   };
+
+  const currentNavTarget = location.pathname === "/" ? activeSection : null;
+
+  const getDesktopNavClassName = (target: "home" | "services" | "portfolio" | "contact") =>
+    cn(
+      "nav-link nav-link-button cursor-pointer",
+      currentNavTarget === target ? "nav-link-active text-foreground font-medium" : "text-foreground/72 hover:text-foreground",
+    );
+
+  const getMobileNavClassName = (target: "home" | "services" | "portfolio" | "contact") =>
+    cn(
+      "block w-full rounded-xl px-4 py-3 text-left transition-colors",
+      currentNavTarget === target ? "bg-foreground/6 text-foreground font-medium" : "text-foreground/72 hover:bg-foreground/6 hover:text-foreground",
+    );
+
   return <>
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isAtTop ? "bg-background/45 backdrop-blur-xl" : "glass shadow-sm"}`}>
         <div className="container mx-auto px-5 sm:px-6 md:px-8">
@@ -166,16 +205,16 @@ export default function Navbar() {
 
             {/* Desktop Navigation - Centered */}
             <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-8">
-              <button onClick={() => handleNavigation("home")} className={`nav-link cursor-pointer transition-colors ${activeSection === '' && location.pathname === '/' && isAtTop ? 'text-accent font-medium' : 'text-foreground/80 hover:text-foreground'}`}>
+              <button onClick={() => handleNavigation("home")} className={getDesktopNavClassName("home")}>
                 Home
               </button>
-              <button onClick={() => handleNavigation("services")} className={`nav-link cursor-pointer transition-colors ${activeSection === 'services' ? 'text-accent font-medium' : 'text-foreground/80 hover:text-foreground'}`}>
+              <button onClick={() => handleNavigation("services")} className={getDesktopNavClassName("services")}>
                 Services
               </button>
-            <button onClick={() => handleNavigation("portfolio")} className={`nav-link cursor-pointer transition-colors ${location.pathname === '/portfolio' ? 'text-accent font-medium' : 'text-foreground/80 hover:text-foreground'}`}>
-              Portfolio
-            </button>
-              <button onClick={() => handleNavigation("contact")} className={`nav-link cursor-pointer transition-colors ${activeSection === 'contact' ? 'text-accent font-medium' : 'text-foreground/80 hover:text-foreground'}`}>
+              <button onClick={() => handleNavigation("portfolio")} className={getDesktopNavClassName("portfolio")}>
+                Portfolio
+              </button>
+              <button onClick={() => handleNavigation("contact")} className={getDesktopNavClassName("contact")}>
                 Contact
               </button>
             </div>
@@ -232,18 +271,18 @@ export default function Navbar() {
           {/* Mobile Menu */}
           {isOpen && <div className="animate-fade-in border-t border-border/70 py-4 md:hidden">
               <div className="space-y-2 rounded-2xl border border-border/60 bg-card/70 p-2">
-              <button onClick={() => handleNavigation("home")} className={`block w-full text-left px-4 py-3 rounded-xl transition-colors ${activeSection === '' && location.pathname === '/' && isAtTop ? 'text-accent font-medium bg-accent/10' : 'text-foreground/80 hover:text-foreground hover:bg-accent/10'}`}>
-                Home
-              </button>
-              <button onClick={() => handleNavigation("portfolio")} className={`block w-full text-left px-4 py-3 rounded-xl transition-colors ${location.pathname === '/portfolio' ? 'text-accent font-medium bg-accent/10' : 'text-foreground/80 hover:text-foreground hover:bg-accent/10'}`}>
-                Portfolio
-              </button>
-              <button onClick={() => handleNavigation("services")} className={`block w-full text-left px-4 py-3 rounded-xl transition-colors ${activeSection === 'services' ? 'text-accent font-medium bg-accent/10' : 'text-foreground/80 hover:text-foreground hover:bg-accent/10'}`}>
-                Services
-              </button>
-              <button onClick={() => handleNavigation("contact")} className={`block w-full text-left px-4 py-3 rounded-xl transition-colors ${activeSection === 'contact' ? 'text-accent font-medium bg-accent/10' : 'text-foreground/80 hover:text-foreground hover:bg-accent/10'}`}>
-                Contact
-              </button>
+                <button onClick={() => handleNavigation("home")} className={getMobileNavClassName("home")}>
+                  Home
+                </button>
+                <button onClick={() => handleNavigation("portfolio")} className={getMobileNavClassName("portfolio")}>
+                  Portfolio
+                </button>
+                <button onClick={() => handleNavigation("services")} className={getMobileNavClassName("services")}>
+                  Services
+                </button>
+                <button onClick={() => handleNavigation("contact")} className={getMobileNavClassName("contact")}>
+                  Contact
+                </button>
               </div>
               {/* AUTHENTICATION DISABLED FOR PUBLIC - Admin access via /auth only
                {user ? (

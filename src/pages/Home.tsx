@@ -11,24 +11,18 @@ import FeaturedProjects from "@/components/landing/FeaturedProjects";
 import Testimonials from "@/components/landing/Testimonials";
 import Contact from "@/components/landing/Contact";
 import Footer from "@/components/landing/Footer";
+import { scrollToSection } from "@/lib/navigation";
 
 export default function Home() {
   // Handle hash-based scrolling when navigating from other pages
   useEffect(() => {
     const hash = window.location.hash;
     if (hash) {
-      // Small delay to ensure DOM is ready
-      setTimeout(() => {
-        const element = document.getElementById(hash.substring(1));
-        if (element) {
-          const offset = 64; // Fixed header height
-          const y = element.getBoundingClientRect().top + window.scrollY - offset;
-          window.scrollTo({
-            top: y,
-            behavior: "smooth"
-          });
-        }
+      const timeoutId = window.setTimeout(() => {
+        scrollToSection(hash.substring(1));
       }, 100);
+
+      return () => window.clearTimeout(timeoutId);
     }
   }, []);
 

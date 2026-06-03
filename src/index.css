@@ -900,6 +900,10 @@ All colors MUST be HSL.
     @apply relative transition-colors duration-300;
   }
 
+  .nav-link-button {
+    padding-block: 0.25rem;
+  }
+
   .nav-link::after {
     content: '';
     position: absolute;
@@ -907,11 +911,12 @@ All colors MUST be HSL.
     left: 0;
     width: 0%;
     height: 2px;
-    background: hsl(var(--accent));
+    background: hsl(var(--foreground) / 0.92);
     transition: width 0.3s ease-out;
   }
 
-  .nav-link:hover::after {
+  .nav-link:hover::after,
+  .nav-link-active::after {
     width: 100%;
   }
 
