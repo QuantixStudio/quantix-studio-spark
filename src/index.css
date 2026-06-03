@@ -628,6 +628,55 @@ All colors MUST be HSL.
     color: hsl(var(--project-showcase-metric)) !important;
   }
 
+  .project-showcase-meta-chip {
+    border: 1px solid rgb(255 255 255 / 0.08);
+    border-radius: 9999px;
+    background: rgb(255 255 255 / 0.03);
+    color: hsl(var(--project-showcase-metric)) !important;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    line-height: 1;
+    text-transform: uppercase;
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
+  }
+
+  .project-showcase-tool-chip {
+    border: 1px solid rgb(255 255 255 / 0.08);
+    border-radius: 9999px;
+    background:
+      linear-gradient(180deg, rgb(255 255 255 / 0.04) 0%, rgb(255 255 255 / 0.02) 100%),
+      hsl(var(--project-showcase-background));
+    color: hsl(var(--project-showcase-title)) !important;
+    padding: 0.52rem 0.86rem;
+    font-size: 0.78rem;
+    font-weight: 500;
+    line-height: 1;
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
+    transition:
+      border-color 220ms ease,
+      background-color 220ms ease,
+      color 220ms ease,
+      transform 220ms ease;
+  }
+
+  .project-showcase-card:hover .project-showcase-tool-chip,
+  .project-showcase-card:focus-within .project-showcase-tool-chip {
+    border-color: rgb(255 255 255 / 0.14);
+    background:
+      linear-gradient(180deg, rgb(255 255 255 / 0.06) 0%, rgb(255 255 255 / 0.03) 100%),
+      hsl(var(--project-showcase-background));
+  }
+
+  .project-showcase-note {
+    background:
+      radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.07), transparent 58%),
+      hsl(var(--project-showcase-media-background));
+    border: 1px solid hsl(var(--project-showcase-media-border) / 0.08);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05);
+  }
+
   .testimonial-showcase-stars {
     color: hsl(var(--foreground)) !important;
   }

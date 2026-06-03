@@ -8,15 +8,23 @@ import type { ProjectWithTools } from "@/types/app";
 interface ProjectShowcaseCardProps {
   project: ProjectWithTools;
   className?: string;
+  variant?: "featured" | "portfolio";
 }
 
 export function ProjectShowcaseCard({
   project,
   className,
+  variant = "featured",
 }: ProjectShowcaseCardProps) {
   const mainImage = getMainProjectImageUrl(project);
   const metric = project.key_metric?.trim();
-  const toolsCount = project.project_tools?.length ?? 0;
+  const tools = project.project_tools ?? [];
+  const toolsCount = tools.length;
+  const visibleTools = tools.slice(0, variant === "portfolio" ? 4 : 3);
+  const remainingToolsCount = Math.max(toolsCount - visibleTools.length, 0);
+  const summaryLabel = metric || `${toolsCount || 1}+ tools used across the build`;
+  const metaLabel = toolsCount > 0 ? `${toolsCount} tool${toolsCount > 1 ? "s" : ""}` : "Case study";
+  const isPortfolioCard = variant === "portfolio";
 
   return (
     <Link
@@ -28,7 +36,12 @@ export function ProjectShowcaseCard({
     >
       <article className="showcase-surface project-showcase-surface flex h-full flex-col overflow-hidden rounded-[28px]">
         <div className="px-5 pt-5">
-          <div className="project-showcase-media-shell relative aspect-[16/11] overflow-hidden rounded-[22px]">
+          <div
+            className={cn(
+              "project-showcase-media-shell relative overflow-hidden rounded-[22px]",
+              isPortfolioCard ? "aspect-[16/10]" : "aspect-[16/11]",
+            )}
+          >
             {mainImage ? (
               <img
                 src={mainImage}
@@ -47,7 +60,7 @@ export function ProjectShowcaseCard({
         </div>
 
         <div className="flex flex-1 flex-col px-6 pb-6 pt-5">
-          <div className="mb-4 flex min-h-7 items-center gap-2">
+          <div className="mb-4 flex min-h-7 items-center justify-between gap-3">
             {project.project_category ? (
               <Badge
                 variant="outline"
@@ -56,9 +69,22 @@ export function ProjectShowcaseCard({
                 {project.project_category.name}
               </Badge>
             ) : null}
+
+            {isPortfolioCard ? (
+              <span className="project-showcase-meta-chip shrink-0">
+                {metaLabel}
+              </span>
+            ) : null}
           </div>
 
-          <h3 className="project-showcase-title mb-3 text-[2rem] font-semibold leading-[1.02] tracking-[-0.04em]">
+          <h3
+            className={cn(
+              "project-showcase-title mb-3 font-semibold leading-[1.02] tracking-[-0.04em]",
+              isPortfolioCard
+                ? "text-[2rem] md:text-[2.15rem]"
+                : "text-[2rem]",
+            )}
+          >
             {project.title}
           </h3>
 
@@ -66,13 +92,38 @@ export function ProjectShowcaseCard({
             {project.short_description}
           </p>
 
-          <div className="mt-auto flex items-end justify-between gap-4 pt-6">
-            <div className="min-w-0">
-              <p className="project-showcase-metric line-clamp-2 text-sm leading-relaxed">
-                {metric || `${toolsCount || 1}+ tools used across the build`}
-              </p>
+          {isPortfolioCard ? (
+            <div className="mt-auto pt-6">
+              <div className="project-showcase-note mb-4 rounded-[20px] p-4 text-sm leading-relaxed">
+                <p className="project-showcase-metric min-w-0">
+                  {summaryLabel}
+                </p>
+              </div>
+
+              {visibleTools.length > 0 ? (
+                <div className="flex flex-wrap gap-2.5">
+                  {visibleTools.map((tool) => (
+                    <span key={tool.id} className="project-showcase-tool-chip">
+                      {tool.name}
+                    </span>
+                  ))}
+                  {remainingToolsCount > 0 ? (
+                    <span className="project-showcase-tool-chip">
+                      +{remainingToolsCount}
+                    </span>
+                  ) : null}
+                </div>
+              ) : null}
             </div>
-          </div>
+          ) : (
+            <div className="mt-auto flex items-end justify-between gap-4 pt-6">
+              <div className="min-w-0">
+                <p className="project-showcase-metric line-clamp-2 text-sm leading-relaxed">
+                  {summaryLabel}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </article>
     </Link>
