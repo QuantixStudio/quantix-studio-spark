@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Calendar, Mail, Send, Linkedin } from "lucide-react";
 import { FadeInUp } from "@/components/animations/FadeInUp";
@@ -76,101 +75,105 @@ export default function Contact() {
       <div className="mx-auto grid max-w-5xl items-stretch gap-6 lg:grid-cols-[0.95fr_1.05fr]">
         {/* Contact Info Card */}
         <FadeInUp delay={0.1} className="h-full">
-          <Card className="admin-surface h-full flex flex-col">
-            <CardContent className="flex flex-1 flex-col p-6 md:p-8">
-              <div className="flex-1">
-                <h3 className="mb-4 text-xl font-semibold md:text-2xl">Get in Touch</h3>
-                <p className="mb-6 leading-relaxed text-muted-foreground">
-                  Schedule a free consultation call to discuss your project, or send us
-                  a message using the form.
-                </p>
+          <div className="contact-showcase-card showcase-card h-full">
+            <article className="showcase-surface flex h-full flex-col overflow-hidden rounded-[28px]">
+              <div className="flex flex-1 flex-col p-6 md:p-8">
+                <div className="flex-1">
+                  <h3 className="contact-showcase-title mb-4 text-xl font-semibold md:text-2xl">Get in Touch</h3>
+                  <p className="contact-showcase-copy mb-6 leading-relaxed">
+                    Schedule a free consultation call to discuss your project, or send us
+                    a message using the form.
+                  </p>
 
-                <div className="mb-6 rounded-2xl border border-border/60 bg-background/60 p-4 text-sm text-muted-foreground">
-                  We usually reply within 1 business day with the next best step: a call,
-                  a quick scoping note, or follow-up questions.
+                  <div className="contact-showcase-note mb-6 rounded-[22px] p-4 text-sm">
+                    We usually reply within 1 business day with the next best step: a call,
+                    a quick scoping note, or follow-up questions.
+                  </div>
+
+                  <div className="mb-6 space-y-3">
+                    <div className="contact-showcase-meta flex items-center gap-3">
+                      <Mail className="contact-showcase-icon h-5 w-5 flex-shrink-0" />
+                      <span>support@quantixstudio.com</span>
+                    </div>
+                    <div className="contact-showcase-meta flex items-center gap-3">
+                      <Linkedin className="contact-showcase-icon h-5 w-5 flex-shrink-0" />
+                      <a
+                        href="https://www.linkedin.com/company/quantix-studio"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="transition-colors hover:text-foreground"
+                      >
+                        linkedin.com/company/quantix-studio
+                      </a>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="space-y-3 mb-6">
-                  <div className="flex items-center gap-3 text-muted-foreground">
-                    <Mail className="h-5 w-5 flex-shrink-0" />
-                    <span>support@quantixstudio.com</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Linkedin className="h-5 w-5 flex-shrink-0 text-muted-foreground" />
-                    <a
-                      href="https://www.linkedin.com/company/quantix-studio"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-muted-foreground hover:text-primary transition-colors"
-                    >
-                      linkedin.com/company/quantix-studio
-                    </a>
-                  </div>
-                </div>
+                <Button asChild className="mt-auto w-full" size="lg">
+                  <a href="https://calendly.com/quantixstudio/30min" target="_blank" rel="noopener noreferrer">
+                    <Calendar className="mr-2 h-5 w-5" />
+                    Schedule a Call
+                  </a>
+                </Button>
               </div>
-
-              <Button asChild className="mt-auto w-full" size="lg">
-                <a href="https://calendly.com/quantixstudio/30min" target="_blank" rel="noopener noreferrer">
-                  <Calendar className="mr-2 h-5 w-5" />
-                  Schedule a Call
-                </a>
-              </Button>
-            </CardContent>
-          </Card>
+            </article>
+          </div>
         </FadeInUp>
 
         {/* Contact Form Card */}
         <FadeInUp delay={0.2} className="h-full">
-          <Card className="admin-surface h-full flex flex-col">
-            <CardContent className="flex flex-1 flex-col p-6 md:p-8">
-              <form onSubmit={handleSubmit} className="flex flex-1 flex-col space-y-4">
-                <div className="space-y-2">
-                  <label htmlFor="contact-name" className="text-sm font-medium">
-                    Your name
-                  </label>
-                  <Input id="contact-name" placeholder="Jane founder" value={formData.name} onChange={e => setFormData({
-                  ...formData,
-                  name: e.target.value
-                })} required />
-                </div>
+          <div className="contact-showcase-card showcase-card h-full">
+            <article className="showcase-surface flex h-full flex-col overflow-hidden rounded-[28px]">
+              <div className="flex flex-1 flex-col p-6 md:p-8">
+                <form onSubmit={handleSubmit} className="flex flex-1 flex-col space-y-4">
+                  <div className="space-y-2">
+                    <label htmlFor="contact-name" className="contact-showcase-label text-sm font-medium">
+                      Your name
+                    </label>
+                    <Input id="contact-name" placeholder="Jane founder" value={formData.name} onChange={e => setFormData({
+                    ...formData,
+                    name: e.target.value
+                  })} required />
+                  </div>
 
-                <div className="space-y-2">
-                  <label htmlFor="contact-email" className="text-sm font-medium">
-                    Work email
-                  </label>
-                  <Input id="contact-email" type="email" placeholder="you@company.com" value={formData.email} onChange={e => setFormData({
-                  ...formData,
-                  email: e.target.value
-                })} required />
-                </div>
+                  <div className="space-y-2">
+                    <label htmlFor="contact-email" className="contact-showcase-label text-sm font-medium">
+                      Work email
+                    </label>
+                    <Input id="contact-email" type="email" placeholder="you@company.com" value={formData.email} onChange={e => setFormData({
+                    ...formData,
+                    email: e.target.value
+                  })} required />
+                  </div>
 
-                <div className="flex flex-1 flex-col space-y-2">
-                  <label htmlFor="contact-message" className="text-sm font-medium">
-                    Project overview
-                  </label>
-                  <Textarea
-                    id="contact-message"
-                    placeholder="Tell us about your project..."
-                    value={formData.message}
-                    onChange={e => setFormData({ ...formData, message: e.target.value })}
-                    rows={6}
-                    required
-                    className="flex-1 min-h-[140px]"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Share your timeline, budget range, or the workflow you want to automate.
-                  </p>
-                </div>
+                  <div className="flex flex-1 flex-col space-y-2">
+                    <label htmlFor="contact-message" className="contact-showcase-label text-sm font-medium">
+                      Project overview
+                    </label>
+                    <Textarea
+                      id="contact-message"
+                      placeholder="Tell us about your project..."
+                      value={formData.message}
+                      onChange={e => setFormData({ ...formData, message: e.target.value })}
+                      rows={6}
+                      required
+                      className="flex-1 min-h-[140px]"
+                    />
+                    <p className="contact-showcase-hint text-xs">
+                      Share your timeline, budget range, or the workflow you want to automate.
+                    </p>
+                  </div>
 
-                <Button type="submit" disabled={isSubmitting} className="mt-auto w-full" size="lg" aria-busy={isSubmitting}>
-                  {isSubmitting ? "Sending..." : <>
-                      <Send className="mr-2 h-4 w-4" />
-                      Send Message
-                    </>}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+                  <Button type="submit" disabled={isSubmitting} className="mt-auto w-full" size="lg" aria-busy={isSubmitting}>
+                    {isSubmitting ? "Sending..." : <>
+                        <Send className="mr-2 h-4 w-4" />
+                        Send Message
+                      </>}
+                  </Button>
+                </form>
+              </div>
+            </article>
+          </div>
         </FadeInUp>
       </div>
     </section>;
