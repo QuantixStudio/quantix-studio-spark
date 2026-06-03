@@ -22,11 +22,11 @@ export function ProjectShowcaseCard({
     <Link
       to={`/portfolio/${project.slug}`}
       className={cn(
-        "project-showcase-card media-hover-trigger group block h-full",
+        "showcase-card project-showcase-card media-hover-trigger group block h-full",
         className,
       )}
     >
-      <article className="project-showcase-surface flex h-full flex-col overflow-hidden rounded-[28px]">
+      <article className="showcase-surface project-showcase-surface flex h-full flex-col overflow-hidden rounded-[28px]">
         <div className="px-5 pt-5">
           <div className="project-showcase-media-shell relative aspect-[16/11] overflow-hidden rounded-[22px]">
             {mainImage ? (

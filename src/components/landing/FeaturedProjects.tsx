@@ -87,8 +87,8 @@ export default function FeaturedProjects() {
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious className="-left-16 h-12 w-12 border-white/10 bg-white/[0.03] text-white hover:bg-white/[0.08]" />
-          <CarouselNext className="-right-16 h-12 w-12 border-white/10 bg-white/[0.03] text-white hover:bg-white/[0.08]" />
+          <CarouselPrevious className="md:-left-6 lg:-left-16" />
+          <CarouselNext className="md:-right-6 lg:-right-16" />
         </Carousel>
       )}
     </section>

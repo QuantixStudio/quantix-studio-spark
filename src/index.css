@@ -49,6 +49,11 @@ All colors MUST be HSL.
     --carousel-card-translate-y: -3px;
     --carousel-card-duration: 380ms;
     --carousel-card-easing: cubic-bezier(0.22, 1, 0.36, 1);
+    --carousel-nav-background: 0 0% 100%;
+    --carousel-nav-border: 0 0% 100%;
+    --carousel-nav-foreground: 0 0% 100%;
+    --carousel-nav-hover-background: 0 0% 100%;
+    --carousel-nav-disabled-background: 0 0% 100%;
     --carousel-logo-scale: 1.69;
     --carousel-logo-scale-hover: 1.73;
     --media-hover-scale: 1.045;
@@ -143,6 +148,11 @@ All colors MUST be HSL.
     --carousel-card-translate-y: -3px;
     --carousel-card-duration: 380ms;
     --carousel-card-easing: cubic-bezier(0.22, 1, 0.36, 1);
+    --carousel-nav-background: 0 0% 100%;
+    --carousel-nav-border: 0 0% 100%;
+    --carousel-nav-foreground: 0 0% 100%;
+    --carousel-nav-hover-background: 0 0% 100%;
+    --carousel-nav-disabled-background: 0 0% 100%;
     --carousel-logo-scale: 1.69;
     --carousel-logo-scale-hover: 1.73;
     --media-hover-scale: 1.045;
@@ -250,6 +260,42 @@ All colors MUST be HSL.
   :focus-visible {
     outline: none;
     box-shadow: 0 0 0 2px hsl(var(--ring)), 0 0 0 4px hsl(var(--background));
+  }
+}
+
+@layer components {
+  .arrow-button {
+    height: 3rem !important;
+    width: 3rem !important;
+    aspect-ratio: 1 / 1;
+    padding: 0 !important;
+    border-radius: 9999px !important;
+    overflow: hidden;
+    border-color: hsl(var(--carousel-nav-border) / 0.1);
+    background-color: hsl(var(--carousel-nav-background) / 0.03);
+    color: hsl(var(--carousel-nav-foreground));
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+    backdrop-filter: blur(10px);
+    transition:
+      background-color 220ms ease,
+      border-color 220ms ease,
+      color 220ms ease,
+      box-shadow 220ms ease,
+      opacity 220ms ease;
+  }
+
+  .arrow-button:hover:not(:disabled) {
+    border-color: hsl(var(--carousel-nav-border) / 0.16);
+    background-color: hsl(var(--carousel-nav-hover-background) / 0.08);
+    color: hsl(var(--carousel-nav-foreground));
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.24);
+  }
+
+  .arrow-button:disabled {
+    border-color: hsl(var(--carousel-nav-border) / 0.08);
+    background-color: hsl(var(--carousel-nav-disabled-background) / 0.02);
+    color: hsl(var(--carousel-nav-foreground) / 0.42);
+    box-shadow: none;
   }
 }
 
@@ -454,7 +500,7 @@ All colors MUST be HSL.
     color: hsl(var(--feature-card-description)) !important;
   }
 
-  .project-showcase-surface {
+  .showcase-surface {
     background:
       linear-gradient(180deg, hsl(var(--project-showcase-background)) 0%, hsl(var(--project-showcase-background) / 0.98) 100%);
     border: 1px solid hsl(var(--project-showcase-border)) !important;
@@ -465,11 +511,16 @@ All colors MUST be HSL.
       transform 260ms ease;
   }
 
-  .project-showcase-card:hover .project-showcase-surface,
-  .project-showcase-card:focus-visible .project-showcase-surface,
-  .project-showcase-card:focus-within .project-showcase-surface {
+  .showcase-card:hover .showcase-surface,
+  .showcase-card:focus-visible .showcase-surface,
+  .showcase-card:focus-within .showcase-surface {
     border-color: hsl(var(--project-showcase-hover-border)) !important;
     box-shadow: var(--project-showcase-shadow-hover);
+  }
+
+  .project-showcase-surface {
+    background:
+      linear-gradient(180deg, hsl(var(--project-showcase-background)) 0%, hsl(var(--project-showcase-background) / 0.98) 100%);
   }
 
   .project-showcase-media-shell {
@@ -513,6 +564,35 @@ All colors MUST be HSL.
 
   .project-showcase-metric {
     color: hsl(var(--project-showcase-metric)) !important;
+  }
+
+  .testimonial-showcase-stars {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  .testimonial-showcase-quote {
+    color: hsl(var(--project-showcase-description)) !important;
+  }
+
+  .testimonial-showcase-avatar {
+    background:
+      radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.07), transparent 58%),
+      hsl(var(--project-showcase-media-background));
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05);
+  }
+
+  .testimonial-showcase-name {
+    color: hsl(var(--project-showcase-title)) !important;
+    transition: color 220ms ease;
+  }
+
+  .testimonial-showcase-role {
+    color: hsl(var(--project-showcase-metric)) !important;
+  }
+
+  .testimonial-showcase-card:hover .testimonial-showcase-name,
+  .testimonial-showcase-card:focus-within .testimonial-showcase-name {
+    color: hsl(var(--foreground)) !important;
   }
 
   .marquee-viewport {
