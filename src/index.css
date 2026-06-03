@@ -90,9 +90,9 @@ All colors MUST be HSL.
     --destructive: 0 84% 60% !important; /* #EF4444 */
     --destructive-foreground: 0 0% 100% !important;
     --border: 0 0% 15.7% !important; /* #282828 */
-    --input: 0 0% 58% !important; /* #949494 */
-    --input-background: 0 0% 6.7% !important; /* #111111 */
-    --input-hover-border: 0 0% 97.3% !important; /* #F8F8F8 */
+    --input: 0 0% 18.8% !important;
+    --input-background: 0 0% 7.8% !important;
+    --input-hover-border: 0 0% 26% !important;
     --ring: 0 0% 97.3% !important;
     --radius: 0.5rem;
     --sidebar-background: 0 0% 6.7% !important;
@@ -105,7 +105,7 @@ All colors MUST be HSL.
     --sidebar-ring: 0 0% 97.3% !important;
     --shadow-surface-sm: 0 1px 3px 0 #000000cc;
     --shadow-surface-md: 0 3px 10px 0 #000000cc;
-    --shadow-input-focus: 0 0 10px 0 rgb(248 248 248 / 0.12);
+    --shadow-input-focus: 0 0 0 1px hsl(var(--project-showcase-hover-border) / 0.72), 0 12px 32px rgba(0, 0, 0, 0.2);
   }
 
   .dark {
@@ -189,9 +189,9 @@ All colors MUST be HSL.
     --destructive: 0 84% 60% !important; /* #EF4444 */
     --destructive-foreground: 0 0% 100% !important;
     --border: 0 0% 15.7% !important; /* #282828 */
-    --input: 0 0% 58% !important; /* #949494 */
-    --input-background: 0 0% 6.7% !important; /* #111111 */
-    --input-hover-border: 0 0% 97.3% !important; /* #F8F8F8 */
+    --input: 0 0% 18.8% !important;
+    --input-background: 0 0% 7.8% !important;
+    --input-hover-border: 0 0% 26% !important;
     --ring: 0 0% 97.3% !important;
     --sidebar-background: 0 0% 6.7% !important;
     --sidebar-foreground: 0 0% 97.3% !important;
@@ -203,7 +203,7 @@ All colors MUST be HSL.
     --sidebar-ring: 0 0% 97.3% !important;
     --shadow-surface-sm: 0 1px 3px 0 #000000cc;
     --shadow-surface-md: 0 3px 10px 0 #000000cc;
-    --shadow-input-focus: 0 0 10px 0 rgb(248 248 248 / 0.12);
+    --shadow-input-focus: 0 0 0 1px hsl(var(--project-showcase-hover-border) / 0.72), 0 12px 32px rgba(0, 0, 0, 0.2);
   }
 }
 
@@ -351,8 +351,12 @@ All colors MUST be HSL.
   }
 
   .field-control {
-    background-color: hsl(var(--input-background)) !important;
+    background:
+      linear-gradient(180deg, hsl(var(--input-background)) 0%, hsl(var(--input-background) / 0.96) 100%) !important;
     border-color: hsl(var(--input)) !important;
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.03),
+      0 0 0 0 transparent;
     transition:
       border-color 200ms ease,
       box-shadow 200ms ease,
@@ -362,12 +366,16 @@ All colors MUST be HSL.
   .field-control:hover,
   .field-control[data-state="open"] {
     border-color: hsl(var(--input-hover-border)) !important;
+    background:
+      linear-gradient(180deg, hsl(var(--input-background) / 0.98) 0%, hsl(var(--input-background) / 0.94) 100%) !important;
   }
 
   .field-control:focus-visible,
   .field-control:focus-within {
     border-color: hsl(var(--input-hover-border)) !important;
     box-shadow: var(--shadow-input-focus) !important;
+    background:
+      linear-gradient(180deg, hsl(var(--input-background) / 0.98) 0%, hsl(var(--input-background) / 0.94) 100%) !important;
   }
 
   .glass {
