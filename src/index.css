@@ -447,18 +447,9 @@ All colors MUST be HSL.
   .icon-group-trigger:focus-within .icon-group-badge-icon {
   }
 
-  .feature-card-surface {
-    background-color: hsl(var(--feature-card-background)) !important;
-    border: 1px solid hsl(var(--feature-card-border)) !important;
-    box-shadow: var(--shadow-surface-sm) !important;
-    transition:
-      border-color 240ms ease,
-      box-shadow 240ms ease,
-      transform 240ms ease;
-  }
-
   .feature-card-title {
     color: hsl(var(--feature-card-title)) !important;
+    transition: color 220ms ease;
   }
 
   .feature-card-icon,
@@ -482,22 +473,17 @@ All colors MUST be HSL.
     will-change: transform;
   }
 
-  .feature-card-surface:hover .feature-card-icon,
-  .feature-card-surface:focus-within .feature-card-icon {
-  }
-
-  .feature-card-surface:hover .feature-card-icon svg,
-  .feature-card-surface:focus-within .feature-card-icon svg,
-  .feature-card-surface:hover .feature-card-icon img,
-  .feature-card-surface:focus-within .feature-card-icon img {
-  }
-
   .feature-card-tools {
     color: hsl(var(--feature-card-tools)) !important;
   }
 
   .feature-card-description {
     color: hsl(var(--feature-card-description)) !important;
+  }
+
+  .showcase-card:hover .feature-card-title,
+  .showcase-card:focus-within .feature-card-title {
+    color: hsl(var(--foreground)) !important;
   }
 
   .showcase-surface {
@@ -708,10 +694,6 @@ All colors MUST be HSL.
 
   .process-stage-card {
     position: relative;
-    background:
-      linear-gradient(180deg, hsl(var(--process-card-background)) 0%, hsl(var(--process-card-background) / 0.96) 100%) !important;
-    border: 1px solid hsl(var(--process-card-border)) !important;
-    box-shadow: var(--shadow-surface-sm) !important;
   }
 
   .process-stage-number {
@@ -735,6 +717,7 @@ All colors MUST be HSL.
 
   .process-stage-title {
     color: hsl(var(--process-card-title)) !important;
+    transition: color 220ms ease;
   }
 
   .process-stage-subtitle {
@@ -743,6 +726,11 @@ All colors MUST be HSL.
 
   .process-stage-description {
     color: hsl(var(--process-card-description)) !important;
+  }
+
+  .showcase-card:hover .process-stage-title,
+  .showcase-card:focus-within .process-stage-title {
+    color: hsl(var(--foreground)) !important;
   }
 
   .section-container {

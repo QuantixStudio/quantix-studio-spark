@@ -113,7 +113,7 @@ export default function Services() {
       </FadeInUp>
 
       {isLoading ? <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
-          {[1, 2, 3, 4].map(i => <div key={i} className="feature-card-surface rounded-2xl p-8">
+          {[1, 2, 3, 4].map(i => <div key={i} className="showcase-surface rounded-[28px] p-8">
               <Skeleton className="mb-6 h-12 w-12 rounded-lg" />
               <Skeleton className="mb-4 h-6 w-3/4" />
               <Skeleton className="mb-4 h-4 w-2/3" />
