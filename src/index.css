@@ -288,8 +288,8 @@ All colors MUST be HSL.
     color: hsl(var(--button-marketing-foreground)) !important;
     padding-inline: 1.75rem !important;
     box-shadow: var(--shadow-button-marketing);
-    font-size: 1.125rem;
-    line-height: 1.2;
+    font-size: 1.05rem !important;
+    line-height: 1.2 !important;
     font-weight: 600;
     letter-spacing: -0.02em;
     transition:

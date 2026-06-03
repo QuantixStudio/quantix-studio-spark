@@ -125,7 +125,7 @@ export default function Contact() {
           <div className="contact-showcase-card showcase-card h-full">
             <article className="showcase-surface flex h-full flex-col overflow-hidden rounded-[28px]">
               <div className="flex flex-1 flex-col p-6 md:p-8">
-                <form onSubmit={handleSubmit} className="flex flex-1 flex-col space-y-4">
+                <form onSubmit={handleSubmit} className="flex h-full flex-col space-y-4">
                   <div className="space-y-2">
                     <label htmlFor="contact-name" className="contact-showcase-label text-sm font-medium">
                       Your name
@@ -146,7 +146,7 @@ export default function Contact() {
                   })} required />
                   </div>
 
-                  <div className="flex flex-1 flex-col space-y-2">
+                  <div className="flex flex-col space-y-2">
                     <label htmlFor="contact-message" className="contact-showcase-label text-sm font-medium">
                       Project overview
                     </label>
@@ -157,7 +157,7 @@ export default function Contact() {
                       onChange={e => setFormData({ ...formData, message: e.target.value })}
                       rows={6}
                       required
-                      className="flex-1 min-h-[140px]"
+                      className="min-h-[180px]"
                     />
                     <p className="contact-showcase-hint text-xs">
                       Share your timeline, budget range, or the workflow you want to automate.
