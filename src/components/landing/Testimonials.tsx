@@ -13,12 +13,7 @@ import {
 import { getTestimonialAvatarUrl } from "@/lib/testimonialStorageUtils";
 
 export default function Testimonials() {
-  const { data: testimonials, isLoading } = useTestimonials();
-
-  // Don't render section if no testimonials
-  if (!isLoading && (!testimonials || testimonials.length === 0)) {
-    return null;
-  }
+  const { data: testimonials, isLoading, isError } = useTestimonials();
 
   return (
     <section className="section-container bg-muted/30">
@@ -52,6 +47,14 @@ export default function Testimonials() {
               </div>
             </article>
           ))}
+        </div>
+      ) : isError ? (
+        <div className="mx-auto max-w-3xl rounded-[28px] border border-border bg-card/60 p-8 text-center text-muted-foreground">
+          Testimonials could not be loaded from Supabase.
+        </div>
+      ) : !testimonials?.length ? (
+        <div className="mx-auto max-w-3xl rounded-[28px] border border-border bg-card/60 p-8 text-center text-muted-foreground">
+          No published rows found in the <code>testimonials</code> table yet.
         </div>
       ) : (
         <Carousel
