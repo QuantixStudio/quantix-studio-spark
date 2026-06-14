@@ -13,7 +13,7 @@ type UntypedSupabaseQuery = {
 };
 
 export interface HowWeWorkStep {
-  id: number;
+  id: string;
   title: string;
   subtitle: string | null;
   description: string;
@@ -35,20 +35,20 @@ export function useHowWeWork() {
         throw error;
       }
 
-      return ((data ?? []) as Array<Record<string, unknown>>).map((row) => ({
-        id: Number(row.id),
+      return ((data ?? []) as Array<Record<string, unknown>>).map((row, index) => ({
+        id: typeof row.id === "string" ? row.id : `how-we-work-${index}`,
         title: String(row.title ?? ""),
         subtitle: null,
         description: String(row.description ?? ""),
         icon_name:
-          Number(row.order ?? 0) === 1
+          Number(row.order ?? index + 1) === 1
             ? "Search"
-            : Number(row.order ?? 0) === 2
+            : Number(row.order ?? index + 1) === 2
               ? "Palette"
-              : Number(row.order ?? 0) === 3
+              : Number(row.order ?? index + 1) === 3
                 ? "Workflow"
                 : "Rocket",
-        order: Number(row.order ?? 0),
+        order: Number(row.order ?? index + 1),
         created_at: String(row.created_at ?? ""),
       })) satisfies HowWeWorkStep[];
     },

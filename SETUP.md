@@ -6,7 +6,7 @@ Complete onboarding guide for developers joining the Quantix Studio project.
 
 ## 📋 Prerequisites
 
-- **Node.js** 18.0+ or **Bun** 1.0+
+- **Node.js** 20.x or **Bun** 1.0+
 - **Git** for version control
 - **Supabase account** with a new project for this copy
 - Modern browser (Chrome, Firefox, Safari, Edge)
@@ -25,6 +25,7 @@ cd quantix-studio
 ### 2. Install Dependencies
 
 ```bash
+nvm use
 npm install
 # or
 bun install
