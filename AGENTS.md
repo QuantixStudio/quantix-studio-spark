@@ -1,6 +1,6 @@
 # Quantix Studio Agent Guide
 
-Last verified: 2026-06-01
+Last verified: 2026-06-14
 
 ## Project snapshot
 
@@ -89,6 +89,11 @@ Routing gotcha:
 - Local config: `supabase/config.toml`
 - MCP server should be configured with the active Supabase project ref when needed.
 
+Live schema note:
+
+- The connected Supabase project was replaced and its live schema differs from the older repo-local migrations and generated docs.
+- Treat `SUPABASE_LIVE_SCHEMA_AUDIT.md` as the current source of truth for the active remote project.
+
 Important implementation detail:
 
 - `.env` and `.env.example` define `VITE_SUPABASE_*` values.
@@ -99,71 +104,82 @@ Important implementation detail:
 
 Core auth and access tables:
 
-- `profiles`: user profile record linked to `auth.users`; stores `full_name`, `email`, `avatar_url`, `bio`.
-- `user_roles`: role assignment table; current enum is `admin | moderator | user`.
-- `has_role(_user_id, _role)`: role-check function used by RLS.
-- `is_admin()`: helper used by some storage policies.
+- `profiles`: user profile record linked to `auth.users`; stores `full_name`, `email`, `avatar_url`, `bio`, and active `role`.
+- Active role enum is `public.app_role = admin | manager | client`.
+- `is_admin()`: helper used by some policies.
 - Signup triggers:
-  - `handle_new_user()` creates profile rows.
-  - `handle_new_user_role()` assigns default `user` role.
+  - `on_auth_user_created` exists on `auth.users`
+  - live `public` functions include `handle_new_user` and `handle_new_user_profile`
 
 Core content tables used by the current frontend:
 
 - `services`: service cards for the landing page.
 - `how_we_work`: process cards for the landing page "How We Work" section; remote table currently stores `id`, `created_at`, `title`, `description`, `order`.
-- `why_choose_us`: value-prop cards for the landing page "Why Choose Quantix Studio" section; stores `id`, `created_at`, `title`, `description`, `icon_name`, `order`.
+- `why_choose_us`: value-prop cards for the landing page "Why Choose Quantix Studio" section; stores `id`, `created_at`, `title`, `description`, `order`.
 - `service_icon`: lookup table for service icon metadata.
-- `projects`: portfolio projects; includes `slug`, `short_description`, `full_description`, `cover_url`, `images`, `demo_url`, `github_url`, `published`, `show_on_home`, `order_index`, `category_id`.
+- `projects`: portfolio projects; includes `slug`, `short_description`, `full_description`, `demo_url`, `github_url`, `published`, `show_on_home`, `order_index`, `category_id`, `client_id`, `status`, `cover_image_id`.
+- `project_images`: project image records linked to `projects`.
+- `project_files`: project file records linked to `projects`.
+- `project_services`: normalized join table between projects and services.
 - `project_category`: project category lookup.
-- `project_technologies`: currently one row per project, with `tools text[]` storing tool IDs.
-- `tools`: tool catalog with `slug`, `categories text[]`, `logo_path`, `website_url`, `is_featured`.
-- `testimonials`: social proof content with avatar, company, role, rating, publish flag.
+- `project_technologies`: normalized join table between projects and `technologies` via `technology_id`.
+- `project_tasks`: task records linked to projects and `task_status`.
+- `project_status`: project status lookup.
+- `task_status`: task status lookup.
+- `tools`: tool catalog with `slug`, `logo_path`, `website_url`, `is_featured`.
+- `technologies`: technology lookup table used by `project_technologies`.
 
 Operational and auxiliary tables present in generated types:
 
+- `clients`
+- `client_status`
 - `inquiries`: lead/contact submissions plus metadata like company, use case, budget, timeline, page path, UTM params.
 - `inquiry_status`: lookup table for inquiry workflow states.
+- `invoices`
+- `invoice_status`
+- `payments`
+- `payment_status`
 - `email_templates`
 - `email_logs`
+- `notes`
+- `activity_log`
 - `documents`
-- `long_chat_history`
-- `n8n_chat_histories`
-- `technologies`: legacy lookup table from an older project-to-technology model.
+- `document_sources`
 
 Schema gotchas:
 
-- `project_technologies` has moved away from a normalized `technology_id` model to a single-row-per-project `tools[]` array model.
-- A `projects_with_tools` view is created in migrations, but the frontend still performs manual multi-query joins instead of using that view.
-- `src/integrations/supabase/types.ts` appears stale in at least two ways:
-  - it does not expose the `projects_with_tools` view
-  - its `tools_category` enum still contains `Data base`, while a newer migration validates `Database`
+- There is no live `user_roles` table in the connected project.
+- There is no live `testimonials` table in the connected project.
+- `project_technologies` is normalized and does not contain `tools text[]`.
+- `tools` does not contain `categories`.
+- `projects` does not contain `cover_url` or `images`; media is split into related tables.
+- `why_choose_us` does not contain `icon_name`.
+- Several project-related tables contain duplicate FK or unique constraints in the live schema.
+- `src/integrations/supabase/types.ts` should be treated as stale until regenerated from the current project.
 
 ## RLS and security summary
 
-- `profiles`: users can update their own profile; users can view their own profile; admins can view all profiles.
-- `user_roles`: users can view their own roles; only admins can manage roles.
-- `services`, `projects`, `testimonials`: public can read published rows; admins can manage all rows.
-- `how_we_work`: public can read published rows; admins can manage all rows.
-- `why_choose_us`: public read; admins can manage all rows.
+- `profiles`: users can read and update their own profile; admins/managers can read all; admins have a broader full-access policy.
+- `services`: public can read published rows; admins/managers can manage all rows.
+- `projects`: public can read published rows; admins/managers can manage all rows.
+- `how_we_work`: public can read all rows; admins/managers can manage all rows.
+- `why_choose_us`: public can read all rows; admins/managers can manage all rows.
 - `inquiries`: public can insert; admins can view and update.
-- `project_category`, `service_icon`, `technologies`, `project_technologies`, `inquiry_status`: readable publicly.
+- `project_category`, `service_icon`, `technologies`, `project_technologies`, `project_status`, `task_status`, `client_status`, `inquiry_status`, `invoice_status`, `payment_status`, `tools`: readable publicly.
+- `documents` and `document_sources`: blocked from frontend access by deny-all policies.
 - Storage rules:
-  - `avatars`: public read, authenticated users manage files inside their own folder
-  - `portfolio`: public read, admin write/update/delete
-  - `service-icons`: public read, admin write
-  - `testimonials_avatars`: public read, admin write/update/delete
+  - current live audit only confirmed one public bucket: `Project_images`
 
 Storage gap to verify:
 
-- Client code uses a `tools_logos` bucket.
-- Local migrations in this repo do not currently show bucket creation or policies for `tools_logos`.
-- Before touching tool logo uploads, verify that the remote Supabase project already has this bucket and correct policies, or add a migration for it.
+- Client code and older docs reference buckets such as `tools_logos`, `avatars`, `portfolio`, and `service-icons`.
+- The current live storage snapshot did not expose those buckets.
+- Before touching uploads, verify the live bucket strategy and reconcile frontend code with the current project.
 
 ## External integrations already in the app
 
 - Supabase
-- n8n webhook for contact form:
-  - `https://n8n.ibs-logistics.store/webhook/fd5bb622-d19d-4052-97df-0b65fc2c1273`
+- The live DB now contains an `AFTER INSERT` trigger on `public.inquiries` that forwards submissions to an external webhook.
 - Calendly booking link:
   - `https://calendly.com/quantixstudio/30min`
 - LinkedIn company page:
@@ -175,21 +191,23 @@ Storage gap to verify:
 
 Note:
 
-- The current contact form does not insert into the `inquiries` table. It POSTs directly to the external n8n webhook.
+- The current live project supports a DB-driven inquiry flow through `public.inquiries` plus a webhook trigger.
+- Verify the frontend flow before assuming it still posts directly to the old webhook endpoint.
 
 ## Current app behavior and product notes
 
-- Public landing page is section-based and data-backed for services, featured projects, tools, and testimonials.
-- Admin CRUD exists for projects, tools, and testimonials.
+- Public landing page is section-based and data-backed for services, featured projects, tools, and other marketing sections.
+- Any testimonial-related frontend behavior should be treated as schema-mismatch work until the app or DB is reconciled.
+- Admin CRUD definitely maps to projects and tools in the live schema.
 - Dashboard numbers are currently static placeholder values, not live analytics.
 - Profile editing updates `profiles.full_name` and `profiles.email`.
 
 ## Working rules for future changes
 
-- Prefer schema truth from `supabase/migrations` first, generated types second.
+- Prefer schema truth from `SUPABASE_LIVE_SCHEMA_AUDIT.md` and live MCP introspection for the currently connected project.
 - If DB schema changes, update migrations and then regenerate `src/integrations/supabase/types.ts`.
-- Do not store role data client-side; use `user_roles` and `has_role()`.
-- Be careful with project-tool relations: current app expects one `project_technologies` row per project.
+- Do not store role data client-side; the live project currently resolves access from `profiles.role`.
+- Be careful with project-technology relations: the live DB uses normalized `project_technologies` rows with `technology_id`.
 - If changing routes, remember there is a hidden admin alias at `/aus`.
 - If changing Supabase client setup, decide whether to keep hardcoded credentials or move fully to `import.meta.env`; do not leave both patterns half-active.
-- If changing contact flows, account for the fact that `inquiries` exists in DB but is not the live submission path right now.
+- If changing contact flows, account for the live `inquiries` trigger and avoid duplicating webhook delivery paths accidentally.

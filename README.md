@@ -63,6 +63,7 @@ This project is built with:
 ## Project documentation
 
 - `AGENTS.md` documents repository-specific implementation rules and known gotchas.
+- `SUPABASE_LIVE_SCHEMA_AUDIT.md` records the current live Supabase schema, fields, relationships, RLS, and known app/schema mismatches.
 - `PROJECT_AUDIT.md` records the latest scalability audit, applied optimizations, and next recommended passes.
 - `DESIGN_SYSTEM.md` records the current visual system, global style primitives, and shared UI conventions.
 

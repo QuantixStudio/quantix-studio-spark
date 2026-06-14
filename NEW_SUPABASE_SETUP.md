@@ -2,6 +2,12 @@
 
 This copy is prepared to connect to a different Supabase project through environment variables.
 
+Important:
+
+- The currently connected live project no longer matches the older local migration history in this repo.
+- Before using `supabase db push`, compare the target project with [SUPABASE_LIVE_SCHEMA_AUDIT.md](/Users/eugenepivovarov/Documents/CodexWorkspace/projects/Quantix Lovable/quantix-studio-spark-new-supabase/SUPABASE_LIVE_SCHEMA_AUDIT.md).
+- Do not assume `supabase/migrations/` is safe to apply unchanged to the new live project.
+
 ## 1. Create or choose a Supabase project
 
 Open the Supabase dashboard, create a new project, then copy:
@@ -24,33 +30,39 @@ VITE_SUPABASE_URL=https://your-new-project-ref.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=your_new_anon_publishable_key
 ```
 
-## 3. Link and migrate
+## 3. Link and verify schema
 
 ```bash
 supabase link --project-ref your_new_project_ref
-supabase db push
 ```
 
-If you are not using the Supabase CLI, apply every file in `supabase/migrations/` in timestamp order.
+Then verify:
+
+- `VITE_SUPABASE_URL` and publishable key point to the intended project
+- the live schema matches the app requirements
+- storage buckets required by the frontend actually exist
+
+Only run `supabase db push` after reconciling repo migrations with the target
+project.
 
 ## 4. Verify required storage buckets
 
-The migrations create these public buckets:
+The current live project audit only found one public bucket:
 
-- `avatars`
-- `portfolio`
-- `service-icons`
-- `testimonials_avatars`
-- `tools_logos`
+- `Project_images`
+
+If the frontend still expects buckets such as `avatars`, `portfolio`,
+`service-icons`, `testimonials_avatars`, or `tools_logos`, create or migrate
+them deliberately instead of assuming they already exist.
 
 ## 5. Create an admin user
 
 Sign up through the app, then assign the admin role in SQL:
 
 ```sql
-INSERT INTO public.user_roles (user_id, role)
-VALUES ('<auth-user-id>', 'admin'::public.app_role)
-ON CONFLICT DO NOTHING;
+UPDATE public.profiles
+SET role = 'admin'::public.app_role
+WHERE id = '<auth-user-id>';
 ```
 
 ## 6. Run locally
