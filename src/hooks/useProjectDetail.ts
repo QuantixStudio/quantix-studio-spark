@@ -1,7 +1,118 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { mapProjectWithTools } from "@/lib/projectUtils";
-import type { ProjectWithTools, RawProjectWithCategory, Tool } from "@/types/app";
+import type { ProjectImage, ProjectWithTools } from "@/types/app";
+
+interface ProjectCategorySummary {
+  id: string;
+  name: string;
+  description: string | null;
+}
+
+interface TechnologySummary {
+  id: string;
+  name: string;
+}
+
+interface ProjectImageRow {
+  public_url: string | null;
+  alt: string | null;
+  is_main: boolean | null;
+  order_index: number | null;
+}
+
+interface RawProjectRow {
+  id: string;
+  title: string;
+  slug: string;
+  short_description: string | null;
+  full_description: string | null;
+  demo_url: string | null;
+  github_url: string | null;
+  key_metric: string | null;
+  show_on_home: boolean | null;
+  published: boolean | null;
+  created_at: string | null;
+  updated_at: string | null;
+  category_id: string | null;
+  project_category: ProjectCategorySummary | null;
+  project_images?: ProjectImageRow[] | null;
+  cover_image?: ProjectImageRow | ProjectImageRow[] | null;
+}
+
+function normalizeRelatedImage(
+  image: ProjectImageRow | ProjectImageRow[] | null | undefined,
+): ProjectImageRow | null {
+  if (!image) {
+    return null;
+  }
+
+  if (Array.isArray(image)) {
+    return image[0] ?? null;
+  }
+
+  return image;
+}
+
+function mapProjectImages(
+  images: ProjectImageRow[] | null | undefined,
+  coverImage: ProjectImageRow | ProjectImageRow[] | null | undefined,
+  fallbackTitle: string,
+): ProjectImage[] {
+  const normalizedImages = (images ?? [])
+    .filter((image): image is ProjectImageRow => Boolean(image?.public_url))
+    .map((image, index) => ({
+      url: image.public_url ?? "",
+      alt: image.alt ?? fallbackTitle,
+      is_main: image.is_main ?? index === 0,
+      order: image.order_index ?? index,
+    }))
+    .sort((left, right) => left.order - right.order);
+
+  if (normalizedImages.length > 0 && !normalizedImages.some((image) => image.is_main)) {
+    normalizedImages[0].is_main = true;
+  }
+
+  if (normalizedImages.length > 0) {
+    return normalizedImages;
+  }
+
+  const fallbackImage = normalizeRelatedImage(coverImage);
+
+  if (fallbackImage?.public_url) {
+    return [
+      {
+        url: fallbackImage.public_url,
+        alt: fallbackImage.alt ?? fallbackTitle,
+        is_main: true,
+        order: fallbackImage.order_index ?? 0,
+      },
+    ];
+  }
+
+  return normalizedImages;
+}
+
+function mapProject(project: RawProjectRow, technologies: TechnologySummary[]): ProjectWithTools {
+  return {
+    ...project,
+    short_description: project.short_description?.trim() || "Project details coming soon.",
+    images: mapProjectImages(project.project_images, project.cover_image, project.title),
+    cover_url: null,
+    published: project.published ?? false,
+    show_on_home: project.show_on_home ?? false,
+    project_tools: technologies.map((technology) => ({
+      id: technology.id,
+      name: technology.name,
+      slug: technology.name.toLowerCase().replace(/\s+/g, "-"),
+      description: null,
+      website_url: null,
+      logo_path: null,
+      is_featured: false,
+      created_at: null,
+      updated_at: null,
+    })),
+  } as ProjectWithTools;
+}
 
 export function useProjectDetail(slug: string) {
   return useQuery({
@@ -11,10 +122,22 @@ export function useProjectDetail(slug: string) {
         .from("projects")
         .select(`
           *,
-          project_category:project_category!projects_category_id_fkey (
+          project_category:project_category!fk_project_category (
             id,
             name,
             description
+          ),
+          cover_image:project_images!projects_cover_image_id_fkey (
+            public_url,
+            alt,
+            is_main,
+            order_index
+          ),
+          project_images:project_images!project_images_project_fk (
+            public_url,
+            alt,
+            is_main,
+            order_index
           )
         `)
         .eq("slug", slug)
@@ -25,30 +148,26 @@ export function useProjectDetail(slug: string) {
       if (!projectData) return null;
 
       // Fetch tools for this project
-      const { data: projectTech, error: projectTechError } = await supabase
+      const { data: projectTechRows, error: projectTechError } = await supabase
         .from("project_technologies")
-        .select("tools")
-        .eq("project_id", projectData.id)
-        .maybeSingle();
+        .select(`
+          technology_id,
+          technologies:technology_id (
+            id,
+            name
+          )
+        `)
+        .eq("project_id", projectData.id);
       if (projectTechError) throw projectTechError;
 
-      const toolIds = projectTech?.tools || [];
+      const technologies = (projectTechRows ?? [])
+        .map((row) => {
+          const technology = row.technologies as TechnologySummary | TechnologySummary[] | null;
+          return Array.isArray(technology) ? technology[0] : technology;
+        })
+        .filter((technology): technology is TechnologySummary => Boolean(technology?.id && technology?.name));
 
-      let projectTools: Tool[] = [];
-
-      if (toolIds.length > 0) {
-        const { data: toolsData, error: toolsError } = await supabase
-          .from("tools")
-          .select("*")
-          .in("id", toolIds);
-        if (toolsError) throw toolsError;
-        projectTools = (toolsData ?? []) as Tool[];
-      }
-
-      return mapProjectWithTools(
-        projectData as RawProjectWithCategory,
-        projectTools,
-      ) as ProjectWithTools;
+      return mapProject(projectData as RawProjectRow, technologies);
     },
     enabled: !!slug,
   });

@@ -16,7 +16,7 @@ import {
 import { ProjectShowcaseCard } from "@/components/shared/ProjectShowcaseCard";
 
 export default function FeaturedProjects() {
-  const { data: projects, isLoading } = useProjects(false, true);
+  const { data: projects, isLoading, isError } = useProjects(false, true);
   const isMobile = useIsMobile();
 
   if (isLoading) {
@@ -35,8 +35,6 @@ export default function FeaturedProjects() {
     );
   }
 
-  if (!projects?.length) return null;
-
   // Limit projects on mobile to prevent overly long page
   const displayProjects = isMobile ? projects.slice(0, 3) : projects;
 
@@ -49,8 +47,16 @@ export default function FeaturedProjects() {
         </div>
       </FadeInUp>
 
-      {/* MOBILE VIEW: Vertical Stack */}
-      {isMobile ? (
+      {isError ? (
+        <div className="mx-auto max-w-3xl rounded-[28px] border border-border bg-card/60 p-8 text-center text-muted-foreground">
+          Featured projects could not be loaded from Supabase.
+        </div>
+      ) : !projects?.length ? (
+        <div className="mx-auto max-w-3xl rounded-[28px] border border-border bg-card/60 p-8 text-center text-muted-foreground">
+          No featured rows found in the <code>projects</code> table.
+        </div>
+      ) : isMobile ? (
+        /* MOBILE VIEW: Vertical Stack */
         <>
           <StaggerContainer className="space-y-6 max-w-lg mx-auto" staggerDelay={0.15}>
             {displayProjects.map((project) => (
