@@ -13,7 +13,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,16 +24,24 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { MoreVertical, Pencil, Trash2 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { StatePanel } from "@/components/shared/StatePanel";
-import type { EditableProject, ProjectWithTools, RawProjectWithCategory, Tool } from "@/types/app";
+import { RowActionsMenu } from "@/components/shared/RowActionsMenu";
+import type {
+  ClientSummary,
+  EditableProject,
+  ProjectFileSummary,
+  ProjectServiceSummary,
+  ProjectStatusSummary,
+  ProjectTaskSummary,
+  ProjectWithTools,
+  RawProjectWithCategory,
+  TaskStatusSummary,
+  Tool,
+} from "@/types/app";
+
+const untypedSupabase = supabase as unknown as {
+  from: (relation: string) => any;
+};
 
 interface ProjectsTableProps {
   projects: ProjectWithTools[];
@@ -46,6 +53,19 @@ interface ProjectImageRelation {
   alt: string | null;
   is_main: boolean | null;
   order_index: number | null;
+}
+
+interface ServiceRelation {
+  services: ProjectServiceSummary | ProjectServiceSummary[] | null;
+}
+
+interface TaskRow {
+  id: string;
+  title: string;
+  description: string | null;
+  due_date: string | null;
+  created_at: string | null;
+  status: string | null;
 }
 
 export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) {
@@ -84,9 +104,18 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
 
       if (error) throw error;
 
-      const [{ data: projectTech, error: projectTechError }, { data: allToolsData, error: allToolsError }] =
+      const projectRecord = projectData as unknown as RawProjectWithCategory;
+      const [
+        { data: projectTech, error: projectTechError },
+        { data: allToolsData, error: allToolsError },
+        { data: projectServiceRows, error: projectServicesError },
+        { data: projectFileRows, error: projectFilesError },
+        { data: projectTaskRows, error: projectTasksError },
+        { data: projectStatusRow, error: projectStatusError },
+        { data: clientRow, error: clientError },
+      ] =
         await Promise.all([
-          supabase
+          untypedSupabase
             .from("project_technologies")
             .select(`
               technology_id,
@@ -97,12 +126,52 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
             `)
             .eq("project_id", projectId),
           supabase.from("technologies").select("id, name"),
+          untypedSupabase
+            .from("project_services")
+            .select(`
+              service_id,
+              services:service_id (
+                id,
+                title,
+                description
+              )
+            `)
+            .eq("project_id", projectId),
+          untypedSupabase
+            .from("project_files")
+            .select("id, file_url, file_type, order_index, created_at")
+            .eq("project_id", projectId)
+            .order("order_index", { ascending: true }),
+          untypedSupabase
+            .from("project_tasks")
+            .select("id, title, description, due_date, created_at, status")
+            .eq("project_id", projectId)
+            .order("created_at", { ascending: false }),
+          projectRecord.status
+            ? untypedSupabase
+                .from("project_status")
+                .select("id, label, color, order_index")
+                .eq("id", projectRecord.status)
+                .maybeSingle()
+            : Promise.resolve({ data: null, error: null }),
+          projectRecord.client_id
+            ? untypedSupabase
+                .from("clients")
+                .select("id, name, email, company, status")
+                .eq("id", projectRecord.client_id)
+                .maybeSingle()
+            : Promise.resolve({ data: null, error: null }),
         ]);
 
       if (projectTechError) throw projectTechError;
       if (allToolsError) throw allToolsError;
+      if (projectServicesError) throw projectServicesError;
+      if (projectFilesError) throw projectFilesError;
+      if (projectTasksError) throw projectTasksError;
+      if (projectStatusError) throw projectStatusError;
+      if (clientError) throw clientError;
 
-      const toolIds = ((projectTech ?? []) as Array<{
+      const toolIds = ((projectTech ?? []) as unknown as Array<{
         technologies: { id: string; name: string } | { id: string; name: string }[] | null;
       }>)
         .map((row) => {
@@ -124,8 +193,37 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
         updated_at: null,
       })) as Tool[];
       const projectTools = allTools.filter((tool) => toolIds.includes(tool.id));
+      const projectServices = ((projectServiceRows ?? []) as unknown as ServiceRelation[])
+        .map((row) => {
+          const service = row.services;
+          return Array.isArray(service) ? service[0] : service;
+        })
+        .filter((service): service is ProjectServiceSummary => Boolean(service?.id && service?.title));
+      const projectFiles = ((projectFileRows ?? []) as unknown as ProjectFileSummary[]).filter((file) => Boolean(file.id));
+      const taskStatusIds = Array.from(
+        new Set(((projectTaskRows ?? []) as unknown as TaskRow[]).map((task) => task.status).filter((status): status is string => Boolean(status))),
+      );
+      let taskStatusMap = new Map<string, TaskStatusSummary>();
+
+      if (taskStatusIds.length > 0) {
+        const { data: taskStatusRows, error: taskStatusError } = await untypedSupabase
+          .from("task_status")
+          .select("id, label, color, order_index")
+          .in("id", taskStatusIds);
+
+        if (taskStatusError) throw taskStatusError;
+
+        taskStatusMap = new Map(
+          ((taskStatusRows ?? []) as TaskStatusSummary[]).map((status) => [status.id, status]),
+        );
+      }
+
+      const projectTasks = ((projectTaskRows ?? []) as unknown as TaskRow[]).map((task) => ({
+        ...task,
+        task_status: task.status ? taskStatusMap.get(task.status) ?? null : null,
+      })) as ProjectTaskSummary[];
       const relatedImages = [
-        ...(((projectData as { project_images?: ProjectImageRelation[] | null }).project_images ?? []).filter(
+        ...((((projectData as unknown as { project_images?: ProjectImageRelation[] | null }).project_images) ?? []).filter(
           (image): image is ProjectImageRelation => Boolean(image?.public_url),
         )),
       ]
@@ -137,16 +235,21 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
         }))
         .sort((left, right) => left.order - right.order);
       const normalizedImages = relatedImages.length > 0 ? relatedImages : [];
-      const coverRelation = (projectData as { cover_image?: ProjectImageRelation | ProjectImageRelation[] | null }).cover_image;
+      const coverRelation = (projectData as unknown as { cover_image?: ProjectImageRelation | ProjectImageRelation[] | null }).cover_image;
       const coverImage = Array.isArray(coverRelation) ? coverRelation[0] : coverRelation;
       const editorProject = {
-        ...(projectData as RawProjectWithCategory),
+        ...projectRecord,
         images: normalizedImages,
         cover_url:
           normalizedImages.find((image) => image.is_main)?.url ??
           normalizedImages[0]?.url ??
           coverImage?.public_url ??
           null,
+        project_status: (projectStatusRow as ProjectStatusSummary | null) ?? null,
+        client: (clientRow as ClientSummary | null) ?? null,
+        project_files: projectFiles,
+        project_services: projectServices,
+        project_tasks: projectTasks,
       };
 
       onEdit(mapProjectWithTools(editorProject, projectTools));
@@ -233,27 +336,11 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
                     {project.created_at ? new Date(project.created_at).toLocaleDateString() : "—"}
                   </TableCell>
                   <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreVertical className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-background">
-                        <DropdownMenuItem onClick={() => handleEdit(project.id)} disabled={isFetching}>
-                          <Pencil className="w-4 h-4 mr-2" />
-                          {isFetching ? "Loading..." : "Edit"}
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={() => setDeleteId(project.id)}
-                          className="text-destructive focus:text-destructive"
-                        >
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <RowActionsMenu
+                      onEdit={() => handleEdit(project.id)}
+                      onDelete={() => setDeleteId(project.id)}
+                      isEditDisabled={isFetching}
+                    />
                   </TableCell>
                 </TableRow>
               ))}
