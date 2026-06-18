@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { getErrorMessage } from "@/lib/errorUtils";
-import { mapProjectWithTools } from "@/lib/projectUtils";
+import { getMainProjectImageUrl, mapProjectWithTools } from "@/lib/projectUtils";
 import { deleteAllProjectImages } from "@/lib/storageUtils";
 import { toast } from "sonner";
 import {
@@ -41,6 +41,13 @@ interface ProjectsTableProps {
   onEdit: (project: EditableProject) => void;
 }
 
+interface ProjectImageRelation {
+  public_url: string | null;
+  alt: string | null;
+  is_main: boolean | null;
+  order_index: number | null;
+}
+
 export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -58,6 +65,18 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
             id,
             name,
             description
+          ),
+          cover_image:project_images!projects_cover_image_id_fkey (
+            public_url,
+            alt,
+            is_main,
+            order_index
+          ),
+          project_images:project_images!project_images_project_fk (
+            public_url,
+            alt,
+            is_main,
+            order_index
           )
         `)
         .eq("id", projectId)
@@ -105,8 +124,32 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
         updated_at: null,
       })) as Tool[];
       const projectTools = allTools.filter((tool) => toolIds.includes(tool.id));
+      const relatedImages = [
+        ...(((projectData as { project_images?: ProjectImageRelation[] | null }).project_images ?? []).filter(
+          (image): image is ProjectImageRelation => Boolean(image?.public_url),
+        )),
+      ]
+        .map((image, index) => ({
+          url: image.public_url ?? "",
+          alt: image.alt ?? projectData.title,
+          is_main: image.is_main ?? index === 0,
+          order: image.order_index ?? index,
+        }))
+        .sort((left, right) => left.order - right.order);
+      const normalizedImages = relatedImages.length > 0 ? relatedImages : [];
+      const coverRelation = (projectData as { cover_image?: ProjectImageRelation | ProjectImageRelation[] | null }).cover_image;
+      const coverImage = Array.isArray(coverRelation) ? coverRelation[0] : coverRelation;
+      const editorProject = {
+        ...(projectData as RawProjectWithCategory),
+        images: normalizedImages,
+        cover_url:
+          normalizedImages.find((image) => image.is_main)?.url ??
+          normalizedImages[0]?.url ??
+          coverImage?.public_url ??
+          null,
+      };
 
-      onEdit(mapProjectWithTools(projectData as RawProjectWithCategory, projectTools));
+      onEdit(mapProjectWithTools(editorProject, projectTools));
     } catch (error) {
       toast.error(getErrorMessage(error, "Failed to load project"));
     } finally {
@@ -162,9 +205,9 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
             {projects.map((project) => (
                 <TableRow key={project.id}>
                   <TableCell>
-                    {project.cover_url ? (
+                    {getMainProjectImageUrl(project) ? (
                       <img
-                        src={project.cover_url}
+                        src={getMainProjectImageUrl(project) ?? ""}
                         alt={project.title}
                         className="w-16 h-16 object-cover rounded"
                       />
@@ -183,7 +226,7 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
                   <TableCell>{project.project_category?.name || "—"}</TableCell>
                   <TableCell>
                     <Badge variant={project.published ? "default" : "secondary"}>
-                      {project.published ? "Published" : "Draft"}
+                      {project.project_status?.label || (project.published ? "Published" : "Draft")}
                     </Badge>
                   </TableCell>
                   <TableCell>

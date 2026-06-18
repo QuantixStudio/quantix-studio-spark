@@ -5,6 +5,12 @@ import type { Tables } from "@/integrations/supabase/types";
 export type Profile = Tables<"profiles">;
 export type ProjectCategory = Tables<"project_category">;
 export type ProjectCategorySummary = Pick<ProjectCategory, "id" | "name" | "description">;
+export interface ProjectStatusSummary {
+  id: string;
+  label: string | null;
+  color: string | null;
+  order_index: number | null;
+}
 export type Tool = Tables<"tools">;
 export type Testimonial = Tables<"testimonials">;
 export type ServiceIcon = Tables<"service_icon">;
@@ -45,6 +51,8 @@ export type ProjectRow = Tables<"projects">;
 
 export interface RawProjectWithCategory extends ProjectRow {
   project_category: ProjectCategorySummary | null;
+  project_status?: ProjectStatusSummary | null;
+  images?: ProjectImage[] | null;
 }
 
 export interface ProjectWithTools
@@ -53,6 +61,7 @@ export interface ProjectWithTools
   published: boolean;
   show_on_home: boolean;
   project_category: ProjectCategorySummary | null;
+  project_status?: ProjectStatusSummary | null;
   project_technologies: ProjectTechnologySummary[];
   project_tools: Tool[];
   project_files: ProjectFileSummary[];

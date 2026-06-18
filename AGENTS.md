@@ -199,6 +199,7 @@ Note:
 - Public landing page is section-based and data-backed for services, featured projects, tools, and other marketing sections.
 - Any testimonial-related frontend behavior should be treated as schema-mismatch work until the app or DB is reconciled.
 - Admin CRUD definitely maps to projects and tools in the live schema.
+- In the admin `Projects` section, list/table display should read from live normalized sources: `projects.created_at`, `project_category.name`, `project_status.label`, and `project_images` / `cover_image_id`. Do not reintroduce reads from deprecated `projects.cover_url` or `projects.images` fields that still exist in stale generated types.
 - Dashboard numbers are currently static placeholder values, not live analytics.
 - Profile editing updates `profiles.full_name` and `profiles.email`.
 

@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type {
   ProjectImage,
+  ProjectStatusSummary,
   ProjectTechnologySummary,
   ProjectWithTools,
 } from "@/types/app";
@@ -32,9 +33,11 @@ interface RawProjectRow {
   published: boolean | null;
   created_at: string | null;
   category_id: string | null;
+  status: string | null;
   project_category: ProjectCategorySummary | null;
   project_images?: ProjectImageRow[] | null;
   cover_image?: ProjectImageRow | ProjectImageRow[] | null;
+  project_status?: ProjectStatusSummary | null;
 }
 
 function normalizeRelatedImage(
@@ -94,13 +97,17 @@ function mapProject(
   project: RawProjectRow,
   technologies: ProjectTechnologySummary[],
 ): ProjectWithTools {
+  const images = mapProjectImages(project.project_images, project.cover_image, project.title);
+  const coverUrl = images.find((image) => image.is_main)?.url ?? images[0]?.url ?? null;
+
   return {
     ...project,
     short_description: project.short_description?.trim() || "Project details coming soon.",
-    images: mapProjectImages(project.project_images, project.cover_image, project.title),
-    cover_url: null,
+    images,
+    cover_url: coverUrl,
     published: project.published ?? false,
     show_on_home: project.show_on_home ?? false,
+    project_status: project.project_status ?? null,
     project_technologies: technologies,
     project_files: [],
     project_services: [],
@@ -137,6 +144,7 @@ export function useProjects(adminMode = false, featuredOnly = false) {
           published,
           created_at,
           category_id,
+          status,
           project_category:project_category!fk_project_category (
             id,
             name,
@@ -154,8 +162,11 @@ export function useProjects(adminMode = false, featuredOnly = false) {
             is_main,
             order_index
           )
-        `)
-        .order("order_index", { ascending: true });
+        `);
+
+      query = adminMode
+        ? query.order("created_at", { ascending: false })
+        : query.order("order_index", { ascending: true });
 
       if (!adminMode) {
         query = query.eq("published", true);
@@ -171,6 +182,26 @@ export function useProjects(adminMode = false, featuredOnly = false) {
       if (error) throw error;
 
       const projects = (projectsData ?? []) as RawProjectRow[];
+      const statusIds = Array.from(
+        new Set(projects.map((project) => project.status).filter((status): status is string => Boolean(status))),
+      );
+
+      const statusMap = new Map<string, ProjectStatusSummary>();
+
+      if (statusIds.length > 0) {
+        const { data: statusRows, error: statusError } = await supabase
+          .from("project_status")
+          .select("id, label, color, order_index")
+          .in("id", statusIds);
+
+        if (statusError) {
+          console.warn("Could not load project statuses", statusError);
+        } else {
+          for (const status of statusRows ?? []) {
+            statusMap.set(status.id, status as ProjectStatusSummary);
+          }
+        }
+      }
 
       const projectsWithTechnologies = await Promise.all(
         projects.map(async (project) => {
@@ -197,7 +228,13 @@ export function useProjects(adminMode = false, featuredOnly = false) {
             })
             .filter((technology): technology is ProjectTechnologySummary => Boolean(technology?.id && technology?.name));
 
-          return mapProject(project, technologies);
+          return mapProject(
+            {
+              ...project,
+              project_status: project.status ? statusMap.get(project.status) ?? null : null,
+            },
+            technologies,
+          );
         }),
       );
 
