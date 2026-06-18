@@ -39,7 +39,12 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 import ImageUploader, { ProjectImage } from "./ImageUploader";
-import type { EditableProject, ProjectCategory, Tool } from "@/types/app";
+import type { EditableProject, ProjectCategory } from "@/types/app";
+
+interface TechnologyOption {
+  id: string;
+  name: string;
+}
 
 const projectSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -76,7 +81,7 @@ export default function ProjectFormModal({
   const [images, setImages] = useState<ProjectImage[]>([]);
   const [originalImages, setOriginalImages] = useState<string[]>([]);
   const [categories, setCategories] = useState<ProjectCategory[]>([]);
-  const [tools, setTools] = useState<Tool[]>([]);
+  const [tools, setTools] = useState<TechnologyOption[]>([]);
   const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof projectSchema>>({
@@ -153,10 +158,10 @@ export default function ProjectFormModal({
 
   const fetchTools = async () => {
     const { data } = await supabase
-      .from("tools")
-      .select("*")
+      .from("technologies")
+      .select("id, name")
       .order("name");
-    if (data) setTools(data as Tool[]);
+    if (data) setTools(data as TechnologyOption[]);
   };
 
   const generateSlug = (title: string) => {
@@ -276,36 +281,28 @@ export default function ProjectFormModal({
         await deleteProjectImages(projectId, deletedImageUrls);
       }
 
-      // Handle tools/technologies (new array-based approach)
-      if (values.technologies && values.technologies.length > 0) {
-        // Check if row exists for this project
-        const { data: existing } = await supabase
-          .from("project_technologies")
-          .select("id")
-          .eq("project_id", projectId)
-          .maybeSingle();
+      const { error: deleteProjectTechnologiesError } = await supabase
+        .from("project_technologies")
+        .delete()
+        .eq("project_id", projectId);
 
-        if (existing) {
-          // Update existing row with new tool IDs
-          await supabase
-            .from("project_technologies")
-            .update({ tools: values.technologies })
-            .eq("project_id", projectId);
-        } else {
-          // Insert new row with tool IDs
-          await supabase
-            .from("project_technologies")
-            .insert({
-              project_id: projectId,
-              tools: values.technologies,
-            });
-        }
-      } else {
-        // Remove tools if none selected
-        await supabase
+      if (deleteProjectTechnologiesError) {
+        throw deleteProjectTechnologiesError;
+      }
+
+      if (values.technologies && values.technologies.length > 0) {
+        const technologyRows = values.technologies.map((technologyId) => ({
+          project_id: projectId,
+          technology_id: technologyId,
+        }));
+
+        const { error: insertProjectTechnologiesError } = await supabase
           .from("project_technologies")
-          .delete()
-          .eq("project_id", projectId);
+          .insert(technologyRows as never);
+
+        if (insertProjectTechnologiesError) {
+          throw insertProjectTechnologiesError;
+        }
       }
 
       toast.success(project ? "Project updated!" : "Project created!");

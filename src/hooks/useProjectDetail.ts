@@ -1,6 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { ProjectImage, ProjectWithTools } from "@/types/app";
+import type {
+  ProjectFileSummary,
+  ProjectImage,
+  ProjectServiceSummary,
+  ProjectTechnologySummary,
+  ProjectWithTools,
+} from "@/types/app";
 
 interface ProjectCategorySummary {
   id: string;
@@ -8,15 +14,23 @@ interface ProjectCategorySummary {
   description: string | null;
 }
 
-interface TechnologySummary {
+interface ServiceSummary {
   id: string;
-  name: string;
+  title: string;
+  description: string;
 }
 
 interface ProjectImageRow {
   public_url: string | null;
   alt: string | null;
   is_main: boolean | null;
+  order_index: number | null;
+}
+
+interface ProjectFileRow {
+  id: string;
+  file_url: string;
+  file_type: string | null;
   order_index: number | null;
 }
 
@@ -92,7 +106,12 @@ function mapProjectImages(
   return normalizedImages;
 }
 
-function mapProject(project: RawProjectRow, technologies: TechnologySummary[]): ProjectWithTools {
+function mapProject(
+  project: RawProjectRow,
+  technologies: ProjectTechnologySummary[],
+  projectFiles: ProjectFileSummary[],
+  projectServices: ProjectServiceSummary[],
+): ProjectWithTools {
   return {
     ...project,
     short_description: project.short_description?.trim() || "Project details coming soon.",
@@ -100,6 +119,9 @@ function mapProject(project: RawProjectRow, technologies: TechnologySummary[]): 
     cover_url: null,
     published: project.published ?? false,
     show_on_home: project.show_on_home ?? false,
+    project_technologies: technologies,
+    project_files: projectFiles,
+    project_services: projectServices,
     project_tools: technologies.map((technology) => ({
       id: technology.id,
       name: technology.name,
@@ -152,22 +174,58 @@ export function useProjectDetail(slug: string) {
         .from("project_technologies")
         .select(`
           technology_id,
-          technologies:technology_id (
+          technologies:technologies!fk_pt_technology (
             id,
             name
           )
         `)
         .eq("project_id", projectData.id);
-      if (projectTechError) throw projectTechError;
+      if (projectTechError) {
+        console.warn(`Could not load technologies for project ${projectData.id}`, projectTechError);
+      }
 
-      const technologies = (projectTechRows ?? [])
+      const technologies = ((projectTechRows ?? []) as Array<{ technologies: ProjectTechnologySummary | ProjectTechnologySummary[] | null }>)
         .map((row) => {
-          const technology = row.technologies as TechnologySummary | TechnologySummary[] | null;
+          const technology = row.technologies as ProjectTechnologySummary | ProjectTechnologySummary[] | null;
           return Array.isArray(technology) ? technology[0] : technology;
         })
-        .filter((technology): technology is TechnologySummary => Boolean(technology?.id && technology?.name));
+        .filter((technology): technology is ProjectTechnologySummary => Boolean(technology?.id && technology?.name));
 
-      return mapProject(projectData as RawProjectRow, technologies);
+      const { data: projectFileRows, error: projectFilesError } = await supabase
+        .from("project_files")
+        .select("id, file_url, file_type, order_index")
+        .eq("project_id", projectData.id)
+        .order("order_index", { ascending: true });
+      if (projectFilesError) {
+        console.warn(`Could not load files for project ${projectData.id}`, projectFilesError);
+      }
+
+      const projectFiles = ((projectFileRows ?? []) as ProjectFileRow[]).filter((file) => Boolean(file.file_url));
+
+      const { data: projectServiceRows, error: projectServicesError } = await supabase
+        .from("project_services")
+        .select(`
+          service_id,
+          services:service_id (
+            id,
+            title,
+            description
+          )
+        `)
+        .eq("project_id", projectData.id);
+
+      if (projectServicesError) {
+        console.warn(`Could not load services for project ${projectData.id}`, projectServicesError);
+      }
+
+      const projectServices = ((projectServiceRows ?? []) as Array<{ services: ServiceSummary | ServiceSummary[] | null }>)
+        .map((row) => {
+          const service = row.services as ServiceSummary | ServiceSummary[] | null;
+          return Array.isArray(service) ? service[0] : service;
+        })
+        .filter((service): service is ServiceSummary => Boolean(service?.id && service?.title));
+
+      return mapProject(projectData as RawProjectRow, technologies, projectFiles, projectServices);
     },
     enabled: !!slug,
   });

@@ -69,17 +69,41 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
         await Promise.all([
           supabase
             .from("project_technologies")
-            .select("tools")
-            .eq("project_id", projectId)
-            .maybeSingle(),
-          supabase.from("tools").select("*"),
+            .select(`
+              technology_id,
+              technologies:technologies!fk_pt_technology (
+                id,
+                name
+              )
+            `)
+            .eq("project_id", projectId),
+          supabase.from("technologies").select("id, name"),
         ]);
 
       if (projectTechError) throw projectTechError;
       if (allToolsError) throw allToolsError;
 
-      const toolIds = projectTech?.tools ?? [];
-      const allTools = (allToolsData ?? []) as Tool[];
+      const toolIds = ((projectTech ?? []) as Array<{
+        technologies: { id: string; name: string } | { id: string; name: string }[] | null;
+      }>)
+        .map((row) => {
+          const technology = row.technologies;
+          return Array.isArray(technology) ? technology[0] : technology;
+        })
+        .filter((technology): technology is { id: string; name: string } => Boolean(technology?.id))
+        .map((technology) => technology.id);
+
+      const allTools = ((allToolsData ?? []) as Array<{ id: string; name: string }>).map((technology) => ({
+        id: technology.id,
+        name: technology.name,
+        slug: technology.name.toLowerCase().replace(/\s+/g, "-"),
+        description: null,
+        website_url: null,
+        logo_path: null,
+        is_featured: false,
+        created_at: null,
+        updated_at: null,
+      })) as Tool[];
       const projectTools = allTools.filter((tool) => toolIds.includes(tool.id));
 
       onEdit(mapProjectWithTools(projectData as RawProjectWithCategory, projectTools));

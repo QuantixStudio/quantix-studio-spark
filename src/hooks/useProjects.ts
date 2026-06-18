@@ -1,16 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { ProjectImage, ProjectWithTools } from "@/types/app";
+import type {
+  ProjectImage,
+  ProjectTechnologySummary,
+  ProjectWithTools,
+} from "@/types/app";
 
 interface ProjectCategorySummary {
   id: string;
   name: string;
   description: string | null;
-}
-
-interface TechnologySummary {
-  id: string;
-  name: string;
 }
 
 interface ProjectImageRow {
@@ -93,7 +92,7 @@ function mapProjectImages(
 
 function mapProject(
   project: RawProjectRow,
-  technologies: TechnologySummary[],
+  technologies: ProjectTechnologySummary[],
 ): ProjectWithTools {
   return {
     ...project,
@@ -102,6 +101,9 @@ function mapProject(
     cover_url: null,
     published: project.published ?? false,
     show_on_home: project.show_on_home ?? false,
+    project_technologies: technologies,
+    project_files: [],
+    project_services: [],
     project_tools: technologies.map((technology) => ({
       id: technology.id,
       name: technology.name,
@@ -176,7 +178,7 @@ export function useProjects(adminMode = false, featuredOnly = false) {
             .from("project_technologies")
             .select(`
               technology_id,
-              technologies:technology_id (
+              technologies:technologies!fk_pt_technology (
                 id,
                 name
               )
@@ -190,10 +192,10 @@ export function useProjects(adminMode = false, featuredOnly = false) {
 
           const technologies = (projectTechRows ?? [])
             .map((row) => {
-              const technology = row.technologies as TechnologySummary | TechnologySummary[] | null;
+              const technology = row.technologies as ProjectTechnologySummary | ProjectTechnologySummary[] | null;
               return Array.isArray(technology) ? technology[0] : technology;
             })
-            .filter((technology): technology is TechnologySummary => Boolean(technology?.id && technology?.name));
+            .filter((technology): technology is ProjectTechnologySummary => Boolean(technology?.id && technology?.name));
 
           return mapProject(project, technologies);
         }),

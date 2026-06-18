@@ -22,6 +22,25 @@ export interface ProjectImage {
   file?: File;
 }
 
+export interface ProjectFileSummary {
+  id: string;
+  file_url: string;
+  file_type: string | null;
+  order_index: number | null;
+}
+
+export interface ProjectServiceSummary {
+  id: string;
+  title: string;
+  description: string;
+}
+
+export interface ProjectTechnologySummary {
+  id: string;
+  name: string;
+  description?: string | null;
+}
+
 export type ProjectRow = Tables<"projects">;
 
 export interface RawProjectWithCategory extends ProjectRow {
@@ -34,7 +53,10 @@ export interface ProjectWithTools
   published: boolean;
   show_on_home: boolean;
   project_category: ProjectCategorySummary | null;
+  project_technologies: ProjectTechnologySummary[];
   project_tools: Tool[];
+  project_files: ProjectFileSummary[];
+  project_services: ProjectServiceSummary[];
 }
 
 export type EditableProject = ProjectWithTools;

@@ -89,6 +89,13 @@ export function mapProjectWithTools(
     published: project.published ?? false,
     show_on_home: project.show_on_home ?? false,
     project_category: project.project_category,
+    project_technologies: projectTools.map((tool) => ({
+      id: tool.id,
+      name: tool.name,
+      description: tool.description,
+    })),
     project_tools: projectTools,
+    project_files: [],
+    project_services: [],
   };
 }

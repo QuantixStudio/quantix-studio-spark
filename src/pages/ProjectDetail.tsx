@@ -18,9 +18,9 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProjectDetail } from "@/hooks/useProjectDetail";
 import { getProjectImages } from "@/lib/projectUtils";
-import { getToolLogoUrl } from "@/lib/toolStorageUtils";
 import {
   ArrowLeft,
+  Download,
   ExternalLink,
   FolderSearch,
   Github,
@@ -29,7 +29,7 @@ import {
 
 export default function ProjectDetail() {
   const { slug } = useParams<{ slug: string }>();
-  const { data: project, isLoading } = useProjectDetail(slug || "");
+  const { data: project, isLoading, isError } = useProjectDetail(slug || "");
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
@@ -86,6 +86,32 @@ export default function ProjectDetail() {
     );
   }
 
+  if (isError) {
+    return (
+      <div className="flex min-h-screen flex-col bg-background">
+        <Navbar />
+        <div className="flex-1 px-5 py-24 sm:px-6 md:px-8">
+          <div className="mx-auto max-w-3xl">
+            <StatePanel
+              icon={FolderSearch}
+              title="Project could not be loaded"
+              description="The project exists, but one of the related Supabase queries failed while loading the page."
+              action={
+                <Button asChild>
+                  <Link to="/portfolio">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Portfolio
+                  </Link>
+                </Button>
+              }
+            />
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   if (!project) {
     return (
       <div className="flex min-h-screen flex-col bg-background">
@@ -116,7 +142,9 @@ export default function ProjectDetail() {
     coverUrl: project.cover_url,
     title: project.title,
   });
-  const tools = project.project_tools ?? [];
+  const buildStack = project.project_technologies ?? [];
+  const files = project.project_files ?? [];
+  const relatedServices = project.project_services ?? [];
   const description = (project.full_description || project.short_description || "").trim();
   const descriptionParagraphs = description
     .split(/\n+/)
@@ -161,29 +189,19 @@ export default function ProjectDetail() {
           </p>
         </section>
 
-        {tools.length > 0 ? (
+        {buildStack.length > 0 ? (
           <section className="mb-6">
             <article className="showcase-surface rounded-[28px] p-6 md:p-7">
               <h2 className="project-showcase-title text-2xl font-semibold">
                 Build Stack
               </h2>
               <div className="mt-5 flex flex-wrap gap-3">
-                {tools.map((tool) => (
-                  <div key={tool.id} className="project-detail-tool media-hover-trigger">
-                    {tool.logo_path ? (
-                      <div className="project-detail-tool-logo-shell">
-                        <img
-                          src={getToolLogoUrl(tool.logo_path) || ""}
-                          alt={tool.name}
-                          className="media-hover-target object-contain"
-                        />
-                      </div>
-                    ) : (
-                      <div className="project-detail-tool-fallback">
-                        <Github className="h-4 w-4" />
-                      </div>
-                    )}
-                    <span className="text-sm font-medium">{tool.name}</span>
+                {buildStack.map((technology) => (
+                  <div key={technology.id} className="project-detail-tool media-hover-trigger">
+                    <div className="project-detail-tool-fallback">
+                      <Github className="h-4 w-4" />
+                    </div>
+                    <span className="text-sm font-medium">{technology.name}</span>
                   </div>
                 ))}
               </div>
@@ -221,6 +239,17 @@ export default function ProjectDetail() {
         </div>
 
         <section className="space-y-6">
+          {project.key_metric ? (
+            <article className="showcase-surface rounded-[28px] p-6 md:p-8">
+              <h2 className="project-showcase-title text-2xl font-semibold">
+                Key Result
+              </h2>
+              <p className="project-detail-lead mt-4 max-w-3xl text-base leading-relaxed md:text-lg">
+                {project.key_metric}
+              </p>
+            </article>
+          ) : null}
+
           {images.length > 0 ? (
             <article className="showcase-surface overflow-hidden rounded-[28px]">
               <div className="flex items-center justify-between gap-4 p-6 pb-0">
@@ -268,6 +297,26 @@ export default function ProjectDetail() {
             </article>
           ) : null}
 
+          {relatedServices.length > 0 ? (
+            <article className="showcase-surface rounded-[28px] p-6 md:p-8">
+              <h2 className="project-showcase-title text-2xl font-semibold">
+                Services Delivered
+              </h2>
+              <div className="mt-5 grid gap-4 md:grid-cols-2">
+                {relatedServices.map((service) => (
+                  <div key={service.id} className="project-showcase-note rounded-[20px] p-4">
+                    <p className="text-base font-semibold text-[hsl(var(--project-showcase-title))]">
+                      {service.title}
+                    </p>
+                    <p className="mt-2 text-sm leading-relaxed text-[hsl(var(--project-showcase-description))]">
+                      {service.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </article>
+          ) : null}
+
           <article className="showcase-surface rounded-[28px] p-6 md:p-8">
             <h2 className="project-showcase-title text-2xl font-semibold">
               Project Overview
@@ -283,6 +332,35 @@ export default function ProjectDetail() {
               )}
             </div>
           </article>
+
+          {files.length > 0 ? (
+            <article className="showcase-surface rounded-[28px] p-6 md:p-8">
+              <h2 className="project-showcase-title text-2xl font-semibold">
+                Project Files
+              </h2>
+              <div className="mt-5 grid gap-3">
+                {files.map((file) => (
+                  <a
+                    key={file.id}
+                    href={file.file_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="project-detail-tool media-hover-trigger justify-between"
+                  >
+                    <span className="flex items-center gap-3">
+                      <span className="project-detail-tool-fallback">
+                        <Download className="h-4 w-4" />
+                      </span>
+                      <span className="text-sm font-medium">
+                        {file.file_type || "Project file"}
+                      </span>
+                    </span>
+                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                  </a>
+                ))}
+              </div>
+            </article>
+          ) : null}
 
           <article className="showcase-surface rounded-[28px] p-6 md:p-8">
             <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-8">
