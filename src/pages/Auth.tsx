@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,14 +34,22 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   
   const { signUp, signIn, resetPassword, user } = useAuth();
+  const { data: roleData, isLoading: roleLoading } = useUserRole();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user) {
-      navigate("/", { replace: true });
+    if (!user || roleLoading) {
+      return;
     }
-  }, [user, navigate]);
+
+    if (roleData?.canAccessAdmin) {
+      navigate("/admin", { replace: true });
+      return;
+    }
+
+    navigate("/", { replace: true });
+  }, [user, roleData?.canAccessAdmin, roleLoading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -183,6 +192,9 @@ export default function Auth() {
             <div className="text-center text-sm space-y-2">
               {mode === "signin" && (
                 <>
+                  <p className="text-xs text-muted-foreground">
+                    Admin and manager accounts are sent straight to the dashboard after sign-in.
+                  </p>
                   <button
                     type="button"
                     onClick={() => setMode("reset")}

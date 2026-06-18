@@ -1,66 +1,72 @@
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
-  server: {
-    host: "::",
-    port: 8080,
-  },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (!id.includes("node_modules")) {
-            return;
-          }
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), "");
+  const port = Number(env.PORT || env.VITE_PORT || 8080);
+  const host = env.HOST || env.VITE_DEV_HOST || "0.0.0.0";
 
-          if (id.includes("recharts") || id.includes("victory-vendor")) {
-            return "charts";
-          }
+  return {
+    server: {
+      host,
+      port,
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (!id.includes("node_modules")) {
+              return;
+            }
 
-          if (id.includes("@supabase")) {
-            return "supabase";
-          }
+            if (id.includes("recharts") || id.includes("victory-vendor")) {
+              return "charts";
+            }
 
-          if (id.includes("framer-motion")) {
-            return "motion";
-          }
+            if (id.includes("@supabase")) {
+              return "supabase";
+            }
 
-          const normalizedId = id.split(path.sep).join("/");
+            if (id.includes("framer-motion")) {
+              return "motion";
+            }
 
-          if (
-            id.includes("@radix-ui") ||
-            id.includes("cmdk") ||
-            id.includes("embla-carousel") ||
-            normalizedId.includes("/node_modules/vaul/")
-          ) {
-            return "ui-vendor";
-          }
+            const normalizedId = id.split(path.sep).join("/");
 
-          if (id.includes("@tanstack")) {
-            return "react-query";
-          }
+            if (
+              id.includes("@radix-ui") ||
+              id.includes("cmdk") ||
+              id.includes("embla-carousel") ||
+              normalizedId.includes("/node_modules/vaul/")
+            ) {
+              return "ui-vendor";
+            }
 
-          if (id.includes("react-router-dom")) {
-            return "router";
-          }
+            if (id.includes("@tanstack")) {
+              return "react-query";
+            }
 
-          if (id.includes("react-day-picker") || id.includes("date-fns")) {
-            return "date";
-          }
+            if (id.includes("react-router-dom")) {
+              return "router";
+            }
 
-          return "vendor";
+            if (id.includes("react-day-picker") || id.includes("date-fns")) {
+              return "date";
+            }
+
+            return "vendor";
+          },
         },
       },
     },
-  },
-  plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
+    plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "./src"),
+      },
     },
-  },
-}));
+  };
+});

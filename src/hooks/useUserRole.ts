@@ -2,25 +2,36 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
+export type AppRole = "admin" | "manager" | "client";
+
 export function useUserRole() {
   const { user } = useAuth();
 
   return useQuery({
     queryKey: ["user-role", user?.id],
     queryFn: async () => {
-      if (!user) return { isAdmin: false, roles: [] };
+      if (!user) {
+        return {
+          role: null as AppRole | null,
+          isAdmin: false,
+          canAccessAdmin: false,
+        };
+      }
 
       const { data, error } = await supabase
-        .from("user_roles")
+        .from("profiles")
         .select("role")
-        .eq("user_id", user.id);
+        .eq("id", user.id)
+        .single()
+        .returns<{ role: AppRole }>();
 
       if (error) throw error;
 
-      const roles = data?.map((r) => r.role) || [];
-      const isAdmin = roles.includes("admin");
+      const role = data?.role ?? null;
+      const isAdmin = role === "admin";
+      const canAccessAdmin = role === "admin" || role === "manager";
 
-      return { isAdmin, roles };
+      return { role, isAdmin, canAccessAdmin };
     },
     enabled: !!user,
   });

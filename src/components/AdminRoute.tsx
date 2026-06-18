@@ -19,7 +19,7 @@ export const AdminRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/auth" replace />;
   }
 
-  if (!roleData?.isAdmin) {
+  if (!roleData?.canAccessAdmin) {
     return (
       <div className="flex min-h-screen items-center justify-center p-4">
         <div className="text-center space-y-4">
