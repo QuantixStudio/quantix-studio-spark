@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type {
-  ProjectFileSummary,
   ProjectImage,
   ProjectServiceSummary,
   ProjectTechnologySummary,
@@ -24,13 +23,6 @@ interface ProjectImageRow {
   public_url: string | null;
   alt: string | null;
   is_main: boolean | null;
-  order_index: number | null;
-}
-
-interface ProjectFileRow {
-  id: string;
-  file_url: string;
-  file_type: string | null;
   order_index: number | null;
 }
 
@@ -109,7 +101,6 @@ function mapProjectImages(
 function mapProject(
   project: RawProjectRow,
   technologies: ProjectTechnologySummary[],
-  projectFiles: ProjectFileSummary[],
   projectServices: ProjectServiceSummary[],
 ): ProjectWithTools {
   return {
@@ -120,7 +111,7 @@ function mapProject(
     published: project.published ?? false,
     show_on_home: project.show_on_home ?? false,
     project_technologies: technologies,
-    project_files: projectFiles,
+    project_files: [],
     project_services: projectServices,
     project_tools: technologies.map((technology) => ({
       id: technology.id,
@@ -191,17 +182,6 @@ export function useProjectDetail(slug: string) {
         })
         .filter((technology): technology is ProjectTechnologySummary => Boolean(technology?.id && technology?.name));
 
-      const { data: projectFileRows, error: projectFilesError } = await supabase
-        .from("project_files")
-        .select("id, file_url, file_type, order_index")
-        .eq("project_id", projectData.id)
-        .order("order_index", { ascending: true });
-      if (projectFilesError) {
-        console.warn(`Could not load files for project ${projectData.id}`, projectFilesError);
-      }
-
-      const projectFiles = ((projectFileRows ?? []) as ProjectFileRow[]).filter((file) => Boolean(file.file_url));
-
       const { data: projectServiceRows, error: projectServicesError } = await supabase
         .from("project_services")
         .select(`
@@ -225,7 +205,7 @@ export function useProjectDetail(slug: string) {
         })
         .filter((service): service is ServiceSummary => Boolean(service?.id && service?.title));
 
-      return mapProject(projectData as RawProjectRow, technologies, projectFiles, projectServices);
+      return mapProject(projectData as RawProjectRow, technologies, projectServices);
     },
     enabled: !!slug,
   });

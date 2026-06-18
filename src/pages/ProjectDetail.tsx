@@ -20,7 +20,6 @@ import { useProjectDetail } from "@/hooks/useProjectDetail";
 import { getProjectImages } from "@/lib/projectUtils";
 import {
   ArrowLeft,
-  Download,
   ExternalLink,
   FolderSearch,
   Github,
@@ -143,7 +142,6 @@ export default function ProjectDetail() {
     title: project.title,
   });
   const buildStack = project.project_technologies ?? [];
-  const files = project.project_files ?? [];
   const relatedServices = project.project_services ?? [];
   const description = (project.full_description || project.short_description || "").trim();
   const descriptionParagraphs = description
@@ -189,8 +187,8 @@ export default function ProjectDetail() {
           </p>
         </section>
 
-        {buildStack.length > 0 ? (
-          <section className="mb-6">
+        <section className="space-y-4 md:space-y-5">
+          {buildStack.length > 0 ? (
             <article className="showcase-surface rounded-[28px] p-6 md:p-7">
               <h2 className="project-showcase-title text-2xl font-semibold">
                 Build Stack
@@ -206,39 +204,8 @@ export default function ProjectDetail() {
                 ))}
               </div>
             </article>
-          </section>
-        ) : null}
-
-        <div className="mb-10 flex flex-wrap gap-3">
-          {project.demo_url ? (
-            <Button
-              variant="outline"
-              size="lg"
-              className="border-white/14 bg-white/[0.04] text-white hover:border-white/22 hover:bg-white/[0.08] hover:text-white"
-              asChild
-            >
-              <a href={project.demo_url} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="mr-2 h-4 w-4" />
-                View Live Demo
-              </a>
-            </Button>
           ) : null}
-          {project.github_url ? (
-            <Button
-              variant="outline"
-              size="lg"
-              className="border-white/14 bg-white/[0.04] text-white hover:border-white/22 hover:bg-white/[0.08] hover:text-white"
-              asChild
-            >
-              <a href={project.github_url} target="_blank" rel="noopener noreferrer">
-                <Github className="mr-2 h-4 w-4" />
-                View on GitHub
-              </a>
-            </Button>
-          ) : null}
-        </div>
 
-        <section className="space-y-6">
           {project.key_metric ? (
             <article className="showcase-surface rounded-[28px] p-6 md:p-8">
               <h2 className="project-showcase-title text-2xl font-semibold">
@@ -247,6 +214,42 @@ export default function ProjectDetail() {
               <p className="project-detail-lead mt-4 max-w-3xl text-base leading-relaxed md:text-lg">
                 {project.key_metric}
               </p>
+            </article>
+          ) : null}
+
+          <article className="showcase-surface rounded-[28px] p-6 md:p-8">
+            <h2 className="project-showcase-title text-2xl font-semibold">
+              Project Overview
+            </h2>
+
+            <div className="project-detail-body mt-5 space-y-4">
+              {descriptionParagraphs.length > 0 ? (
+                descriptionParagraphs.map((paragraph, index) => (
+                  <p key={`${project.id}-paragraph-${index}`}>{paragraph}</p>
+                ))
+              ) : (
+                <p>{project.short_description}</p>
+              )}
+            </div>
+          </article>
+
+          {relatedServices.length > 0 ? (
+            <article className="showcase-surface rounded-[28px] p-6 md:p-8">
+              <h2 className="project-showcase-title text-2xl font-semibold">
+                Services Delivered
+              </h2>
+              <div className="mt-5 grid gap-4 md:grid-cols-2">
+                {relatedServices.map((service) => (
+                  <div key={service.id} className="project-showcase-note rounded-[20px] p-4">
+                    <p className="text-base font-semibold text-[hsl(var(--project-showcase-title))]">
+                      {service.title}
+                    </p>
+                    <p className="mt-2 text-sm leading-relaxed text-[hsl(var(--project-showcase-description))]">
+                      {service.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </article>
           ) : null}
 
@@ -297,70 +300,34 @@ export default function ProjectDetail() {
             </article>
           ) : null}
 
-          {relatedServices.length > 0 ? (
-            <article className="showcase-surface rounded-[28px] p-6 md:p-8">
-              <h2 className="project-showcase-title text-2xl font-semibold">
-                Services Delivered
-              </h2>
-              <div className="mt-5 grid gap-4 md:grid-cols-2">
-                {relatedServices.map((service) => (
-                  <div key={service.id} className="project-showcase-note rounded-[20px] p-4">
-                    <p className="text-base font-semibold text-[hsl(var(--project-showcase-title))]">
-                      {service.title}
-                    </p>
-                    <p className="mt-2 text-sm leading-relaxed text-[hsl(var(--project-showcase-description))]">
-                      {service.description}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </article>
-          ) : null}
-
-          <article className="showcase-surface rounded-[28px] p-6 md:p-8">
-            <h2 className="project-showcase-title text-2xl font-semibold">
-              Project Overview
-            </h2>
-
-            <div className="project-detail-body mt-5 space-y-4">
-              {descriptionParagraphs.length > 0 ? (
-                descriptionParagraphs.map((paragraph, index) => (
-                  <p key={`${project.id}-paragraph-${index}`}>{paragraph}</p>
-                ))
-              ) : (
-                <p>{project.short_description}</p>
-              )}
-            </div>
-          </article>
-
-          {files.length > 0 ? (
-            <article className="showcase-surface rounded-[28px] p-6 md:p-8">
-              <h2 className="project-showcase-title text-2xl font-semibold">
-                Project Files
-              </h2>
-              <div className="mt-5 grid gap-3">
-                {files.map((file) => (
-                  <a
-                    key={file.id}
-                    href={file.file_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="project-detail-tool media-hover-trigger justify-between"
-                  >
-                    <span className="flex items-center gap-3">
-                      <span className="project-detail-tool-fallback">
-                        <Download className="h-4 w-4" />
-                      </span>
-                      <span className="text-sm font-medium">
-                        {file.file_type || "Project file"}
-                      </span>
-                    </span>
-                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                  </a>
-                ))}
-              </div>
-            </article>
-          ) : null}
+          <div className="flex flex-wrap gap-3 pt-1">
+            {project.demo_url ? (
+              <Button
+                variant="outline"
+                size="lg"
+                className="border-white/14 bg-white/[0.04] text-white hover:border-white/22 hover:bg-white/[0.08] hover:text-white"
+                asChild
+              >
+                <a href={project.demo_url} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="mr-2 h-4 w-4" />
+                  View Live Demo
+                </a>
+              </Button>
+            ) : null}
+            {project.github_url ? (
+              <Button
+                variant="outline"
+                size="lg"
+                className="border-white/14 bg-white/[0.04] text-white hover:border-white/22 hover:bg-white/[0.08] hover:text-white"
+                asChild
+              >
+                <a href={project.github_url} target="_blank" rel="noopener noreferrer">
+                  <Github className="mr-2 h-4 w-4" />
+                  View on GitHub
+                </a>
+              </Button>
+            ) : null}
+          </div>
 
           <article className="showcase-surface rounded-[28px] p-6 md:p-8">
             <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-8">
