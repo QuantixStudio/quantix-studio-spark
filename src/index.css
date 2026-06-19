@@ -1012,6 +1012,42 @@ All colors MUST be HSL.
     box-shadow: var(--shadow-surface-md) !important;
   }
 
+  .admin-modal-shell {
+    @apply max-h-[92vh] overflow-y-auto rounded-2xl border bg-card/95;
+    border-color: hsl(var(--border)) !important;
+    box-shadow: var(--shadow-surface-md) !important;
+  }
+
+  .admin-modal-form {
+    @apply space-y-6 pb-1;
+  }
+
+  .admin-modal-grid {
+    @apply grid gap-4 lg:grid-cols-[1.35fr_1fr];
+  }
+
+  .admin-meta-grid {
+    @apply grid gap-3 p-4 sm:grid-cols-2 xl:grid-cols-3;
+  }
+
+  .admin-metric-grid {
+    @apply grid gap-3 p-4 sm:grid-cols-2;
+  }
+
+  .admin-detail-card {
+    @apply rounded-xl border border-border/70 bg-background/35 p-3;
+  }
+
+  .admin-detail-stack {
+    @apply space-y-3;
+  }
+
+  .admin-toggle-row {
+    @apply flex items-center justify-between rounded-lg border p-4;
+    border-color: hsl(var(--border)) !important;
+    background-color: hsl(var(--background) / 0.38);
+  }
+
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;

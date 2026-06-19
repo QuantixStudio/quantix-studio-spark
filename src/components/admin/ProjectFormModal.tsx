@@ -93,6 +93,7 @@ export default function ProjectFormModal({
   onClose,
   project,
 }: ProjectFormModalProps) {
+  const mode = project ? "edit" : "create";
   const [isLoading, setIsLoading] = useState(false);
   const [images, setImages] = useState<ProjectImage[]>([]);
   const [originalImages, setOriginalImages] = useState<ProjectImage[]>([]);
@@ -456,20 +457,22 @@ export default function ProjectFormModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-h-[92vh] overflow-y-auto rounded-2xl border bg-card/95 sm:max-w-5xl">
+      <DialogContent className="admin-modal-shell sm:max-w-5xl">
         <DialogHeader>
-          <DialogTitle>{project ? "Edit Project" : "Create Project"}</DialogTitle>
+          <DialogTitle>{mode === "edit" ? "Edit Project" : "Create Project"}</DialogTitle>
           <DialogDescription>
-            Keep this project polished for both the portfolio grid and the featured sections on the landing page.
+            {mode === "edit"
+              ? "Update this project across the admin CMS and public portfolio without leaving the current workflow."
+              : "Create a new project entry for the admin CMS, portfolio grid, and featured landing sections."}
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pb-1">
-            {project ? (
-              <div className="grid gap-4 lg:grid-cols-[1.35fr_1fr]">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="admin-modal-form">
+            {mode === "edit" && project ? (
+              <div className="admin-modal-grid">
                 <Card className="admin-surface">
-                  <CardContent className="grid gap-3 p-4 sm:grid-cols-2 xl:grid-cols-3">
+                  <CardContent className="admin-meta-grid">
                     <div className="space-y-1">
                       <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Project ID</p>
                       <p className="truncate text-sm font-medium">{project.id}</p>
@@ -498,20 +501,20 @@ export default function ProjectFormModal({
                 </Card>
 
                 <Card className="admin-surface">
-                  <CardContent className="grid gap-3 p-4 sm:grid-cols-2">
-                    <div className="rounded-xl border border-border/70 bg-background/35 p-3">
+                  <CardContent className="admin-metric-grid">
+                    <div className="admin-detail-card">
                       <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Technologies</p>
                       <p className="mt-2 text-2xl font-semibold">{project.project_technologies.length}</p>
                     </div>
-                    <div className="rounded-xl border border-border/70 bg-background/35 p-3">
+                    <div className="admin-detail-card">
                       <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Related Services</p>
                       <p className="mt-2 text-2xl font-semibold">{project.project_services.length}</p>
                     </div>
-                    <div className="rounded-xl border border-border/70 bg-background/35 p-3">
+                    <div className="admin-detail-card">
                       <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Files</p>
                       <p className="mt-2 text-2xl font-semibold">{project.project_files.length}</p>
                     </div>
-                    <div className="rounded-xl border border-border/70 bg-background/35 p-3">
+                    <div className="admin-detail-card">
                       <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Tasks</p>
                       <p className="mt-2 text-2xl font-semibold">{project.project_tasks.length}</p>
                     </div>
@@ -717,7 +720,7 @@ export default function ProjectFormModal({
                 control={form.control}
                 name="published"
                 render={({ field }) => (
-                  <FormItem className="flex items-center justify-between border rounded-lg p-4">
+                  <FormItem className="admin-toggle-row">
                     <div>
                       <FormLabel>Published</FormLabel>
                       <FormDescription className="text-sm">
@@ -735,7 +738,7 @@ export default function ProjectFormModal({
                 control={form.control}
                 name="showOnHome"
                 render={({ field }) => (
-                  <FormItem className="flex items-center justify-between border rounded-lg p-4">
+                  <FormItem className="admin-toggle-row">
                     <div>
                       <FormLabel>Show on Home</FormLabel>
                       <FormDescription className="text-sm">
@@ -832,7 +835,7 @@ export default function ProjectFormModal({
               )}
               />
 
-              {project ? (
+              {mode === "edit" && project ? (
                 <>
                   <Separator className="my-2" />
 
@@ -844,9 +847,9 @@ export default function ProjectFormModal({
                           <h3 className="text-sm font-semibold">Related Services</h3>
                         </div>
                         {project.project_services.length > 0 ? (
-                          <div className="space-y-3">
+                          <div className="admin-detail-stack">
                             {project.project_services.map((service) => (
-                              <div key={service.id} className="rounded-xl border border-border/70 bg-background/35 p-3">
+                              <div key={service.id} className="admin-detail-card">
                                 <p className="font-medium">{service.title}</p>
                                 <p className="mt-1 text-sm text-muted-foreground">
                                   {service.description || "No description"}
@@ -867,9 +870,9 @@ export default function ProjectFormModal({
                           <h3 className="text-sm font-semibold">Project Files</h3>
                         </div>
                         {project.project_files.length > 0 ? (
-                          <div className="space-y-3">
+                          <div className="admin-detail-stack">
                             {project.project_files.map((file) => (
-                              <div key={file.id} className="rounded-xl border border-border/70 bg-background/35 p-3">
+                              <div key={file.id} className="admin-detail-card">
                                 <div className="flex items-center justify-between gap-3">
                                   <div className="min-w-0">
                                     <p className="truncate font-medium">{file.file_type || "File"}</p>
@@ -901,9 +904,9 @@ export default function ProjectFormModal({
                           <h3 className="text-sm font-semibold">Project Tasks</h3>
                         </div>
                         {project.project_tasks.length > 0 ? (
-                          <div className="space-y-3">
+                          <div className="admin-detail-stack">
                             {project.project_tasks.map((task) => (
-                              <div key={task.id} className="rounded-xl border border-border/70 bg-background/35 p-3">
+                              <div key={task.id} className="admin-detail-card">
                                 <div className="flex flex-wrap items-center gap-2">
                                   <p className="font-medium">{task.title}</p>
                                   {task.task_status?.label ? (
