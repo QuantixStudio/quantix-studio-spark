@@ -20,7 +20,7 @@ interface ProjectCategorySummary {
 interface ServiceSummary {
   id: string;
   title: string;
-  description: string;
+  description: string | null;
 }
 
 interface ProjectImageRow {
@@ -194,26 +194,30 @@ export function useProjectDetail(slug: string) {
 
       const { data: projectServiceRows, error: projectServicesError } = await untypedSupabase
         .from("project_services")
-        .select(`
-          service_id,
-          services:service_id (
-            id,
-            title,
-            description
-          )
-        `)
+        .select("service_id")
         .eq("project_id", projectData.id);
 
       if (projectServicesError) {
         console.warn(`Could not load services for project ${projectData.id}`, projectServicesError);
       }
 
-      const projectServices = ((projectServiceRows ?? []) as unknown as Array<{ services: ServiceSummary | ServiceSummary[] | null }>)
-        .map((row) => {
-          const service = row.services;
-          return Array.isArray(service) ? service[0] : service;
-        })
-        .filter((service): service is ServiceSummary => Boolean(service?.id && service?.title));
+      const serviceIds = ((projectServiceRows ?? []) as Array<{ service_id: string | null }>)
+        .map((row) => row.service_id)
+        .filter((serviceId): serviceId is string => Boolean(serviceId));
+      let projectServices: ServiceSummary[] = [];
+
+      if (serviceIds.length > 0) {
+        const { data: serviceRows, error: servicesError } = await supabase
+          .from("services")
+          .select("id, title, description")
+          .in("id", serviceIds);
+
+        if (servicesError) {
+          console.warn(`Could not load services catalog for project ${projectData.id}`, servicesError);
+        } else {
+          projectServices = (serviceRows ?? []) as ServiceSummary[];
+        }
+      }
 
       return mapProject(projectData as unknown as RawProjectRow, technologies, projectServices);
     },

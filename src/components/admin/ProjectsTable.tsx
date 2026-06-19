@@ -55,10 +55,6 @@ interface ProjectImageRelation {
   order_index: number | null;
 }
 
-interface ServiceRelation {
-  services: ProjectServiceSummary | ProjectServiceSummary[] | null;
-}
-
 interface TaskRow {
   id: string;
   title: string;
@@ -74,112 +70,116 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
   const [isFetching, setIsFetching] = useState(false);
   const queryClient = useQueryClient();
 
-  const handleEdit = async (projectId: string) => {
+  const handleEdit = async (project: ProjectWithTools) => {
     setIsFetching(true);
     try {
       const { data: projectData, error } = await supabase
         .from("projects")
-        .select(`
-          *,
-          project_category:project_category!projects_category_id_fkey (
-            id,
-            name,
-            description
-          ),
-          cover_image:project_images!projects_cover_image_id_fkey (
-            public_url,
-            alt,
-            is_main,
-            order_index
-          ),
-          project_images:project_images!project_images_project_fk (
-            public_url,
-            alt,
-            is_main,
-            order_index
-          )
-        `)
-        .eq("id", projectId)
+        .select("*")
+        .eq("id", project.id)
         .single();
 
       if (error) throw error;
 
-      const projectRecord = projectData as unknown as RawProjectWithCategory;
-      const [
-        { data: projectTech, error: projectTechError },
-        { data: allToolsData, error: allToolsError },
-        { data: projectServiceRows, error: projectServicesError },
-        { data: projectFileRows, error: projectFilesError },
-        { data: projectTaskRows, error: projectTasksError },
-        { data: projectStatusRow, error: projectStatusError },
-        { data: clientRow, error: clientError },
-      ] =
-        await Promise.all([
-          untypedSupabase
-            .from("project_technologies")
-            .select(`
-              technology_id,
-              technologies:technologies!fk_pt_technology (
-                id,
-                name
-              )
-            `)
-            .eq("project_id", projectId),
-          supabase.from("technologies").select("id, name"),
-          untypedSupabase
-            .from("project_services")
-            .select(`
-              service_id,
-              services:service_id (
-                id,
-                title,
-                description
-              )
-            `)
-            .eq("project_id", projectId),
-          untypedSupabase
-            .from("project_files")
-            .select("id, file_url, file_type, order_index, created_at")
-            .eq("project_id", projectId)
-            .order("order_index", { ascending: true }),
-          untypedSupabase
-            .from("project_tasks")
-            .select("id, title, description, due_date, created_at, status")
-            .eq("project_id", projectId)
-            .order("created_at", { ascending: false }),
-          projectRecord.status
-            ? untypedSupabase
-                .from("project_status")
-                .select("id, label, color, order_index")
-                .eq("id", projectRecord.status)
-                .maybeSingle()
-            : Promise.resolve({ data: null, error: null }),
-          projectRecord.client_id
-            ? untypedSupabase
-                .from("clients")
-                .select("id, name, email, company, status")
-                .eq("id", projectRecord.client_id)
-                .maybeSingle()
-            : Promise.resolve({ data: null, error: null }),
-        ]);
+      const projectRecord = {
+        ...(projectData as unknown as RawProjectWithCategory),
+        project_category: project.project_category ?? null,
+      };
 
-      if (projectTechError) throw projectTechError;
-      if (allToolsError) throw allToolsError;
-      if (projectServicesError) throw projectServicesError;
-      if (projectFilesError) throw projectFilesError;
-      if (projectTasksError) throw projectTasksError;
-      if (projectStatusError) throw projectStatusError;
-      if (clientError) throw clientError;
+      const settledQueries = await Promise.allSettled([
+        untypedSupabase
+          .from("project_images")
+          .select("public_url, alt, is_main, order_index")
+          .eq("project_id", project.id)
+          .order("order_index", { ascending: true }),
+        untypedSupabase
+          .from("project_technologies")
+          .select("technology_id")
+          .eq("project_id", project.id),
+        supabase.from("technologies").select("id, name"),
+        untypedSupabase
+          .from("project_services")
+          .select("service_id")
+          .eq("project_id", project.id),
+        untypedSupabase
+          .from("project_files")
+          .select("id, file_url, file_type, order_index, created_at")
+          .eq("project_id", project.id)
+          .order("order_index", { ascending: true }),
+        untypedSupabase
+          .from("project_tasks")
+          .select("id, title, description, due_date, created_at, status")
+          .eq("project_id", project.id)
+          .order("created_at", { ascending: false }),
+        projectRecord.status
+          ? untypedSupabase
+              .from("project_status")
+              .select("id, label, color, order_index")
+              .eq("id", projectRecord.status)
+              .maybeSingle()
+          : Promise.resolve({ data: null, error: null }),
+        projectRecord.client_id
+          ? untypedSupabase
+              .from("clients")
+              .select("id, name, email, company, status")
+              .eq("id", projectRecord.client_id)
+              .maybeSingle()
+          : Promise.resolve({ data: null, error: null }),
+      ]);
 
-      const toolIds = ((projectTech ?? []) as unknown as Array<{
-        technologies: { id: string; name: string } | { id: string; name: string }[] | null;
-      }>)
-        .map((row) => {
-          const technology = row.technologies;
-          return Array.isArray(technology) ? technology[0] : technology;
-        })
-        .filter((technology): technology is { id: string; name: string } => Boolean(technology?.id))
-        .map((technology) => technology.id);
+      const readQueryResult = <T,>(
+        result: PromiseSettledResult<{ data: T; error: unknown }>,
+        label: string,
+      ): T | null => {
+        if (result.status === "rejected") {
+          console.warn(`Could not load ${label} for project ${project.id}`, result.reason);
+          return null;
+        }
+
+        if (result.value.error) {
+          console.warn(`Could not load ${label} for project ${project.id}`, result.value.error);
+          return null;
+        }
+
+        return result.value.data;
+      };
+
+      const projectImagesData = readQueryResult<ProjectImageRelation[]>(
+        settledQueries[0],
+        "project images",
+      );
+      const projectTechRows = readQueryResult<Array<{ technology_id: string | null }>>(
+        settledQueries[1],
+        "project technologies",
+      );
+      const allToolsData = readQueryResult<Array<{ id: string; name: string }>>(
+        settledQueries[2],
+        "technologies catalog",
+      );
+      const projectServiceLinks = readQueryResult<Array<{ service_id: string | null }>>(
+        settledQueries[3],
+        "project services",
+      );
+      const projectFileRows = readQueryResult<ProjectFileSummary[]>(
+        settledQueries[4],
+        "project files",
+      );
+      const projectTaskRows = readQueryResult<TaskRow[]>(
+        settledQueries[5],
+        "project tasks",
+      );
+      const projectStatusRow = readQueryResult<ProjectStatusSummary | null>(
+        settledQueries[6],
+        "project status",
+      );
+      const clientRow = readQueryResult<ClientSummary | null>(
+        settledQueries[7],
+        "project client",
+      );
+
+      const toolIds = (projectTechRows ?? [])
+        .map((row) => row.technology_id)
+        .filter((technologyId): technologyId is string => Boolean(technologyId));
 
       const allTools = ((allToolsData ?? []) as Array<{ id: string; name: string }>).map((technology) => ({
         id: technology.id,
@@ -193,15 +193,28 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
         updated_at: null,
       })) as Tool[];
       const projectTools = allTools.filter((tool) => toolIds.includes(tool.id));
-      const projectServices = ((projectServiceRows ?? []) as unknown as ServiceRelation[])
-        .map((row) => {
-          const service = row.services;
-          return Array.isArray(service) ? service[0] : service;
-        })
-        .filter((service): service is ProjectServiceSummary => Boolean(service?.id && service?.title));
-      const projectFiles = ((projectFileRows ?? []) as unknown as ProjectFileSummary[]).filter((file) => Boolean(file.id));
+
+      const serviceIds = (projectServiceLinks ?? [])
+        .map((row) => row.service_id)
+        .filter((serviceId): serviceId is string => Boolean(serviceId));
+      let projectServices: ProjectServiceSummary[] = [];
+
+      if (serviceIds.length > 0) {
+        const { data: serviceRows, error: servicesError } = await supabase
+          .from("services")
+          .select("id, title, description")
+          .in("id", serviceIds);
+
+        if (servicesError) {
+          console.warn(`Could not load services catalog for project ${project.id}`, servicesError);
+        } else {
+          projectServices = (serviceRows ?? []) as ProjectServiceSummary[];
+        }
+      }
+
+      const projectFiles = (projectFileRows ?? []).filter((file) => Boolean(file.id));
       const taskStatusIds = Array.from(
-        new Set(((projectTaskRows ?? []) as unknown as TaskRow[]).map((task) => task.status).filter((status): status is string => Boolean(status))),
+        new Set((projectTaskRows ?? []).map((task) => task.status).filter((status): status is string => Boolean(status))),
       );
       let taskStatusMap = new Map<string, TaskStatusSummary>();
 
@@ -218,32 +231,30 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
         );
       }
 
-      const projectTasks = ((projectTaskRows ?? []) as unknown as TaskRow[]).map((task) => ({
+      const projectTasks = (projectTaskRows ?? []).map((task) => ({
         ...task,
         task_status: task.status ? taskStatusMap.get(task.status) ?? null : null,
       })) as ProjectTaskSummary[];
       const relatedImages = [
-        ...((((projectData as unknown as { project_images?: ProjectImageRelation[] | null }).project_images) ?? []).filter(
+        ...((projectImagesData ?? []).filter(
           (image): image is ProjectImageRelation => Boolean(image?.public_url),
         )),
       ]
         .map((image, index) => ({
           url: image.public_url ?? "",
-          alt: image.alt ?? projectData.title,
+          alt: image.alt ?? projectRecord.title,
           is_main: image.is_main ?? index === 0,
           order: image.order_index ?? index,
         }))
         .sort((left, right) => left.order - right.order);
       const normalizedImages = relatedImages.length > 0 ? relatedImages : [];
-      const coverRelation = (projectData as unknown as { cover_image?: ProjectImageRelation | ProjectImageRelation[] | null }).cover_image;
-      const coverImage = Array.isArray(coverRelation) ? coverRelation[0] : coverRelation;
       const editorProject = {
         ...projectRecord,
         images: normalizedImages,
         cover_url:
           normalizedImages.find((image) => image.is_main)?.url ??
           normalizedImages[0]?.url ??
-          coverImage?.public_url ??
+          project.cover_url ??
           null,
         project_status: (projectStatusRow as ProjectStatusSummary | null) ?? null,
         client: (clientRow as ClientSummary | null) ?? null,
@@ -254,7 +265,9 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
 
       onEdit(mapProjectWithTools(editorProject, projectTools));
     } catch (error) {
-      toast.error(getErrorMessage(error, "Failed to load project"));
+      console.error("Failed to load full project payload for editing", error);
+      onEdit(project);
+      toast.error(getErrorMessage(error, "Opened project with limited data"));
     } finally {
       setIsFetching(false);
     }
@@ -337,7 +350,7 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
                   </TableCell>
                   <TableCell className="text-right">
                     <RowActionsMenu
-                      onEdit={() => handleEdit(project.id)}
+                      onEdit={() => handleEdit(project)}
                       onDelete={() => setDeleteId(project.id)}
                       isEditDisabled={isFetching}
                     />
