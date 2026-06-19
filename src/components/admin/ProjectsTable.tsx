@@ -49,6 +49,8 @@ interface ProjectsTableProps {
 }
 
 interface ProjectImageRelation {
+  id: string;
+  file_path: string | null;
   public_url: string | null;
   alt: string | null;
   is_main: boolean | null;
@@ -89,7 +91,7 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
       const settledQueries = await Promise.allSettled([
         untypedSupabase
           .from("project_images")
-          .select("public_url, alt, is_main, order_index")
+          .select("id, file_path, public_url, alt, is_main, order_index")
           .eq("project_id", project.id)
           .order("order_index", { ascending: true }),
         untypedSupabase
@@ -241,10 +243,12 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
         )),
       ]
         .map((image, index) => ({
+          id: image.id,
           url: image.public_url ?? "",
           alt: image.alt ?? projectRecord.title,
           is_main: image.is_main ?? index === 0,
           order: image.order_index ?? index,
+          file_path: image.file_path ?? null,
         }))
         .sort((left, right) => left.order - right.order);
       const normalizedImages = relatedImages.length > 0 ? relatedImages : [];

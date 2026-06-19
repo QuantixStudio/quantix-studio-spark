@@ -34,10 +34,12 @@ export interface ServiceWithIcon extends Tables<"services"> {
 }
 
 export interface ProjectImage {
+  id?: string;
   url: string;
   alt: string;
   is_main: boolean;
   order: number;
+  file_path?: string | null;
   file?: File;
 }
 

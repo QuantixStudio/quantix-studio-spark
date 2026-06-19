@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { STORAGE_BUCKETS } from "@/lib/storageBuckets";
 
 export async function deleteProjectImages(
   projectId: string,
@@ -8,14 +9,14 @@ export async function deleteProjectImages(
 
   const filePaths = imageUrls
     .map((url) => {
-      const match = url.match(/portfolio\/(.+)$/);
+      const match = url.match(/Project_images\/(.+)$/);
       return match ? match[1] : null;
     })
     .filter(Boolean) as string[];
 
   if (filePaths.length > 0) {
     const { error } = await supabase.storage
-      .from("portfolio")
+      .from(STORAGE_BUCKETS.projectImages)
       .remove(filePaths);
 
     if (error) {
@@ -27,7 +28,7 @@ export async function deleteProjectImages(
 
 export async function deleteAllProjectImages(projectId: string): Promise<void> {
   const { data: files, error: listError } = await supabase.storage
-    .from("portfolio")
+    .from(STORAGE_BUCKETS.projectImages)
     .list(projectId);
 
   if (listError) {
@@ -39,7 +40,7 @@ export async function deleteAllProjectImages(projectId: string): Promise<void> {
     const filePaths = files.map((file) => `${projectId}/${file.name}`);
 
     const { error: deleteError } = await supabase.storage
-      .from("portfolio")
+      .from(STORAGE_BUCKETS.projectImages)
       .remove(filePaths);
 
     if (deleteError) {

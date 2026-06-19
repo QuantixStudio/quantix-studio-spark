@@ -28,10 +28,16 @@ export function getProjectImages(
     const parsedImages = images
       .filter(isProjectImage)
       .map((image) => ({
+        id: typeof (image as { id?: unknown }).id === "string" ? (image as { id?: string }).id : undefined,
         url: image.url,
         alt: image.alt,
         is_main: image.is_main,
         order: image.order,
+        file_path:
+          typeof (image as { file_path?: unknown }).file_path === "string" ||
+          (image as { file_path?: unknown }).file_path === null
+            ? ((image as { file_path?: string | null }).file_path ?? null)
+            : null,
       }))
       .sort((left, right) => left.order - right.order);
 
@@ -47,10 +53,12 @@ export function getProjectImages(
   if (fallback?.coverUrl) {
     return [
       {
+        id: undefined,
         url: fallback.coverUrl,
         alt: fallback.title,
         is_main: true,
         order: 0,
+        file_path: null,
       },
     ];
   }
@@ -60,10 +68,12 @@ export function getProjectImages(
 
 export function serializeProjectImages(images: ProjectImage[]) {
   return images.map((image) => ({
+    id: image.id,
     url: image.url,
     alt: image.alt,
     is_main: image.is_main,
     order: image.order,
+    file_path: image.file_path ?? null,
   }));
 }
 

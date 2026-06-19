@@ -24,6 +24,8 @@ interface ServiceSummary {
 }
 
 interface ProjectImageRow {
+  id: string;
+  file_path: string | null;
   public_url: string | null;
   alt: string | null;
   is_main: boolean | null;
@@ -71,10 +73,12 @@ function mapProjectImages(
   const normalizedImages = (images ?? [])
     .filter((image): image is ProjectImageRow => Boolean(image?.public_url))
     .map((image, index) => ({
+      id: image.id,
       url: image.public_url ?? "",
       alt: image.alt ?? fallbackTitle,
       is_main: image.is_main ?? index === 0,
       order: image.order_index ?? index,
+      file_path: image.file_path ?? null,
     }))
     .sort((left, right) => left.order - right.order);
 
@@ -91,10 +95,12 @@ function mapProjectImages(
   if (fallbackImage?.public_url) {
     return [
       {
+        id: fallbackImage.id,
         url: fallbackImage.public_url,
         alt: fallbackImage.alt ?? fallbackTitle,
         is_main: true,
         order: fallbackImage.order_index ?? 0,
+        file_path: fallbackImage.file_path ?? null,
       },
     ];
   }
@@ -151,12 +157,16 @@ export function useProjectDetail(slug: string) {
             description
           ),
           cover_image:project_images!projects_cover_image_id_fkey (
+            id,
+            file_path,
             public_url,
             alt,
             is_main,
             order_index
           ),
           project_images:project_images!project_images_project_fk (
+            id,
+            file_path,
             public_url,
             alt,
             is_main,

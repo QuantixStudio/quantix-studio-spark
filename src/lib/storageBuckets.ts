@@ -1,6 +1,7 @@
 export const STORAGE_BUCKETS = {
   avatars: "avatars",
   portfolio: "portfolio",
+  projectImages: "Project_images",
   testimonialsAvatars: "testimonials_avatars",
   toolsLogos: "tools_logos",
 } as const;

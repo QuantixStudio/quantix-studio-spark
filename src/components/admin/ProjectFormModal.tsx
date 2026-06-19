@@ -7,7 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import type { TablesInsert } from "@/integrations/supabase/types";
 import { deleteProjectImages } from "@/lib/storageUtils";
 import { getErrorMessage } from "@/lib/errorUtils";
-import { getProjectImages, serializeProjectImages } from "@/lib/projectUtils";
+import { getProjectImages } from "@/lib/projectUtils";
+import { STORAGE_BUCKETS } from "@/lib/storageBuckets";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -94,7 +95,7 @@ export default function ProjectFormModal({
 }: ProjectFormModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [images, setImages] = useState<ProjectImage[]>([]);
-  const [originalImages, setOriginalImages] = useState<string[]>([]);
+  const [originalImages, setOriginalImages] = useState<ProjectImage[]>([]);
   const [categories, setCategories] = useState<ProjectCategory[]>([]);
   const [tools, setTools] = useState<TechnologyOption[]>([]);
   const [statuses, setStatuses] = useState<ProjectStatusSummary[]>([]);
@@ -152,7 +153,7 @@ export default function ProjectFormModal({
         });
 
         setImages(projectImages);
-        setOriginalImages(projectImages.map((img) => img.url));
+        setOriginalImages(projectImages);
       } else {
         form.reset({
           title: "",
@@ -215,18 +216,18 @@ export default function ProjectFormModal({
       .replace(/^-+|-+$/g, "");
   };
 
-  const uploadImages = async (projectId: string): Promise<ProjectImage[]> => {
+  const uploadImages = async (projectId: string, nextImages: ProjectImage[]): Promise<ProjectImage[]> => {
     const uploadedImages: ProjectImage[] = [];
 
-    for (let i = 0; i < images.length; i++) {
-      const image = images[i];
+    for (let i = 0; i < nextImages.length; i++) {
+      const image = nextImages[i];
 
       if (image.file) {
         const fileExt = image.file.name.split(".").pop();
         const fileName = `${projectId}/image-${Date.now()}-${i}.${fileExt}`;
 
         const { error: uploadError } = await supabase.storage
-          .from("portfolio")
+          .from(STORAGE_BUCKETS.projectImages)
           .upload(fileName, image.file, { 
             upsert: true,
             contentType: image.file.type,
@@ -236,25 +237,114 @@ export default function ProjectFormModal({
 
         const {
           data: { publicUrl },
-        } = supabase.storage.from("portfolio").getPublicUrl(fileName);
+        } = supabase.storage.from(STORAGE_BUCKETS.projectImages).getPublicUrl(fileName);
 
         uploadedImages.push({
+          id: image.id,
           url: publicUrl,
           alt: image.alt,
           is_main: image.is_main,
           order: i,
+          file_path: fileName,
         });
       } else {
         uploadedImages.push({
+          id: image.id,
           url: image.url,
           alt: image.alt,
           is_main: image.is_main,
           order: i,
+          file_path: image.file_path ?? null,
         });
       }
     }
 
     return uploadedImages;
+  };
+
+  const syncProjectImages = async (projectId: string, nextImages: ProjectImage[]) => {
+    const removedImageUrls = originalImages
+      .filter((originalImage) => !nextImages.some((image) => image.url === originalImage.url))
+      .map((image) => image.url);
+
+    const removedImageIds = originalImages
+      .filter((originalImage) => !nextImages.some((image) => image.url === originalImage.url))
+      .map((image) => image.id)
+      .filter((imageId): imageId is string => Boolean(imageId));
+
+    if (removedImageUrls.length > 0) {
+      await deleteProjectImages(projectId, removedImageUrls);
+    }
+
+    if (removedImageIds.length > 0) {
+      const { error: deleteRemovedImagesError } = await untypedSupabase
+        .from("project_images")
+        .delete()
+        .in("id", removedImageIds);
+
+      if (deleteRemovedImagesError) {
+        throw deleteRemovedImagesError;
+      }
+    }
+
+    const { error: clearCoverImageError } = await untypedSupabase
+      .from("projects")
+      .update({ cover_image_id: null })
+      .eq("id", projectId);
+
+    if (clearCoverImageError) {
+      throw clearCoverImageError;
+    }
+
+    const { error: deleteImageRowsError } = await untypedSupabase
+      .from("project_images")
+      .delete()
+      .eq("project_id", projectId);
+
+    if (deleteImageRowsError) {
+      throw deleteImageRowsError;
+    }
+
+    if (nextImages.length === 0) {
+      return null;
+    }
+
+    const imageRows = nextImages.map((image, index) => ({
+      project_id: projectId,
+      file_path: image.file_path ?? null,
+      public_url: image.url,
+      alt: image.alt,
+      order_index: index,
+      is_main: image.is_main,
+    }));
+
+    const { data: insertedImages, error: insertImagesError } = await untypedSupabase
+      .from("project_images")
+      .insert(imageRows)
+      .select("id, is_main, order_index")
+      .order("order_index", { ascending: true });
+
+    if (insertImagesError) {
+      throw insertImagesError;
+    }
+
+    const mainImageId =
+      ((insertedImages ?? []) as Array<{ id: string; is_main: boolean | null; order_index: number | null }>).find(
+        (image) => image.is_main,
+      )?.id ??
+      ((insertedImages ?? []) as Array<{ id: string }>)[0]?.id ??
+      null;
+
+    const { error: updateCoverImageError } = await untypedSupabase
+      .from("projects")
+      .update({ cover_image_id: mainImageId })
+      .eq("id", projectId);
+
+    if (updateCoverImageError) {
+      throw updateCoverImageError;
+    }
+
+    return mainImageId;
   };
 
   const onSubmit = async (values: z.infer<typeof projectSchema>) => {
@@ -274,6 +364,10 @@ export default function ProjectFormModal({
     try {
       let projectId = project?.id;
       const normalizedOrderIndex = values.orderIndex.trim() ? Number(values.orderIndex) : null;
+      const normalizedImages = [...validatedImages].map((image, index) => ({
+        ...image,
+        order: index,
+      }));
 
       if (!projectId) {
         const insertData = {
@@ -292,8 +386,7 @@ export default function ProjectFormModal({
         projectId = newProject.id;
       }
 
-      const uploadedImages = await uploadImages(projectId);
-      const mainImage = uploadedImages.find((img) => img.is_main) || uploadedImages[0];
+      const uploadedImages = await uploadImages(projectId, normalizedImages);
 
       const updateData: Record<string, unknown> = {
         title: values.title,
@@ -309,25 +402,16 @@ export default function ProjectFormModal({
         published: values.published,
         show_on_home: values.showOnHome,
         key_metric: values.keyMetric || null,
-        images: serializeProjectImages(uploadedImages),
-        cover_url: mainImage?.url || null,
       };
 
-      const { error: updateError } = await supabase
+      const { error: updateError } = await untypedSupabase
         .from("projects")
-        .update(updateData as never)
+        .update(updateData)
         .eq("id", projectId);
 
       if (updateError) throw updateError;
 
-      const currentImageUrls = uploadedImages.map((img) => img.url);
-      const deletedImageUrls = originalImages.filter(
-        (url) => !currentImageUrls.includes(url)
-      );
-
-      if (deletedImageUrls.length > 0) {
-        await deleteProjectImages(projectId, deletedImageUrls);
-      }
+      await syncProjectImages(projectId, uploadedImages);
 
       const { error: deleteProjectTechnologiesError } = await supabase
         .from("project_technologies")
@@ -355,6 +439,7 @@ export default function ProjectFormModal({
 
       toast.success(project ? "Project updated!" : "Project created!");
       queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["project", values.slug] });
       onClose();
     } catch (error) {
       toast.error(getErrorMessage(error, "Failed to save project"));
