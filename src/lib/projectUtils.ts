@@ -88,14 +88,21 @@ export function mapProjectWithTools(
     }),
     published: project.published ?? false,
     show_on_home: project.show_on_home ?? false,
+    status: project.status ?? null,
+    client_id: project.client_id ?? null,
+    cover_image_id: project.cover_image_id ?? null,
+    order_index: project.order_index ?? null,
     project_category: project.project_category,
+    project_status: project.project_status ?? null,
+    client: project.client ?? null,
     project_technologies: projectTools.map((tool) => ({
       id: tool.id,
       name: tool.name,
       description: tool.description,
     })),
     project_tools: projectTools,
-    project_files: [],
-    project_services: [],
+    project_files: project.project_files ?? [],
+    project_services: project.project_services ?? [],
+    project_tasks: project.project_tasks ?? [],
   };
 }

@@ -7,6 +7,10 @@ import type {
   ProjectWithTools,
 } from "@/types/app";
 
+const untypedSupabase = supabase as unknown as {
+  from: (relation: string) => any;
+};
+
 interface ProjectCategorySummary {
   id: string;
   name: string;
@@ -107,10 +111,15 @@ function mapProject(
     cover_url: coverUrl,
     published: project.published ?? false,
     show_on_home: project.show_on_home ?? false,
+    status: project.status ?? null,
+    client_id: null,
+    cover_image_id: null,
     project_status: project.project_status ?? null,
+    client: null,
     project_technologies: technologies,
     project_files: [],
     project_services: [],
+    project_tasks: [],
     project_tools: technologies.map((technology) => ({
       id: technology.id,
       name: technology.name,
@@ -181,7 +190,7 @@ export function useProjects(adminMode = false, featuredOnly = false) {
       const { data: projectsData, error } = await query;
       if (error) throw error;
 
-      const projects = (projectsData ?? []) as RawProjectRow[];
+      const projects = (projectsData ?? []) as unknown as RawProjectRow[];
       const statusIds = Array.from(
         new Set(projects.map((project) => project.status).filter((status): status is string => Boolean(status))),
       );
@@ -189,7 +198,7 @@ export function useProjects(adminMode = false, featuredOnly = false) {
       const statusMap = new Map<string, ProjectStatusSummary>();
 
       if (statusIds.length > 0) {
-        const { data: statusRows, error: statusError } = await supabase
+        const { data: statusRows, error: statusError } = await untypedSupabase
           .from("project_status")
           .select("id, label, color, order_index")
           .in("id", statusIds);
@@ -205,7 +214,7 @@ export function useProjects(adminMode = false, featuredOnly = false) {
 
       const projectsWithTechnologies = await Promise.all(
         projects.map(async (project) => {
-          const { data: projectTechRows, error: projectTechError } = await supabase
+          const { data: projectTechRows, error: projectTechError } = await untypedSupabase
             .from("project_technologies")
             .select(`
               technology_id,
@@ -223,7 +232,7 @@ export function useProjects(adminMode = false, featuredOnly = false) {
 
           const technologies = (projectTechRows ?? [])
             .map((row) => {
-              const technology = row.technologies as ProjectTechnologySummary | ProjectTechnologySummary[] | null;
+              const technology = (row as { technologies: ProjectTechnologySummary | ProjectTechnologySummary[] | null }).technologies;
               return Array.isArray(technology) ? technology[0] : technology;
             })
             .filter((technology): technology is ProjectTechnologySummary => Boolean(technology?.id && technology?.name));

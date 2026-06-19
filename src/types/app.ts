@@ -11,6 +11,19 @@ export interface ProjectStatusSummary {
   color: string | null;
   order_index: number | null;
 }
+export interface ClientSummary {
+  id: string;
+  name: string | null;
+  email: string | null;
+  company: string | null;
+  status: string | null;
+}
+export interface TaskStatusSummary {
+  id: string;
+  label: string | null;
+  color: string | null;
+  order_index: number | null;
+}
 export type Tool = Tables<"tools">;
 export type Testimonial = Tables<"testimonials">;
 export type ServiceIcon = Tables<"service_icon">;
@@ -33,12 +46,23 @@ export interface ProjectFileSummary {
   file_url: string;
   file_type: string | null;
   order_index: number | null;
+  created_at: string | null;
 }
 
 export interface ProjectServiceSummary {
   id: string;
   title: string;
-  description: string;
+  description: string | null;
+}
+
+export interface ProjectTaskSummary {
+  id: string;
+  title: string;
+  description: string | null;
+  due_date: string | null;
+  created_at: string | null;
+  status: string | null;
+  task_status?: TaskStatusSummary | null;
 }
 
 export interface ProjectTechnologySummary {
@@ -49,23 +73,35 @@ export interface ProjectTechnologySummary {
 
 export type ProjectRow = Tables<"projects">;
 
-export interface RawProjectWithCategory extends ProjectRow {
+export interface RawProjectWithCategory extends Omit<ProjectRow, "images"> {
+  status: string | null;
+  client_id: string | null;
+  cover_image_id: string | null;
   project_category: ProjectCategorySummary | null;
   project_status?: ProjectStatusSummary | null;
+  client?: ClientSummary | null;
   images?: ProjectImage[] | null;
+  project_tasks?: ProjectTaskSummary[];
+  project_files?: ProjectFileSummary[];
+  project_services?: ProjectServiceSummary[];
 }
 
 export interface ProjectWithTools
   extends Omit<ProjectRow, "images" | "published" | "show_on_home"> {
+  status: string | null;
+  client_id: string | null;
+  cover_image_id: string | null;
   images: ProjectImage[] | null;
   published: boolean;
   show_on_home: boolean;
   project_category: ProjectCategorySummary | null;
   project_status?: ProjectStatusSummary | null;
+  client?: ClientSummary | null;
   project_technologies: ProjectTechnologySummary[];
   project_tools: Tool[];
   project_files: ProjectFileSummary[];
   project_services: ProjectServiceSummary[];
+  project_tasks: ProjectTaskSummary[];
 }
 
 export type EditableProject = ProjectWithTools;

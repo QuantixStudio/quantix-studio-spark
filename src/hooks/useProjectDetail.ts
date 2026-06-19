@@ -7,6 +7,10 @@ import type {
   ProjectWithTools,
 } from "@/types/app";
 
+const untypedSupabase = supabase as unknown as {
+  from: (relation: string) => any;
+};
+
 interface ProjectCategorySummary {
   id: string;
   name: string;
@@ -110,9 +114,15 @@ function mapProject(
     cover_url: null,
     published: project.published ?? false,
     show_on_home: project.show_on_home ?? false,
+    status: null,
+    client_id: null,
+    cover_image_id: null,
+    project_status: null,
+    client: null,
     project_technologies: technologies,
     project_files: [],
     project_services: projectServices,
+    project_tasks: [],
     project_tools: technologies.map((technology) => ({
       id: technology.id,
       name: technology.name,
@@ -161,7 +171,7 @@ export function useProjectDetail(slug: string) {
       if (!projectData) return null;
 
       // Fetch tools for this project
-      const { data: projectTechRows, error: projectTechError } = await supabase
+      const { data: projectTechRows, error: projectTechError } = await untypedSupabase
         .from("project_technologies")
         .select(`
           technology_id,
@@ -177,12 +187,12 @@ export function useProjectDetail(slug: string) {
 
       const technologies = ((projectTechRows ?? []) as Array<{ technologies: ProjectTechnologySummary | ProjectTechnologySummary[] | null }>)
         .map((row) => {
-          const technology = row.technologies as ProjectTechnologySummary | ProjectTechnologySummary[] | null;
+          const technology = (row as { technologies: ProjectTechnologySummary | ProjectTechnologySummary[] | null }).technologies;
           return Array.isArray(technology) ? technology[0] : technology;
         })
         .filter((technology): technology is ProjectTechnologySummary => Boolean(technology?.id && technology?.name));
 
-      const { data: projectServiceRows, error: projectServicesError } = await supabase
+      const { data: projectServiceRows, error: projectServicesError } = await untypedSupabase
         .from("project_services")
         .select(`
           service_id,
@@ -198,14 +208,14 @@ export function useProjectDetail(slug: string) {
         console.warn(`Could not load services for project ${projectData.id}`, projectServicesError);
       }
 
-      const projectServices = ((projectServiceRows ?? []) as Array<{ services: ServiceSummary | ServiceSummary[] | null }>)
+      const projectServices = ((projectServiceRows ?? []) as unknown as Array<{ services: ServiceSummary | ServiceSummary[] | null }>)
         .map((row) => {
-          const service = row.services as ServiceSummary | ServiceSummary[] | null;
+          const service = row.services;
           return Array.isArray(service) ? service[0] : service;
         })
         .filter((service): service is ServiceSummary => Boolean(service?.id && service?.title));
 
-      return mapProject(projectData as RawProjectRow, technologies, projectServices);
+      return mapProject(projectData as unknown as RawProjectRow, technologies, projectServices);
     },
     enabled: !!slug,
   });

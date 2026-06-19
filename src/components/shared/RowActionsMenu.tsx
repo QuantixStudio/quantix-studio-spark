@@ -32,7 +32,7 @@ export function RowActionsMenu({
         <Button
           variant="ghost"
           size="icon"
-          className="h-10 w-10 rounded-xl border border-transparent text-muted-foreground shadow-none transition-colors hover:border-transparent hover:bg-muted/50 hover:text-foreground hover:shadow-none focus:!border-transparent focus:!outline-none focus:!ring-0 focus:!ring-offset-0 focus:shadow-none focus-visible:!border-transparent focus-visible:!outline-none focus-visible:!ring-0 focus-visible:!ring-offset-0 focus-visible:shadow-none data-[state=open]:border-transparent data-[state=open]:bg-muted/60 data-[state=open]:text-foreground data-[state=open]:shadow-none"
+          className="h-10 w-10 rounded-xl border border-transparent text-muted-foreground shadow-none transition-colors hover:border-transparent hover:bg-accent/60 hover:text-accent-foreground hover:shadow-none focus:!border-transparent focus:!bg-accent/60 focus:!text-accent-foreground focus:!outline-none focus:!ring-0 focus:!ring-offset-0 focus:shadow-none focus-visible:!border-transparent focus-visible:!bg-accent/60 focus-visible:!text-accent-foreground focus-visible:!outline-none focus-visible:!ring-0 focus-visible:!ring-offset-0 focus-visible:shadow-none data-[state=open]:border-transparent data-[state=open]:bg-accent/60 data-[state=open]:text-accent-foreground data-[state=open]:shadow-none"
         >
           <MoreVertical className="h-4 w-4" />
         </Button>
