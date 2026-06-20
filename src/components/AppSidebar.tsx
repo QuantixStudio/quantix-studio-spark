@@ -88,13 +88,14 @@ export function AppSidebar() {
                   <SidebarMenuButton
                     asChild
                     tooltip={isCollapsed ? item.title : undefined}
-                    className="group-data-[collapsible=icon]:!size-14 group-data-[collapsible=icon]:!p-0"
+                    className="!p-0 group-data-[collapsible=icon]:!size-14 group-data-[collapsible=icon]:!p-0"
                   >
                     <NavLink
                       to={item.url}
                       end
                       className={({ isActive }) => cn(
-                        "group relative flex min-h-11 items-center gap-3 overflow-hidden rounded-2xl border px-3.5 py-2.5 transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring/70",
+                        "group relative flex min-h-11 items-center overflow-hidden rounded-2xl border pl-1.5 pr-3 py-2.5 transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring/70",
+                        !isCollapsed && "justify-start",
                         isCollapsed && cn(collapsedTileClassName, "min-h-0 justify-center px-0 py-0"),
                         isActive
                           ? "border-white/10 bg-white/[0.065] text-sidebar-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_8px_24px_rgba(0,0,0,0.18)]"
@@ -108,25 +109,32 @@ export function AppSidebar() {
                           )}
                           <div
                             className={cn(
-                              "relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border transition-all duration-200",
-                              isCollapsed && "size-10 rounded-[14px]",
-                              isActive
-                                ? "border-white/10 bg-white/[0.07] text-white"
-                                : "border-transparent bg-transparent text-sidebar-foreground/60 group-hover:border-white/8 group-hover:bg-white/[0.04] group-hover:text-sidebar-foreground/90",
+                              "relative z-10 flex min-w-0 flex-1 items-center",
+                              isCollapsed ? "justify-center" : "justify-start gap-4 pl-4",
                             )}
                           >
-                            <item.icon className="h-[1.05rem] w-[1.05rem]" />
-                          </div>
-                          {!isCollapsed && (
-                            <span
+                            <div
                               className={cn(
-                                "relative z-10 text-[0.95rem] tracking-[-0.01em] transition-colors duration-200",
-                                isActive ? "font-medium text-sidebar-foreground" : "font-normal",
+                                "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border transition-all duration-200",
+                                isCollapsed && "size-10 rounded-[14px]",
+                                isActive
+                                  ? "border-white/10 bg-white/[0.07] text-white"
+                                  : "border-transparent bg-transparent text-sidebar-foreground/60 group-hover:border-white/8 group-hover:bg-white/[0.04] group-hover:text-sidebar-foreground/90",
                               )}
                             >
-                              {item.title}
-                            </span>
-                          )}
+                              <item.icon className="h-[1.05rem] w-[1.05rem]" />
+                            </div>
+                            {!isCollapsed && (
+                              <span
+                                className={cn(
+                                  "relative z-10 min-w-0 text-left text-[0.95rem] tracking-[-0.01em] transition-colors duration-200",
+                                  isActive ? "font-medium text-sidebar-foreground" : "font-normal",
+                                )}
+                              >
+                                {item.title}
+                              </span>
+                            )}
+                          </div>
                         </>
                       )}
                     </NavLink>
