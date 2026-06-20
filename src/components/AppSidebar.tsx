@@ -115,11 +115,9 @@ export function AppSidebar() {
                           >
                             <div
                               className={cn(
-                                "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border transition-all duration-200",
-                                isCollapsed && "size-10 rounded-[14px]",
-                                isActive
-                                  ? "border-white/10 bg-white/[0.07] text-white"
-                                  : "border-transparent bg-transparent text-sidebar-foreground/60 group-hover:border-white/8 group-hover:bg-white/[0.04] group-hover:text-sidebar-foreground/90",
+                                "flex h-8 w-8 shrink-0 items-center justify-center transition-all duration-200",
+                                isCollapsed && "size-10",
+                                isActive ? "text-white" : "text-sidebar-foreground/60 group-hover:text-sidebar-foreground/90",
                               )}
                             >
                               <item.icon className="h-[1.05rem] w-[1.05rem]" />
