@@ -80,7 +80,7 @@ export default function ProfileFormModal({ isOpen, onClose, profile }: ProfileFo
 
     const { error: uploadError } = await supabase.storage
       .from(STORAGE_BUCKETS.avatars)
-      .upload(fileName, compressedFile, { upsert: true, contentType: compressedFile.type });
+      .upload(fileName, compressedFile, { contentType: compressedFile.type });
 
     if (uploadError) {
       throw uploadError;

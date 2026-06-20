@@ -27,6 +27,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getErrorMessage } from "@/lib/errorUtils";
+import { STORAGE_BUCKETS } from "@/lib/storageBuckets";
 
 const profileSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters"),
@@ -101,14 +102,14 @@ export default function ProfileEditModal({
     const fileExt = avatarFile.name.split(".").pop();
     const fileName = `${user.id}/avatar-${Date.now()}.${fileExt}`;
 
-    const { error: uploadError, data } = await supabase.storage
-      .from("avatars")
-      .upload(fileName, avatarFile, { upsert: true });
+    const { error: uploadError } = await supabase.storage
+      .from(STORAGE_BUCKETS.avatars)
+      .upload(fileName, avatarFile);
 
     if (uploadError) throw uploadError;
 
     const { data: { publicUrl } } = supabase.storage
-      .from("avatars")
+      .from(STORAGE_BUCKETS.avatars)
       .getPublicUrl(fileName);
 
     return publicUrl;
