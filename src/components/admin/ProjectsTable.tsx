@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { formatUiDate } from "@/lib/date";
 import { getErrorMessage } from "@/lib/errorUtils";
 import { getMainProjectImageUrl, mapProjectWithTools } from "@/lib/projectUtils";
 import { deleteAllProjectImages } from "@/lib/storageUtils";
@@ -71,6 +72,7 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
   const [isDeleting, setIsDeleting] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const queryClient = useQueryClient();
+  const adminStatusBadgeClassName = "rounded-[5px] px-5 py-1.5 text-sm font-semibold";
 
   const handleEdit = async (project: ProjectWithTools) => {
     setIsFetching(true);
@@ -343,14 +345,28 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
                       <p className="max-w-xs text-xs text-muted-foreground line-clamp-2">{project.short_description}</p>
                     </div>
                   </TableCell>
-                  <TableCell>{project.project_category?.name || "—"}</TableCell>
                   <TableCell>
-                    <Badge variant={project.published ? "default" : "secondary"}>
+                    {project.project_category?.name ? (
+                      <Badge
+                        variant="outline"
+                        className={`${adminStatusBadgeClassName} border-border/70 bg-background/70 text-foreground`}
+                      >
+                        {project.project_category.name}
+                      </Badge>
+                    ) : (
+                      "—"
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={project.published ? "default" : "secondary"}
+                      className={adminStatusBadgeClassName}
+                    >
                       {project.project_status?.label || (project.published ? "Published" : "Draft")}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    {project.created_at ? new Date(project.created_at).toLocaleDateString() : "—"}
+                    {formatUiDate(project.created_at)}
                   </TableCell>
                   <TableCell className="text-right">
                     <RowActionsMenu

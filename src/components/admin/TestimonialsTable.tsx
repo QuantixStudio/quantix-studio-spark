@@ -7,11 +7,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { getErrorMessage } from "@/lib/errorUtils";
+import { formatUiDate } from "@/lib/date";
 import { deleteTestimonialAvatar, getTestimonialAvatarUrl } from "@/lib/testimonialStorageUtils";
 import { StatePanel } from "@/components/shared/StatePanel";
 import { RowActionsMenu } from "@/components/shared/RowActionsMenu";
 import type { Testimonial } from "@/types/app";
-import { format } from "date-fns";
 
 interface TestimonialsTableProps {
   testimonials: Testimonial[];
@@ -22,6 +22,7 @@ export default function TestimonialsTable({ testimonials, onEdit }: Testimonials
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const queryClient = useQueryClient();
+  const adminStatusBadgeClassName = "rounded-[5px] px-5 py-1.5 text-sm font-semibold";
 
   const handleEdit = async (testimonialId: string) => {
     const { data, error } = await supabase
@@ -143,13 +144,13 @@ export default function TestimonialsTable({ testimonials, onEdit }: Testimonials
                 <TableCell>{renderRating(testimonial.rating)}</TableCell>
                 <TableCell>
                   {testimonial.published ? (
-                    <Badge variant="default" className="bg-green-500">Published</Badge>
+                    <Badge variant="default" className={`${adminStatusBadgeClassName} bg-green-500`}>Published</Badge>
                   ) : (
-                    <Badge variant="secondary">Draft</Badge>
+                    <Badge variant="secondary" className={adminStatusBadgeClassName}>Draft</Badge>
                   )}
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
-                  {format(new Date(testimonial.created_at), "MMM d, yyyy")}
+                  {formatUiDate(testimonial.created_at)}
                 </TableCell>
                 <TableCell>
                   <RowActionsMenu

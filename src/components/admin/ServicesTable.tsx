@@ -55,6 +55,7 @@ export default function ServicesTable({ services, onEdit }: ServicesTableProps) 
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const queryClient = useQueryClient();
+  const adminStatusBadgeClassName = "rounded-[5px] px-5 py-1.5 text-sm font-semibold";
 
   const handleDelete = async () => {
     if (!deleteId) return;
@@ -111,9 +112,9 @@ export default function ServicesTable({ services, onEdit }: ServicesTableProps) 
                 </TableCell>
                 <TableCell>
                   {service.published ? (
-                    <Badge variant="default" className="bg-green-500">Published</Badge>
+                    <Badge variant="default" className={`${adminStatusBadgeClassName} bg-green-500`}>Published</Badge>
                   ) : (
-                    <Badge variant="secondary">Draft</Badge>
+                    <Badge variant="secondary" className={adminStatusBadgeClassName}>Draft</Badge>
                   )}
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground">{service.order_index ?? "—"}</TableCell>

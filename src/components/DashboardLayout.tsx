@@ -80,7 +80,10 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
                     {firstName} {lastName}
                   </p>
                   <div className="mt-1 flex justify-end">
-                    <Badge variant={role === "admin" ? "destructive" : role === "manager" ? "default" : "secondary"}>
+                    <Badge
+                      variant={role === "admin" ? "destructive" : role === "manager" ? "default" : "secondary"}
+                      className="rounded-[5px] px-4"
+                    >
                       {role}
                     </Badge>
                   </div>

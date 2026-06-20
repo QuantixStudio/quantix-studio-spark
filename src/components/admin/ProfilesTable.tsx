@@ -81,7 +81,7 @@ export default function ProfilesTable({ profiles }: ProfilesTableProps) {
                 </div>
               </TableCell>
               <TableCell>
-                <Badge variant={getRoleBadgeVariant(profile.role)}>
+                <Badge variant={getRoleBadgeVariant(profile.role)} className="rounded-[5px] px-4 py-1.5 text-sm font-semibold">
                   {profile.role || "unknown"}
                 </Badge>
               </TableCell>
