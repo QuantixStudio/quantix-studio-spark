@@ -948,7 +948,7 @@ All colors MUST be HSL.
   }
 
   .page-shell {
-    @apply mx-auto flex w-full max-w-6xl flex-col gap-6 md:gap-8;
+    @apply flex w-full max-w-none flex-col gap-6 md:gap-8;
   }
 
   .page-stack {

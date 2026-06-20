@@ -11,7 +11,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Mail, User as UserIcon } from "lucide-react";
 import { z } from "zod";
 import { getErrorMessage } from "@/lib/errorUtils";
-import { PageHeader } from "@/components/shared/PageHeader";
 import type { Profile as UserProfile } from "@/types/app";
 
 const profileSchema = z.object({
@@ -110,12 +109,6 @@ export default function Profile() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      <PageHeader
-        eyebrow="Account"
-        title="Profile"
-        description="Manage the core contact details tied to your admin access."
-      />
-
       <Card className="admin-surface">
         <CardHeader>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">

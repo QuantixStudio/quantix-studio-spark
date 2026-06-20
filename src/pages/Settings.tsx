@@ -5,7 +5,6 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Bell, Mail, Shield, Smartphone } from "lucide-react";
-import { PageHeader } from "@/components/shared/PageHeader";
 import { StatePanel } from "@/components/shared/StatePanel";
 
 export default function Settings() {
@@ -24,12 +23,6 @@ export default function Settings() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      <PageHeader
-        eyebrow="Preferences"
-        title="Settings"
-        description="Review notification and security preferences for the admin workspace."
-      />
-
       <StatePanel
         icon={Shield}
         title="Settings are currently local-only"

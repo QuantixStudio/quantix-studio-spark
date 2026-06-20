@@ -9,7 +9,6 @@ import { Folder, MessageSquare, Sparkles, Wrench } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
 import { useTools } from "@/hooks/useTools";
 import { useAdminTestimonials } from "@/hooks/useAdminTestimonials";
-import { PageHeader } from "@/components/shared/PageHeader";
 import { AdminMetricCard } from "@/components/shared/AdminMetricCard";
 import type { Profile } from "@/types/app";
 
@@ -65,12 +64,6 @@ export default function Dashboard() {
 
   return (
     <div className="page-stack">
-      <PageHeader
-        eyebrow="Workspace overview"
-        title={`Welcome back, ${displayName}`}
-        description="Here’s a quick snapshot of your published content and the next places to update."
-      />
-
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <AdminMetricCard
           title="Projects"

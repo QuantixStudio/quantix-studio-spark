@@ -45,7 +45,11 @@ const statusSchema = z.object({
     .min(2, "ID must be at least 2 characters")
     .regex(/^[a-z0-9-_]+$/, "Use lowercase letters, numbers, hyphens, or underscores"),
   label: z.string().trim().min(2, "Label must be at least 2 characters").max(120),
-  color: z.string().max(40, "Color must be less than 40 characters").optional().or(z.literal("")),
+  color: z
+    .string()
+    .trim()
+    .regex(/^#[0-9a-fA-F]{6}$/, "Choose a valid hex color")
+    .default("#6B7280"),
   order_index: z.coerce.number().int().min(0, "Order must be 0 or greater"),
 });
 
@@ -87,6 +91,8 @@ const formConfig = {
   },
 } as const;
 
+const DEFAULT_STATUS_COLOR = "#6B7280";
+
 function slugify(value: string) {
   return value
     .toLowerCase()
@@ -115,7 +121,7 @@ export default function PortfolioReferenceFormModal({
 
   const statusForm = useForm<StatusFormValues>({
     resolver: zodResolver(statusSchema),
-    defaultValues: { id: "", label: "", color: "", order_index: 0 },
+    defaultValues: { id: "", label: "", color: DEFAULT_STATUS_COLOR, order_index: 0 },
   });
 
   useEffect(() => {
@@ -145,7 +151,7 @@ export default function PortfolioReferenceFormModal({
     statusForm.reset({
       id: status?.id || "",
       label: status?.label || "",
-      color: status?.color || "",
+      color: status?.color || DEFAULT_STATUS_COLOR,
       order_index: status?.order_index ?? 0,
     });
   }, [categoryForm, isOpen, item, statusForm, tab, technologyForm]);
@@ -208,7 +214,7 @@ export default function PortfolioReferenceFormModal({
       const payload = {
         id: values.id,
         label: values.label,
-        color: values.color || null,
+        color: values.color.toUpperCase(),
         order_index: values.order_index,
       };
 
@@ -397,7 +403,19 @@ export default function PortfolioReferenceFormModal({
                     <FormItem>
                       <FormLabel>Color</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="#22c55e" />
+                        <div className="flex h-14 items-center gap-3 rounded-[18px] border border-input bg-background px-3">
+                          <input
+                            type="color"
+                            value={field.value || DEFAULT_STATUS_COLOR}
+                            onChange={(event) => field.onChange(event.target.value.toUpperCase())}
+                            className="h-10 w-12 cursor-pointer rounded-lg border border-white/10 bg-transparent p-1"
+                            aria-label="Pick status color"
+                          />
+                          <div className="flex min-w-0 flex-col">
+                            <code className="text-sm font-medium text-foreground">{field.value || DEFAULT_STATUS_COLOR}</code>
+                            <span className="text-xs text-muted-foreground">Selected color</span>
+                          </div>
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
