@@ -56,7 +56,17 @@ npm run dev
 bun run dev
 ```
 
-App will be available at: `http://localhost:8080`
+App will be available at: `http://127.0.0.1:3000`
+
+Important:
+
+- Open the exact URL above in the browser
+- Do not open bare `http://127.0.0.1/` because nothing is served on port `80`
+- If `npm run dev` fails because port `3000` is busy, inspect the conflicting process:
+
+```bash
+lsof -nP -iTCP:3000 -sTCP:LISTEN
+```
 
 ---
 

@@ -70,6 +70,32 @@ This project is built with:
 - `PROJECT_AUDIT.md` records the latest scalability audit, applied optimizations, and next recommended passes.
 - `DESIGN_SYSTEM.md` records the current visual system, global style primitives, and shared UI conventions.
 
+## Local development
+
+This project is a Vite app. The site will not open until the dev server is running.
+
+Canonical local URL:
+
+- `http://127.0.0.1:3000/`
+
+Canonical start command:
+
+```sh
+npm run dev
+```
+
+Important:
+
+- Open `http://127.0.0.1:3000/`, not bare `http://127.0.0.1/`
+- The dev server is configured to use `127.0.0.1:3000` with a strict port
+- If port `3000` is already occupied, stop the other process first instead of guessing another URL
+
+To see which process is using the port:
+
+```sh
+lsof -nP -iTCP:3000 -sTCP:LISTEN
+```
+
 ## How can I deploy this project?
 
 Simply open [Lovable](https://lovable.dev/projects/e5f1a7ec-e152-4439-a46c-1891e1bdafec) and click on Share -> Publish.

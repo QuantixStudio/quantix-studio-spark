@@ -3,16 +3,39 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 
+function resolveLocalHost(rawHost: string | undefined) {
+  if (!rawHost) {
+    return "127.0.0.1";
+  }
+
+  const normalized = rawHost.trim().toLowerCase();
+
+  // Prefer a loopback default so local browser checks work consistently and
+  // dev startup does not depend on external bind permissions.
+  if (normalized === "0.0.0.0" || normalized === "::" || normalized === "::1") {
+    return "127.0.0.1";
+  }
+
+  return rawHost;
+}
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  const port = Number(env.PORT || env.VITE_PORT || 8080);
-  const host = env.HOST || env.VITE_DEV_HOST || "0.0.0.0";
+  const port = Number(env.PORT || env.VITE_PORT || 3000);
+  const host = resolveLocalHost(env.HOST || env.VITE_DEV_HOST);
 
   return {
     server: {
       host,
       port,
+      strictPort: true,
+      open: true,
+    },
+    preview: {
+      host,
+      port,
+      strictPort: true,
     },
     build: {
       rollupOptions: {

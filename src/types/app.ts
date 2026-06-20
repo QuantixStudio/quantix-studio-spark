@@ -24,13 +24,81 @@ export interface TaskStatusSummary {
   color: string | null;
   order_index: number | null;
 }
-export type Tool = Tables<"tools">;
+export interface Tool {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  website_url: string | null;
+  logo_path: string | null;
+  is_featured: boolean | null;
+  created_at: string | null;
+  updated_at: string | null;
+}
+export interface AdminProfile {
+  id: string;
+  email: string | null;
+  full_name: string | null;
+  avatar_url: string | null;
+  bio: string | null;
+  role: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+}
 export type Testimonial = Tables<"testimonials">;
 export type ServiceIcon = Tables<"service_icon">;
 export type UserRole = Tables<"user_roles">;
 
 export interface ServiceWithIcon extends Tables<"services"> {
   service_icon: Pick<ServiceIcon, "id" | "name" | "icon_url"> | null;
+}
+
+export type ContentTab = "services" | "how-we-work" | "why-choose-us";
+export type PortfolioSystemTab = "technologies" | "categories" | "statuses";
+export type PortfolioStatusTab = "project-statuses" | "task-statuses";
+
+export interface AdminService {
+  id: string;
+  title: string | null;
+  description: string | null;
+  order_index: number | null;
+  published: boolean | null;
+  updated_at: string | null;
+  icon_id: string | null;
+  service_icon: Pick<ServiceIcon, "id" | "name" | "icon_url"> | null;
+}
+
+export interface AdminContentItem {
+  id: string;
+  title: string | null;
+  description: string | null;
+  order: number | null;
+  created_at: string | null;
+}
+
+export interface AdminTechnology {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  created_at: string | null;
+  usage_count: number;
+}
+
+export interface AdminProjectCategory {
+  id: string;
+  name: string;
+  description: string | null;
+  order_index: number | null;
+  usage_count: number;
+}
+
+export interface AdminPortfolioStatus {
+  id: string;
+  label: string | null;
+  color: string | null;
+  order_index: number | null;
+  usage_count: number;
 }
 
 export interface ProjectImage {

@@ -16,10 +16,13 @@ import Portfolio from "./pages/Portfolio";
 const Auth = lazy(() => import("./pages/Auth"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Profile = lazy(() => import("./pages/Profile"));
+const ProfilesManagement = lazy(() => import("./pages/admin/ProfilesManagement"));
 const Settings = lazy(() => import("./pages/Settings"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const ProjectDetail = lazy(() => import("./pages/ProjectDetail"));
+const ContentManagement = lazy(() => import("./pages/admin/ContentManagement"));
+const PortfolioSystemManagement = lazy(() => import("./pages/admin/PortfolioSystemManagement"));
 const ProjectsManagement = lazy(() => import("./pages/admin/ProjectsManagement"));
 const ToolsManagement = lazy(() => import("./pages/admin/ToolsManagement"));
 const TestimonialsManagement = lazy(() => import("./pages/admin/TestimonialsManagement"));
@@ -79,6 +82,26 @@ const App = () => (
                   }
                 />
                 <Route
+                  path="/admin/content"
+                  element={
+                    <AdminRoute>
+                      <DashboardLayout>
+                        <ContentManagement />
+                      </DashboardLayout>
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/admin/portfolio-system"
+                  element={
+                    <AdminRoute>
+                      <DashboardLayout>
+                        <PortfolioSystemManagement />
+                      </DashboardLayout>
+                    </AdminRoute>
+                  }
+                />
+                <Route
                   path="/admin/projects"
                   element={
                     <AdminRoute>
@@ -104,6 +127,16 @@ const App = () => (
                     <AdminRoute>
                       <DashboardLayout>
                         <TestimonialsManagement />
+                      </DashboardLayout>
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/admin/profiles"
+                  element={
+                    <AdminRoute>
+                      <DashboardLayout>
+                        <ProfilesManagement />
                       </DashboardLayout>
                     </AdminRoute>
                   }
