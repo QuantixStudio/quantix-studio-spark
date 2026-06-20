@@ -11,7 +11,7 @@ import {
 
 interface RowActionsMenuProps {
   onEdit: () => void;
-  onDelete: () => void;
+  onDelete?: () => void;
   editLabel?: string;
   deleteLabel?: string;
   isEditDisabled?: boolean;
@@ -50,14 +50,18 @@ export function RowActionsMenu({
           <Pencil className="mr-2 h-4 w-4" />
           {isEditDisabled ? editLoadingLabel : editLabel}
         </DropdownMenuItem>
-        <DropdownMenuSeparator className="my-1 bg-border/70" />
-        <DropdownMenuItem
-          onClick={onDelete}
-          className="cursor-pointer rounded-lg px-3 py-2.5 text-destructive focus:text-destructive data-[highlighted]:bg-destructive/10 data-[highlighted]:text-destructive"
-        >
-          <Trash2 className="mr-2 h-4 w-4" />
-          {deleteLabel}
-        </DropdownMenuItem>
+        {onDelete ? (
+          <>
+            <DropdownMenuSeparator className="my-1 bg-border/70" />
+            <DropdownMenuItem
+              onClick={onDelete}
+              className="cursor-pointer rounded-lg px-3 py-2.5 text-destructive focus:text-destructive data-[highlighted]:bg-destructive/10 data-[highlighted]:text-destructive"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              {deleteLabel}
+            </DropdownMenuItem>
+          </>
+        ) : null}
       </DropdownMenuContent>
     </DropdownMenu>
   );

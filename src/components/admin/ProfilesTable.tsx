@@ -1,12 +1,14 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { RowActionsMenu } from "@/components/shared/RowActionsMenu";
 import { StatePanel } from "@/components/shared/StatePanel";
 import { formatUiDate, formatUiDateTime } from "@/lib/date";
 import type { AdminProfile } from "@/types/app";
 
 interface ProfilesTableProps {
   profiles: AdminProfile[];
+  onEdit: (profile: AdminProfile) => void;
 }
 
 function getInitials(profile: AdminProfile) {
@@ -35,7 +37,7 @@ function getDisplayName(profile: AdminProfile) {
   return profile.full_name?.trim() || "Unnamed user";
 }
 
-export default function ProfilesTable({ profiles }: ProfilesTableProps) {
+export default function ProfilesTable({ profiles, onEdit }: ProfilesTableProps) {
   if (profiles.length === 0) {
     return (
       <StatePanel
@@ -57,6 +59,7 @@ export default function ProfilesTable({ profiles }: ProfilesTableProps) {
             <TableHead>Joined</TableHead>
             <TableHead>Updated</TableHead>
             <TableHead>Profile ID</TableHead>
+            <TableHead className="w-12"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -102,6 +105,9 @@ export default function ProfilesTable({ profiles }: ProfilesTableProps) {
               </TableCell>
               <TableCell>
                 <code className="text-xs text-muted-foreground">{profile.id}</code>
+              </TableCell>
+              <TableCell>
+                <RowActionsMenu onEdit={() => onEdit(profile)} editLabel="Edit profile" />
               </TableCell>
             </TableRow>
           ))}
