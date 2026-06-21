@@ -73,6 +73,7 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
   const [isFetching, setIsFetching] = useState(false);
   const queryClient = useQueryClient();
   const adminStatusBadgeClassName = "rounded-[5px] px-5 py-1.5 text-sm font-semibold";
+  const neutralReferenceBadgeClassName = `${adminStatusBadgeClassName} border-border/70 bg-background/70 text-foreground`;
 
   const handleEdit = async (project: ProjectWithTools) => {
     setIsFetching(true);
@@ -349,7 +350,7 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
                     {project.project_category?.name ? (
                       <Badge
                         variant="outline"
-                        className={`${adminStatusBadgeClassName} border-border/70 bg-background/70 text-foreground`}
+                        className={neutralReferenceBadgeClassName}
                       >
                         {project.project_category.name}
                       </Badge>
@@ -359,8 +360,8 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
                   </TableCell>
                   <TableCell>
                     <Badge
-                      variant={project.published ? "default" : "secondary"}
-                      className={adminStatusBadgeClassName}
+                      variant="outline"
+                      className={neutralReferenceBadgeClassName}
                     >
                       {project.project_status?.label || (project.published ? "Published" : "Draft")}
                     </Badge>
