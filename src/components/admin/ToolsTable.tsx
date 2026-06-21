@@ -22,59 +22,48 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { getErrorMessage } from "@/lib/errorUtils";
+import { formatUiDate } from "@/lib/date";
 import { deleteToolLogo, getToolLogoUrl } from "@/lib/toolStorageUtils";
 import { StatePanel } from "@/components/shared/StatePanel";
 import { RowActionsMenu } from "@/components/shared/RowActionsMenu";
 import type { Tool } from "@/types/app";
-import { format } from "date-fns";
 
 interface ToolsTableProps {
   tools: Tool[];
   onEdit: (tool: Tool) => void;
 }
 
-const getCategoryColor = (category: string) => {
-  switch (category) {
-    case 'Frontend':
-      return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
-    case 'Backend':
-      return 'bg-green-500/10 text-green-500 border-green-500/20';
-    case 'Database':
-      return 'bg-purple-500/10 text-purple-500 border-purple-500/20';
-    case 'AI':
-      return 'bg-pink-500/10 text-pink-500 border-pink-500/20';
-    case 'Automation':
-      return 'bg-orange-500/10 text-orange-500 border-orange-500/20';
-    case 'Design':
-      return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
-    case 'CMS':
-      return 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20';
-    case 'Email & Marketing':
-      return 'bg-red-500/10 text-red-500 border-red-500/20';
-    case 'Analytics':
-      return 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20';
-    case 'CRM / Business Tools':
-      return 'bg-teal-500/10 text-teal-500 border-teal-500/20';
-    case 'Mobile':
-      return 'bg-violet-500/10 text-violet-500 border-violet-500/20';
-    case 'SaaS':
-      return 'bg-fuchsia-500/10 text-fuchsia-500 border-fuchsia-500/20';
-    case 'Full-stack':
-      return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
-    default:
-      return 'bg-gray-500/10 text-gray-500 border-gray-500/20';
-  }
-};
-
 export default function ToolsTable({ tools, onEdit }: ToolsTableProps) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const queryClient = useQueryClient();
+  const adminStatusBadgeClassName = "rounded-[5px] px-5 py-1.5 text-sm font-semibold";
+  const logoFrameClassName = "flex h-12 w-12 items-center justify-center overflow-hidden rounded-[10px] border border-border/60 bg-white p-1";
 
   const handleEdit = async (toolId: string) => {
-    const { data, error } = await supabase
-      .from("tools")
-      .select("*")
+    const toolQuery = supabase.from("tools") as unknown as {
+      select: (columns: string) => {
+        eq: (
+          column: string,
+          value: string,
+        ) => {
+          single: () => Promise<{ data: Tool | null; error: Error | null }>;
+        };
+      };
+    };
+
+    const { data, error } = await toolQuery
+      .select(`
+        id,
+        name,
+        slug,
+        description,
+        website_url,
+        logo_path,
+        is_featured,
+        created_at,
+        updated_at
+      `)
       .eq("id", toolId)
       .single();
 
@@ -83,7 +72,12 @@ export default function ToolsTable({ tools, onEdit }: ToolsTableProps) {
       return;
     }
 
-    onEdit(data as Tool);
+    if (!data) {
+      toast.error("Tool details are unavailable");
+      return;
+    }
+
+    onEdit(data);
   };
 
   const handleDelete = async () => {
@@ -129,8 +123,9 @@ export default function ToolsTable({ tools, onEdit }: ToolsTableProps) {
             <TableRow>
               <TableHead className="w-20">Logo</TableHead>
               <TableHead>Name</TableHead>
-              <TableHead>Categories</TableHead>
+              <TableHead>Slug</TableHead>
               <TableHead>Featured</TableHead>
+              <TableHead>Website</TableHead>
               <TableHead>Updated</TableHead>
               <TableHead className="w-12"></TableHead>
             </TableRow>
@@ -140,15 +135,16 @@ export default function ToolsTable({ tools, onEdit }: ToolsTableProps) {
               <TableRow key={tool.id}>
                 <TableCell>
                   {tool.logo_path ? (
-                    <div className="w-12 h-12 bg-white rounded-[5px] p-1 flex items-center justify-center">
+                    <div className={logoFrameClassName}>
                       <img
                         src={getToolLogoUrl(tool.logo_path) || ""}
                         alt={tool.name}
-                        className="w-full h-full object-contain"
+                        className="h-full w-full object-contain"
+                        loading="lazy"
                       />
                     </div>
                   ) : (
-                    <div className="w-12 h-12 bg-muted rounded flex items-center justify-center text-xs text-muted-foreground">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-[10px] border border-border/60 bg-muted text-[10px] text-muted-foreground">
                       No logo
                     </div>
                   )}
@@ -162,29 +158,31 @@ export default function ToolsTable({ tools, onEdit }: ToolsTableProps) {
                   </div>
                 </TableCell>
                 <TableCell>
-                  {tool.categories && tool.categories.length > 0 ? (
-                    <div className="flex flex-wrap gap-1">
-                      {tool.categories.map((category) => (
-                        <Badge
-                          key={category}
-                          variant="outline"
-                          className={getCategoryColor(category)}
-                        >
-                          {category}
-                        </Badge>
-                      ))}
-                    </div>
+                  <code className="text-xs text-muted-foreground">{tool.slug}</code>
+                </TableCell>
+                <TableCell>
+                  {tool.is_featured ? (
+                    <Badge variant="default" className={adminStatusBadgeClassName}>Featured</Badge>
                   ) : (
-                    <span className="text-xs text-muted-foreground">No categories</span>
+                    <span className="text-xs text-muted-foreground">No</span>
                   )}
                 </TableCell>
                 <TableCell>
-                  {tool.is_featured && (
-                    <Badge variant="default">Featured</Badge>
+                  {tool.website_url ? (
+                    <a
+                      href={tool.website_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+                    >
+                      Open site
+                    </a>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">No website</span>
                   )}
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
-                  {format(new Date(tool.updated_at), "MMM d, yyyy")}
+                  {formatUiDate(tool.updated_at)}
                 </TableCell>
                 <TableCell>
                   <RowActionsMenu

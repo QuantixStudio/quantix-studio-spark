@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -17,12 +17,16 @@ export default function LogoUploader({
   const [preview, setPreview] = useState<string | null>(existingLogoUrl || null);
   const [isDragging, setIsDragging] = useState(false);
 
+  useEffect(() => {
+    setPreview(existingLogoUrl || null);
+  }, [existingLogoUrl]);
+
   const validateFile = (file: File): boolean => {
-    const validTypes = ["image/jpeg", "image/png", "image/webp"];
+    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/svg+xml"];
     const maxSize = 2 * 1024 * 1024; // 2MB
 
     if (!validTypes.includes(file.type)) {
-      toast.error("Please upload a JPG, PNG, or WebP image");
+      toast.error("Please upload a JPG, PNG, WebP, or SVG image");
       return false;
     }
 
@@ -98,7 +102,7 @@ export default function LogoUploader({
             type="file"
             id="logo-upload"
             className="hidden"
-            accept="image/jpeg,image/png,image/webp"
+            accept="image/jpeg,image/png,image/webp,image/svg+xml"
             onChange={handleFileSelect}
           />
           <label
@@ -111,18 +115,20 @@ export default function LogoUploader({
                 Drag & drop logo here, or click to select
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                JPG, PNG, WebP • Max 2MB
+                JPG, PNG, WebP, SVG • Max 2MB
               </p>
             </div>
           </label>
         </div>
       ) : (
-        <div className="relative inline-block">
-          <img
-            src={preview}
-            alt="Logo preview"
-            className="w-32 h-32 object-contain border rounded-lg"
-          />
+        <div className="relative inline-flex flex-col gap-3">
+          <div className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-[14px] border border-border/70 bg-white p-2 shadow-sm">
+            <img
+              src={preview}
+              alt="Logo preview"
+              className="h-full w-full object-contain"
+            />
+          </div>
           <Button
             type="button"
             variant="destructive"
@@ -132,6 +138,9 @@ export default function LogoUploader({
           >
             <X className="h-4 w-4" />
           </Button>
+          <p className="text-xs text-muted-foreground">
+            Stored in Supabase bucket <span className="font-medium text-foreground">tools_logos</span>.
+          </p>
         </div>
       )}
     </div>
