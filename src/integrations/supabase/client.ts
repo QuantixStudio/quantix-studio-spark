@@ -2,12 +2,30 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const PUBLIC_SUPABASE_FALLBACK = {
+  url: 'https://tbdhzxarsshzoweyndha.supabase.co',
+  publishableKey:
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRiZGh6eGFyc3Noem93ZXluZGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAxODUxMjUsImV4cCI6MjA3NTc2MTEyNX0.r7-22ytfwU65i-hqpoaCYNfxRXRbzQq19GYFUcY8Os',
+} as const;
+
+const SUPABASE_URL =
+  import.meta.env.VITE_SUPABASE_URL || PUBLIC_SUPABASE_FALLBACK.url;
+const SUPABASE_PUBLISHABLE_KEY =
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+  PUBLIC_SUPABASE_FALLBACK.publishableKey;
 
 if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
   throw new Error(
     "Missing Supabase environment variables. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in .env.",
+  );
+}
+
+if (
+  !import.meta.env.VITE_SUPABASE_URL ||
+  !import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+) {
+  console.warn(
+    'Supabase env vars are missing; using the public client fallback configuration.',
   );
 }
 
