@@ -3,9 +3,9 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
 const PUBLIC_SUPABASE_FALLBACK = {
-  url: 'https://tbdhzxarsshzoweyndha.supabase.co',
+  url: 'https://whsjpjnvhnqhubvuqymg.supabase.co',
   publishableKey:
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRiZGh6eGFyc3Noem93ZXluZGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAxODUxMjUsImV4cCI6MjA3NTc2MTEyNX0.r7-22ytfwU65i-hqpoaCYNfxRXRbzQq19GYFUcY8Os',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indoc2pwam52aG5xdWhidnVxeW1nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0MjExMTAsImV4cCI6MjA2NTk5NzExMH0.N0YPrMOfEdrUBgZpAm0X0jP8Nf7wFN7eQeSnc0c1vLk',
 } as const;
 
 const SUPABASE_URL =
