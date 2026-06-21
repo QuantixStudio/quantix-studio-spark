@@ -192,6 +192,7 @@ export default function ToolFormModal({
       } else {
         // Create new tool
         const timestamp = new Date().toISOString();
+        const newToolId = crypto.randomUUID();
 
         const insertQuery = supabase.from("tools") as unknown as {
           insert: (values: Record<string, unknown>) => {
@@ -203,6 +204,7 @@ export default function ToolFormModal({
 
         const { data: newTool, error: insertError } = await insertQuery
           .insert({
+            id: newToolId,
             name: values.name,
             slug: values.slug,
             description: values.description || null,
@@ -215,7 +217,7 @@ export default function ToolFormModal({
           .single();
 
         if (insertError) throw insertError;
-        createdToolId = newTool?.id ?? undefined;
+        createdToolId = newTool?.id ?? newToolId;
 
         // Upload logo if provided
         if (logoFile && newTool) {

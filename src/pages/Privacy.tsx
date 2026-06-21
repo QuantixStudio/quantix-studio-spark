@@ -1,5 +1,6 @@
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
+import { formatUiDate } from "@/lib/date";
 export default function Privacy() {
   return <div className="min-h-screen bg-background">
       <Navbar />
@@ -9,7 +10,7 @@ export default function Privacy() {
         
         <div className="prose dark:prose-invert max-w-none">
           <p className="text-muted-foreground mb-6">
-            Last updated: {new Date().toLocaleDateString()}
+            Last updated: {formatUiDate(new Date())}
           </p>
 
           <section className="mb-8">

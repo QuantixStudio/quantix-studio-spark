@@ -35,7 +35,7 @@ export function MultiSelect({
 
   return (
     <Command className="overflow-visible bg-transparent">
-      <div className="field-control group rounded-md border border-input px-3 py-2 text-sm ring-offset-background">
+      <div className="field-control group min-h-14 rounded-[18px] border border-input px-5 py-3 text-[15px] ring-offset-background">
         <div className="flex flex-wrap gap-1">
           {value.map((item) => (
             <Badge
@@ -64,9 +64,9 @@ export function MultiSelect({
               </button>
             </Badge>
           ))}
-          <CommandInput
-            placeholder={value.length === 0 ? placeholder : "Add more..."}
-            className="ml-2 flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
+            <CommandInput
+              placeholder={value.length === 0 ? placeholder : "Add more..."}
+            className="ml-2 h-7 flex-1 bg-transparent text-[15px] outline-none placeholder:text-muted-foreground/90"
             onFocus={() => setOpen(true)}
             onBlur={() => setOpen(false)}
           />

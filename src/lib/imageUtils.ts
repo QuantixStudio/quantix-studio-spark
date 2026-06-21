@@ -2,6 +2,10 @@ export async function compressImage(
   file: File,
   maxSizeMB: number = 3
 ): Promise<File> {
+  if (file.type === "image/svg+xml") {
+    return file;
+  }
+
   // If image is already small enough, return as-is to preserve quality
   if (file.size <= maxSizeMB * 1024 * 1024) {
     return file;
