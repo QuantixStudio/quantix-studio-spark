@@ -47,6 +47,13 @@ nano .env  # or use your preferred editor
 3. Copy **anon/public key** → `VITE_SUPABASE_PUBLISHABLE_KEY`
 4. Copy **Project Reference** → `VITE_SUPABASE_PROJECT_ID`
 5. Update `supabase/config.toml` with the same project reference before using the Supabase CLI.
+6. If the site is deployed on Vercel, add the same values to the Vercel project environment variables for `Production`, `Preview`, and `Development`.
+
+Important:
+
+- Vite only exposes client env vars that start with `VITE_`.
+- Those values are baked into the production bundle at build time.
+- If Vercel is missing `VITE_SUPABASE_URL` or `VITE_SUPABASE_PUBLISHABLE_KEY`, the deployed site will not point at the intended Supabase project.
 
 ### 4. Start Development Server
 
@@ -57,6 +64,16 @@ bun run dev
 ```
 
 App will be available at: `http://127.0.0.1:3000`
+
+## Vercel production checklist
+
+If `www.quantixstudio.com` or another deployed domain works differently from local dev:
+
+1. Open the Vercel project settings.
+2. Verify `VITE_SUPABASE_URL` matches the active project URL.
+3. Verify `VITE_SUPABASE_PUBLISHABLE_KEY` matches the active project's publishable or anon key.
+4. Redeploy after updating the env vars, because Vite injects them during the build.
+5. Confirm the deployed JavaScript bundle no longer logs that Supabase env vars are missing.
 
 Important:
 
