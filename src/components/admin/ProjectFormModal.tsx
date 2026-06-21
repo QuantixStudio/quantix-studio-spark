@@ -1,15 +1,32 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
+import {
+  CalendarDays,
+  Database,
+  Eye,
+  FolderKanban,
+  Image as ImageIcon,
+  Link2,
+  ListTodo,
+  Orbit,
+  Paperclip,
+  Rocket,
+  Tag,
+  User2,
+  X,
+} from "lucide-react";
+import { toast } from "sonner";
+
 import { supabase } from "@/integrations/supabase/client";
 import type { TablesInsert } from "@/integrations/supabase/types";
-import { deleteProjectImages } from "@/lib/storageUtils";
+import { deleteAllProjectImages, deleteProjectImages } from "@/lib/storageUtils";
+import { formatUiDate, formatUiDateTime } from "@/lib/date";
 import { getErrorMessage } from "@/lib/errorUtils";
 import { getProjectImages } from "@/lib/projectUtils";
 import { STORAGE_BUCKETS } from "@/lib/storageBuckets";
-import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -20,11 +37,11 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from "@/components/ui/form";
 import {
   Select,
@@ -38,9 +55,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { CalendarDays, Database, FolderKanban, Link2, ListTodo, Paperclip, Tag, User2, X } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ImageUploader, { ProjectImage } from "./ImageUploader";
 import type { EditableProject, ProjectCategory, ProjectStatusSummary } from "@/types/app";
 
@@ -58,6 +76,24 @@ interface ClientOption {
   name: string | null;
   company: string | null;
 }
+
+type SectionId = "overview" | "media" | "organization" | "publishing" | "relations" | "record";
+
+interface SectionDefinition {
+  value: SectionId;
+  label: string;
+  icon: typeof Rocket;
+  editOnly?: boolean;
+}
+
+const sectionDefinitions: SectionDefinition[] = [
+  { value: "overview", label: "Overview", icon: Rocket },
+  { value: "media", label: "Media", icon: ImageIcon },
+  { value: "organization", label: "Organization", icon: Orbit },
+  { value: "publishing", label: "Publishing", icon: Eye },
+  { value: "relations", label: "Relations", icon: FolderKanban, editOnly: true },
+  { value: "record", label: "Record", icon: Database, editOnly: true },
+];
 
 const projectSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -88,12 +124,97 @@ interface ProjectFormModalProps {
   project?: EditableProject | null;
 }
 
+function SectionCard({
+  title,
+  description,
+  children,
+  aside,
+}: {
+  title: string;
+  description: string;
+  children: React.ReactNode;
+  aside?: React.ReactNode;
+}) {
+  return (
+    <Card className="admin-surface border-border/80">
+      <CardHeader className="flex flex-col gap-4 border-b border-border/70 pb-5 md:flex-row md:items-start md:justify-between">
+        <div className="space-y-1">
+          <CardTitle className="text-xl">{title}</CardTitle>
+          <CardDescription>{description}</CardDescription>
+        </div>
+        {aside ? <div className="shrink-0">{aside}</div> : null}
+      </CardHeader>
+      <CardContent className="space-y-6 p-6">{children}</CardContent>
+    </Card>
+  );
+}
+
+function ToggleFieldShell({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center justify-between rounded-[18px] border border-border/70 bg-background/35 px-5 py-4">
+      <div className="min-w-0 pr-4">
+        <p className="text-sm font-medium text-foreground">{title}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function InfoTile({
+  label,
+  value,
+}: {
+  label: string;
+  value: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-[18px] border border-border/70 bg-background/35 p-4">
+      <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
+      <div className="mt-2 text-sm font-medium text-foreground">{value}</div>
+    </div>
+  );
+}
+
+function EmptyRelationState({
+  title,
+  description,
+  icon: Icon,
+}: {
+  title: string;
+  description: string;
+  icon: typeof FolderKanban;
+}) {
+  return (
+    <div className="rounded-[18px] border border-dashed border-border/70 bg-background/25 p-5">
+      <div className="flex items-start gap-3">
+        <div className="mt-0.5 rounded-2xl border border-border/70 bg-muted/40 p-2">
+          <Icon className="h-4 w-4 text-muted-foreground" />
+        </div>
+        <div className="space-y-1">
+          <p className="text-sm font-medium text-foreground">{title}</p>
+          <p className="text-sm text-muted-foreground">{description}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ProjectFormModal({
   isOpen,
   onClose,
   project,
 }: ProjectFormModalProps) {
   const mode = project ? "edit" : "create";
+  const [activeSection, setActiveSection] = useState<SectionId>("overview");
   const [isLoading, setIsLoading] = useState(false);
   const [images, setImages] = useState<ProjectImage[]>([]);
   const [originalImages, setOriginalImages] = useState<ProjectImage[]>([]);
@@ -125,6 +246,7 @@ export default function ProjectFormModal({
 
   useEffect(() => {
     if (isOpen) {
+      setActiveSection("overview");
       fetchCategories();
       fetchTools();
       fetchStatuses();
@@ -179,18 +301,12 @@ export default function ProjectFormModal({
   }, [form, isOpen, project]);
 
   const fetchCategories = async () => {
-    const { data } = await supabase
-      .from("project_category")
-      .select("*")
-      .order("order_index");
+    const { data } = await supabase.from("project_category").select("*").order("order_index");
     if (data) setCategories(data as ProjectCategory[]);
   };
 
   const fetchTools = async () => {
-    const { data } = await supabase
-      .from("technologies")
-      .select("id, name")
-      .order("name");
+    const { data } = await supabase.from("technologies").select("id, name").order("name");
     if (data) setTools(data as TechnologyOption[]);
   };
 
@@ -203,10 +319,7 @@ export default function ProjectFormModal({
   };
 
   const fetchClients = async () => {
-    const { data } = await untypedSupabase
-      .from("clients")
-      .select("id, name, company")
-      .order("name");
+    const { data } = await untypedSupabase.from("clients").select("id, name, company").order("name");
     if (data) setClients(data as ClientOption[]);
   };
 
@@ -217,50 +330,76 @@ export default function ProjectFormModal({
       .replace(/^-+|-+$/g, "");
   };
 
-  const uploadImages = async (projectId: string, nextImages: ProjectImage[]): Promise<ProjectImage[]> => {
-    const uploadedImages: ProjectImage[] = [];
+  const ensureUniqueProjectSlug = async (slug: string, currentProjectId?: string) => {
+    const { data, error } = await untypedSupabase
+      .from("projects")
+      .select("id, title, slug")
+      .eq("slug", slug)
+      .maybeSingle();
 
-    for (let i = 0; i < nextImages.length; i++) {
-      const image = nextImages[i];
-
-      if (image.file) {
-        const fileExt = image.file.name.split(".").pop();
-        const fileName = `${projectId}/image-${Date.now()}-${i}.${fileExt}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from(STORAGE_BUCKETS.projectImages)
-          .upload(fileName, image.file, { 
-            upsert: true,
-            contentType: image.file.type,
-          });
-
-        if (uploadError) throw uploadError;
-
-        const {
-          data: { publicUrl },
-        } = supabase.storage.from(STORAGE_BUCKETS.projectImages).getPublicUrl(fileName);
-
-        uploadedImages.push({
-          id: image.id,
-          url: publicUrl,
-          alt: image.alt,
-          is_main: image.is_main,
-          order: i,
-          file_path: fileName,
-        });
-      } else {
-        uploadedImages.push({
-          id: image.id,
-          url: image.url,
-          alt: image.alt,
-          is_main: image.is_main,
-          order: i,
-          file_path: image.file_path ?? null,
-        });
-      }
+    if (error) {
+      throw error;
     }
 
-    return uploadedImages;
+    if (data && data.id !== currentProjectId) {
+      throw new Error(`Project slug "${slug}" is already in use. Please choose a different slug.`);
+    }
+  };
+
+  const uploadImages = async (projectId: string, nextImages: ProjectImage[]): Promise<ProjectImage[]> => {
+    const uploadedImages: ProjectImage[] = [];
+    const uploadedFilePaths: string[] = [];
+
+    try {
+      for (let i = 0; i < nextImages.length; i++) {
+        const image = nextImages[i];
+
+        if (image.file) {
+          const fileExt = image.file.name.split(".").pop();
+          const fileName = `${projectId}/image-${Date.now()}-${i}.${fileExt}`;
+
+          const { error: uploadError } = await supabase.storage
+            .from(STORAGE_BUCKETS.projectImages)
+            .upload(fileName, image.file, {
+              contentType: image.file.type,
+            });
+
+          if (uploadError) throw uploadError;
+
+          uploadedFilePaths.push(fileName);
+
+          const {
+            data: { publicUrl },
+          } = supabase.storage.from(STORAGE_BUCKETS.projectImages).getPublicUrl(fileName);
+
+          uploadedImages.push({
+            id: image.id,
+            url: publicUrl,
+            alt: image.alt,
+            is_main: image.is_main,
+            order: i,
+            file_path: fileName,
+          });
+        } else {
+          uploadedImages.push({
+            id: image.id,
+            url: image.url,
+            alt: image.alt,
+            is_main: image.is_main,
+            order: i,
+            file_path: image.file_path ?? null,
+          });
+        }
+      }
+
+      return uploadedImages;
+    } catch (error) {
+      if (uploadedFilePaths.length > 0) {
+        await supabase.storage.from(STORAGE_BUCKETS.projectImages).remove(uploadedFilePaths);
+      }
+
+      throw error;
+    }
   };
 
   const syncProjectImages = async (projectId: string, nextImages: ProjectImage[]) => {
@@ -283,9 +422,7 @@ export default function ProjectFormModal({
         .delete()
         .in("id", removedImageIds);
 
-      if (deleteRemovedImagesError) {
-        throw deleteRemovedImagesError;
-      }
+      if (deleteRemovedImagesError) throw deleteRemovedImagesError;
     }
 
     const { error: clearCoverImageError } = await untypedSupabase
@@ -293,18 +430,14 @@ export default function ProjectFormModal({
       .update({ cover_image_id: null })
       .eq("id", projectId);
 
-    if (clearCoverImageError) {
-      throw clearCoverImageError;
-    }
+    if (clearCoverImageError) throw clearCoverImageError;
 
     const { error: deleteImageRowsError } = await untypedSupabase
       .from("project_images")
       .delete()
       .eq("project_id", projectId);
 
-    if (deleteImageRowsError) {
-      throw deleteImageRowsError;
-    }
+    if (deleteImageRowsError) throw deleteImageRowsError;
 
     if (nextImages.length === 0) {
       return null;
@@ -325,9 +458,7 @@ export default function ProjectFormModal({
       .select("id, is_main, order_index")
       .order("order_index", { ascending: true });
 
-    if (insertImagesError) {
-      throw insertImagesError;
-    }
+    if (insertImagesError) throw insertImagesError;
 
     const mainImageId =
       ((insertedImages ?? []) as Array<{ id: string; is_main: boolean | null; order_index: number | null }>).find(
@@ -341,9 +472,7 @@ export default function ProjectFormModal({
       .update({ cover_image_id: mainImageId })
       .eq("id", projectId);
 
-    if (updateCoverImageError) {
-      throw updateCoverImageError;
-    }
+    if (updateCoverImageError) throw updateCoverImageError;
 
     return mainImageId;
   };
@@ -362,6 +491,7 @@ export default function ProjectFormModal({
     }
 
     setIsLoading(true);
+    let createdProjectId: string | undefined;
     try {
       let projectId = project?.id;
       const normalizedOrderIndex = values.orderIndex.trim() ? Number(values.orderIndex) : null;
@@ -370,13 +500,15 @@ export default function ProjectFormModal({
         order: index,
       }));
 
+      await ensureUniqueProjectSlug(values.slug, projectId);
+
       if (!projectId) {
         const insertData = {
-          title: values.title, 
+          title: values.title,
           slug: values.slug,
           short_description: values.shortDescription,
         } satisfies Partial<TablesInsert<"projects">>;
-        
+
         const { data: newProject, error: insertError } = await supabase
           .from("projects")
           .insert(insertData)
@@ -385,6 +517,7 @@ export default function ProjectFormModal({
 
         if (insertError) throw insertError;
         projectId = newProject.id;
+        createdProjectId = newProject.id;
       }
 
       const uploadedImages = await uploadImages(projectId, normalizedImages);
@@ -405,11 +538,7 @@ export default function ProjectFormModal({
         key_metric: values.keyMetric || null,
       };
 
-      const { error: updateError } = await untypedSupabase
-        .from("projects")
-        .update(updateData)
-        .eq("id", projectId);
-
+      const { error: updateError } = await untypedSupabase.from("projects").update(updateData).eq("id", projectId);
       if (updateError) throw updateError;
 
       await syncProjectImages(projectId, uploadedImages);
@@ -419,9 +548,7 @@ export default function ProjectFormModal({
         .delete()
         .eq("project_id", projectId);
 
-      if (deleteProjectTechnologiesError) {
-        throw deleteProjectTechnologiesError;
-      }
+      if (deleteProjectTechnologiesError) throw deleteProjectTechnologiesError;
 
       if (values.technologies && values.technologies.length > 0) {
         const technologyRows = values.technologies.map((technologyId) => ({
@@ -433,9 +560,7 @@ export default function ProjectFormModal({
           .from("project_technologies")
           .insert(technologyRows as never);
 
-        if (insertProjectTechnologiesError) {
-          throw insertProjectTechnologiesError;
-        }
+        if (insertProjectTechnologiesError) throw insertProjectTechnologiesError;
       }
 
       toast.success(project ? "Project updated!" : "Project created!");
@@ -443,6 +568,19 @@ export default function ProjectFormModal({
       queryClient.invalidateQueries({ queryKey: ["project", values.slug] });
       onClose();
     } catch (error) {
+      if (error instanceof Error && error.message.includes('Project slug "')) {
+        form.setError("slug", { type: "manual", message: error.message });
+      }
+
+      if (createdProjectId) {
+        try {
+          await deleteAllProjectImages(createdProjectId);
+          await supabase.from("projects").delete().eq("id", createdProjectId);
+        } catch (cleanupError) {
+          console.error("Failed to rollback partially created project", cleanupError);
+        }
+      }
+
       toast.error(getErrorMessage(error, "Failed to save project"));
     } finally {
       setIsLoading(false);
@@ -450,538 +588,695 @@ export default function ProjectFormModal({
   };
 
   const showOnHome = form.watch("showOnHome");
+  const selectedTechnologies = form.watch("technologies") || [];
   const projectStatusLabel =
     project?.project_status?.label ||
     statuses.find((status) => status.id === project?.status)?.label ||
     "Not set";
+  const availableSections = sectionDefinitions.filter((section) => !section.editOnly || mode === "edit");
+  const visibleSection = availableSections.some((section) => section.value === activeSection)
+    ? activeSection
+    : availableSections[0].value;
+  const relationSummary = [
+    { label: "Services", value: project?.project_services.length ?? 0 },
+    { label: "Files", value: project?.project_files.length ?? 0 },
+    { label: "Tasks", value: project?.project_tasks.length ?? 0 },
+    { label: "Tech", value: project?.project_technologies.length ?? 0 },
+  ];
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="admin-modal-shell sm:max-w-5xl">
-        <DialogHeader>
-          <DialogTitle>{mode === "edit" ? "Edit Project" : "Create Project"}</DialogTitle>
-          <DialogDescription>
-            {mode === "edit"
-              ? "Update this project across the admin CMS and public portfolio without leaving the current workflow."
-              : "Create a new project entry for the admin CMS, portfolio grid, and featured landing sections."}
-          </DialogDescription>
-        </DialogHeader>
-
+      <DialogContent className="admin-modal-shell !max-w-6xl gap-0 overflow-hidden !p-0">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="admin-modal-form">
-            {mode === "edit" && project ? (
-              <div className="admin-modal-grid">
-                <Card className="admin-surface">
-                  <CardContent className="admin-meta-grid">
-                    <div className="space-y-1">
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Project ID</p>
-                      <p className="truncate text-sm font-medium">{project.id}</p>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex max-h-[92vh] flex-col">
+            <div className="border-b border-border/70 bg-card/95 px-6 pb-5 pt-6 backdrop-blur-xl">
+              <DialogHeader className="space-y-4 pr-10 text-left">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge variant="outline" className="rounded-[5px] border-border/80 bg-background/50 px-3 py-1 text-[11px] uppercase tracking-[0.18em]">
+                        {mode === "edit" ? "Edit Project" : "Create Project"}
+                      </Badge>
+                      <Badge
+                        variant={form.watch("published") ? "default" : "secondary"}
+                        className="rounded-[5px] px-3 py-1 text-[11px] uppercase tracking-[0.16em]"
+                      >
+                        {form.watch("published") ? "Published" : "Draft"}
+                      </Badge>
+                      {mode === "edit" && project?.updated_at ? (
+                        <span className="text-xs text-muted-foreground">
+                          Updated {formatUiDateTime(project.updated_at)}
+                        </span>
+                      ) : null}
                     </div>
-                    <div className="space-y-1">
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Created</p>
-                      <p className="text-sm font-medium">{project.created_at ? new Date(project.created_at).toLocaleString() : "—"}</p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Updated</p>
-                      <p className="text-sm font-medium">{project.updated_at ? new Date(project.updated_at).toLocaleString() : "—"}</p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Status</p>
-                      <p className="text-sm font-medium">{projectStatusLabel}</p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Client</p>
-                      <p className="text-sm font-medium">{project.client?.name || project.client?.company || "Unassigned"}</p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Cover Image ID</p>
-                      <p className="truncate text-sm font-medium">{project.cover_image_id || "Not linked"}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="admin-surface">
-                  <CardContent className="admin-metric-grid">
-                    <div className="admin-detail-card">
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Technologies</p>
-                      <p className="mt-2 text-2xl font-semibold">{project.project_technologies.length}</p>
-                    </div>
-                    <div className="admin-detail-card">
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Related Services</p>
-                      <p className="mt-2 text-2xl font-semibold">{project.project_services.length}</p>
-                    </div>
-                    <div className="admin-detail-card">
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Files</p>
-                      <p className="mt-2 text-2xl font-semibold">{project.project_files.length}</p>
-                    </div>
-                    <div className="admin-detail-card">
-                      <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Tasks</p>
-                      <p className="mt-2 text-2xl font-semibold">{project.project_tasks.length}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            ) : null}
-
-            <ImageUploader images={images} onChange={setImages} />
-
-            <div className="space-y-4">
-              <div className="grid gap-4 lg:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Title *</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Project Title"
-                          {...field}
-                          onChange={(e) => {
-                            field.onChange(e);
-                            if (!project) {
-                              form.setValue("slug", generateSlug(e.target.value));
-                            }
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="slug"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Slug *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="project-slug" {...field} />
-                      </FormControl>
-                      <FormDescription>URL-friendly identifier</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                <FormField
-                  control={form.control}
-                  name="categoryId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Category</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select category" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {categories.map((cat) => (
-                            <SelectItem key={cat.id} value={cat.id}>
-                              {cat.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="statusId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Status</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select status" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {statuses.map((status) => (
-                            <SelectItem key={status.id} value={status.id}>
-                              {status.label || status.id}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="clientId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Client</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select client" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {clients.map((client) => (
-                            <SelectItem key={client.id} value={client.id}>
-                              {client.name || client.company || client.id}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="orderIndex"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Order Index</FormLabel>
-                      <FormControl>
-                        <Input inputMode="numeric" placeholder="0" {...field} />
-                      </FormControl>
-                      <FormDescription>Controls manual ordering in admin and portfolio flows.</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name="shortDescription"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Short Description *</FormLabel>
-                    <FormControl>
-                      <Textarea placeholder="Brief description" rows={2} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="fullDescription"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Full Description</FormLabel>
-                    <FormControl>
-                      <Textarea placeholder="Detailed description" rows={4} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="demoUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Demo URL</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://..." {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="githubUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>GitHub URL</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://..." {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name="published"
-                render={({ field }) => (
-                  <FormItem className="admin-toggle-row">
-                    <div>
-                      <FormLabel>Published</FormLabel>
-                      <FormDescription className="text-sm">
-                        Visible in portfolio page
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch checked={field.value} onCheckedChange={field.onChange} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="showOnHome"
-                render={({ field }) => (
-                  <FormItem className="admin-toggle-row">
-                    <div>
-                      <FormLabel>Show on Home</FormLabel>
-                      <FormDescription className="text-sm">
-                        Featured on landing page
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch checked={field.value} onCheckedChange={field.onChange} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              {showOnHome && (
-                <FormField
-                  control={form.control}
-                  name="keyMetric"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Key Metric</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="e.g., '40% increase in conversions'"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Highlight a key achievement (shown on home page)
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-
-              <FormField
-                control={form.control}
-                name="technologies"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tools / Technologies Used</FormLabel>
-                    <FormControl>
-                      <div className="space-y-2">
-                        {/* Selected tools as badges */}
-                        <div className="flex flex-wrap gap-2 min-h-[40px] p-2 border rounded-md bg-background">
-                          {field.value && field.value.length > 0 ? (
-                            field.value.map((toolId) => {
-                              const tool = tools.find(t => t.id === toolId);
-                              return tool ? (
-                                <Badge key={toolId} variant="secondary" className="gap-1">
-                                  {tool.name}
-                                  <X 
-                                    className="h-3 w-3 cursor-pointer hover:text-destructive" 
-                                    onClick={() => {
-                                      field.onChange(field.value?.filter(id => id !== toolId));
-                                    }} 
-                                  />
-                                </Badge>
-                              ) : null;
-                            })
-                          ) : (
-                            <span className="text-sm text-muted-foreground">No tools selected</span>
-                          )}
-                        </div>
-                        {/* Dropdown to add more */}
-                        <Select 
-                          onValueChange={(value) => {
-                            if (!field.value?.includes(value)) {
-                              field.onChange([...(field.value || []), value]);
-                            }
-                          }}
-                          value=""
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Add tool..." />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {tools
-                              .filter(tool => !field.value?.includes(tool.id))
-                              .map((tool) => (
-                                <SelectItem key={tool.id} value={tool.id}>
-                                  {tool.name}
-                                </SelectItem>
-                              ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </FormControl>
-                    <FormDescription>
-                      Select tools and technologies used in this project
-                    </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-              />
-
-              {mode === "edit" && project ? (
-                <>
-                  <Separator className="my-2" />
-
-                  <div className="grid gap-4 xl:grid-cols-2">
-                    <Card className="admin-surface">
-                      <CardContent className="space-y-4 p-4">
-                        <div className="flex items-center gap-2">
-                          <Tag className="h-4 w-4 text-muted-foreground" />
-                          <h3 className="text-sm font-semibold">Related Services</h3>
-                        </div>
-                        {project.project_services.length > 0 ? (
-                          <div className="admin-detail-stack">
-                            {project.project_services.map((service) => (
-                              <div key={service.id} className="admin-detail-card">
-                                <p className="font-medium">{service.title}</p>
-                                <p className="mt-1 text-sm text-muted-foreground">
-                                  {service.description || "No description"}
-                                </p>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="text-sm text-muted-foreground">No related services linked to this project.</p>
-                        )}
-                      </CardContent>
-                    </Card>
-
-                    <Card className="admin-surface">
-                      <CardContent className="space-y-4 p-4">
-                        <div className="flex items-center gap-2">
-                          <Paperclip className="h-4 w-4 text-muted-foreground" />
-                          <h3 className="text-sm font-semibold">Project Files</h3>
-                        </div>
-                        {project.project_files.length > 0 ? (
-                          <div className="admin-detail-stack">
-                            {project.project_files.map((file) => (
-                              <div key={file.id} className="admin-detail-card">
-                                <div className="flex items-center justify-between gap-3">
-                                  <div className="min-w-0">
-                                    <p className="truncate font-medium">{file.file_type || "File"}</p>
-                                    <p className="truncate text-sm text-muted-foreground">{file.file_url}</p>
-                                  </div>
-                                  <a
-                                    href={file.file_url}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
-                                  >
-                                    <Link2 className="h-3.5 w-3.5" />
-                                    Open
-                                  </a>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="text-sm text-muted-foreground">No project files attached yet.</p>
-                        )}
-                      </CardContent>
-                    </Card>
-
-                    <Card className="admin-surface">
-                      <CardContent className="space-y-4 p-4">
-                        <div className="flex items-center gap-2">
-                          <ListTodo className="h-4 w-4 text-muted-foreground" />
-                          <h3 className="text-sm font-semibold">Project Tasks</h3>
-                        </div>
-                        {project.project_tasks.length > 0 ? (
-                          <div className="admin-detail-stack">
-                            {project.project_tasks.map((task) => (
-                              <div key={task.id} className="admin-detail-card">
-                                <div className="flex flex-wrap items-center gap-2">
-                                  <p className="font-medium">{task.title}</p>
-                                  {task.task_status?.label ? (
-                                    <Badge variant="outline">{task.task_status.label}</Badge>
-                                  ) : null}
-                                </div>
-                                {task.description ? (
-                                  <p className="mt-1 text-sm text-muted-foreground">{task.description}</p>
-                                ) : null}
-                                <div className="mt-2 flex flex-wrap gap-4 text-xs text-muted-foreground">
-                                  <span>Due: {task.due_date || "—"}</span>
-                                  <span>Created: {task.created_at ? new Date(task.created_at).toLocaleDateString() : "—"}</span>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="text-sm text-muted-foreground">No project tasks recorded.</p>
-                        )}
-                      </CardContent>
-                    </Card>
-
-                    <Card className="admin-surface">
-                      <CardContent className="space-y-4 p-4">
-                        <div className="flex items-center gap-2">
-                          <FolderKanban className="h-4 w-4 text-muted-foreground" />
-                          <h3 className="text-sm font-semibold">Record Metadata</h3>
-                        </div>
-                        <div className="space-y-3 text-sm">
-                          <div className="flex items-start gap-2">
-                            <Database className="mt-0.5 h-4 w-4 text-muted-foreground" />
-                            <div>
-                              <p className="font-medium">Internal links</p>
-                              <p className="text-muted-foreground">Status ID: {project.status || "—"}</p>
-                              <p className="text-muted-foreground">Category ID: {project.category_id || "—"}</p>
-                              <p className="text-muted-foreground">Client ID: {project.client_id || "—"}</p>
-                            </div>
-                          </div>
-                          <div className="flex items-start gap-2">
-                            <User2 className="mt-0.5 h-4 w-4 text-muted-foreground" />
-                            <div>
-                              <p className="font-medium">Client snapshot</p>
-                              <p className="text-muted-foreground">{project.client?.name || project.client?.company || "No linked client"}</p>
-                              <p className="text-muted-foreground">{project.client?.email || "No client email"}</p>
-                            </div>
-                          </div>
-                          <div className="flex items-start gap-2">
-                            <CalendarDays className="mt-0.5 h-4 w-4 text-muted-foreground" />
-                            <div>
-                              <p className="font-medium">Timestamps</p>
-                              <p className="text-muted-foreground">Created: {project.created_at ? new Date(project.created_at).toLocaleString() : "—"}</p>
-                              <p className="text-muted-foreground">Updated: {project.updated_at ? new Date(project.updated_at).toLocaleString() : "—"}</p>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <DialogTitle className="text-3xl font-semibold tracking-tight">
+                      {mode === "edit" ? "Edit Project" : "Create Project"}
+                    </DialogTitle>
+                    <DialogDescription className="max-w-3xl text-sm leading-6">
+                      {mode === "edit"
+                        ? "Refine the project across overview, media, publishing, and internal relations without leaving the admin workflow."
+                        : "Build a clean project record with consistent media, metadata, and publishing controls for the portfolio and home page."}
+                    </DialogDescription>
                   </div>
-                </>
-              ) : null}
+
+                  {mode === "edit" && project ? (
+                    <div className="grid min-w-[280px] gap-3 sm:grid-cols-2">
+                      <InfoTile label="Status" value={projectStatusLabel} />
+                      <InfoTile
+                        label="Client"
+                        value={project.client?.name || project.client?.company || "Unassigned"}
+                      />
+                    </div>
+                  ) : null}
+                </div>
+              </DialogHeader>
             </div>
 
-            <div className="flex flex-col-reverse gap-2 border-t border-border/70 pt-4 sm:flex-row sm:justify-end">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={onClose}
-                disabled={isLoading}
-                className="w-full sm:w-auto"
-              >
-                Cancel
-              </Button>
-              <Button type="submit" className="w-full sm:w-auto" disabled={isLoading}>
-                {isLoading ? "Saving..." : project ? "Update Project" : "Create Project"}
-              </Button>
+            <Tabs value={visibleSection} onValueChange={(value) => setActiveSection(value as SectionId)} className="flex min-h-0 flex-1 flex-col">
+              <div className="border-b border-border/70 bg-card/92 px-6 py-3 backdrop-blur-xl">
+                <div className="overflow-x-auto scrollbar-hide">
+                  <TabsList className="inline-flex h-auto min-w-max gap-2 rounded-[18px] border border-border/70 bg-background/40 p-1">
+                    {availableSections.map((section) => {
+                      const Icon = section.icon;
+                      const badgeValue =
+                        section.value === "media"
+                          ? images.length
+                          : section.value === "relations" && mode === "edit"
+                            ? relationSummary.reduce((sum, item) => sum + item.value, 0)
+                            : undefined;
+
+                      return (
+                        <TabsTrigger
+                          key={section.value}
+                          value={section.value}
+                          className="gap-2 rounded-[14px] px-4 py-2.5 text-sm data-[state=active]:border data-[state=active]:border-border/80 data-[state=active]:bg-card"
+                        >
+                          <Icon className="h-4 w-4" />
+                          <span>{section.label}</span>
+                          {typeof badgeValue === "number" ? (
+                            <span className="rounded-full bg-background/70 px-2 py-0.5 text-[11px] text-muted-foreground">
+                              {badgeValue}
+                            </span>
+                          ) : null}
+                        </TabsTrigger>
+                      );
+                    })}
+                  </TabsList>
+                </div>
+              </div>
+
+              <ScrollArea className="min-h-0 flex-1">
+                <div className="px-6 py-6">
+                  <TabsContent value="overview" className="mt-0">
+                    <SectionCard
+                      title="Overview"
+                      description="Define the project identity, public copy, and destination links in one clean section."
+                      aside={
+                        <Badge variant="outline" className="rounded-[5px] border-border/70 bg-background/50 px-3 py-1 text-xs">
+                          Core info
+                        </Badge>
+                      }
+                    >
+                      <div className="grid gap-4 lg:grid-cols-2">
+                        <FormField
+                          control={form.control}
+                          name="title"
+                          render={({ field }) => (
+                            <FormItem className="space-y-3">
+                              <FormLabel>Title *</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Project title"
+                                  {...field}
+                                  onChange={(e) => {
+                                    field.onChange(e);
+                                    if (!project) {
+                                      form.setValue("slug", generateSlug(e.target.value));
+                                    }
+                                  }}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="slug"
+                          render={({ field }) => (
+                            <FormItem className="space-y-3">
+                              <FormLabel>Slug *</FormLabel>
+                              <FormControl>
+                                <Input placeholder="project-slug" {...field} />
+                              </FormControl>
+                              <FormDescription>Used in the portfolio URL and internal lookup.</FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <FormField
+                        control={form.control}
+                        name="shortDescription"
+                        render={({ field }) => (
+                          <FormItem className="space-y-3">
+                            <FormLabel>Short Description *</FormLabel>
+                            <FormControl>
+                              <Textarea placeholder="A concise summary for cards and list views" rows={3} {...field} />
+                            </FormControl>
+                            <FormDescription>Keep this tight and scannable for portfolio previews.</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="fullDescription"
+                        render={({ field }) => (
+                          <FormItem className="space-y-3">
+                            <FormLabel>Full Description</FormLabel>
+                            <FormControl>
+                              <Textarea placeholder="A longer narrative for the project detail page" rows={7} {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="grid gap-4 lg:grid-cols-2">
+                        <FormField
+                          control={form.control}
+                          name="demoUrl"
+                          render={({ field }) => (
+                            <FormItem className="space-y-3">
+                              <FormLabel>Demo URL</FormLabel>
+                              <FormControl>
+                                <Input placeholder="https://demo.example.com" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="githubUrl"
+                          render={({ field }) => (
+                            <FormItem className="space-y-3">
+                              <FormLabel>GitHub URL</FormLabel>
+                              <FormControl>
+                                <Input placeholder="https://github.com/org/repo" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </SectionCard>
+                  </TabsContent>
+
+                  <TabsContent value="media" className="mt-0">
+                    <SectionCard
+                      title="Media"
+                      description="Upload, order, and annotate the project gallery. The first main image becomes the cover source."
+                      aside={
+                        <div className="grid gap-2 sm:grid-cols-2">
+                          <InfoTile label="Images" value={images.length} />
+                          <InfoTile
+                            label="Main"
+                            value={images.find((image) => image.is_main)?.alt || "Not set"}
+                          />
+                        </div>
+                      }
+                    >
+                      <div className="rounded-[18px] border border-dashed border-border/70 bg-background/20 p-4">
+                        <ImageUploader images={images} onChange={setImages} />
+                      </div>
+                    </SectionCard>
+                  </TabsContent>
+
+                  <TabsContent value="organization" className="mt-0">
+                    <SectionCard
+                      title="Organization"
+                      description="Connect the project to its taxonomy, ownership, and technology stack."
+                      aside={
+                        <Badge variant="outline" className="rounded-full border-border/70 bg-background/50 px-3 py-1 text-xs">
+                          Internal structure
+                        </Badge>
+                      }
+                    >
+                      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                        <FormField
+                          control={form.control}
+                          name="categoryId"
+                          render={({ field }) => (
+                            <FormItem className="space-y-3">
+                              <FormLabel>Category</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select category" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {categories.map((cat) => (
+                                    <SelectItem key={cat.id} value={cat.id}>
+                                      {cat.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="statusId"
+                          render={({ field }) => (
+                            <FormItem className="space-y-3">
+                              <FormLabel>Status</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select status" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {statuses.map((status) => (
+                                    <SelectItem key={status.id} value={status.id}>
+                                      {status.label || status.id}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="clientId"
+                          render={({ field }) => (
+                            <FormItem className="space-y-3">
+                              <FormLabel>Client</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select client" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {clients.map((client) => (
+                                    <SelectItem key={client.id} value={client.id}>
+                                      {client.name || client.company || client.id}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <FormField
+                        control={form.control}
+                        name="technologies"
+                        render={({ field }) => (
+                          <FormItem className="space-y-3">
+                            <FormLabel>Technologies</FormLabel>
+                            <FormControl>
+                              <div className="space-y-3">
+                                <div className="min-h-14 rounded-[18px] border border-input bg-background px-5 py-3">
+                                  {field.value && field.value.length > 0 ? (
+                                    <div className="flex flex-wrap gap-2">
+                                      {field.value.map((toolId) => {
+                                        const tool = tools.find((item) => item.id === toolId);
+                                        if (!tool) return null;
+
+                                        return (
+                                          <Badge
+                                            key={toolId}
+                                            variant="secondary"
+                                            className="gap-1.5 rounded-full border border-border/70 bg-muted/50 px-3 py-1 text-xs"
+                                          >
+                                            {tool.name}
+                                            <button
+                                              type="button"
+                                              className="rounded-full p-0.5 text-muted-foreground transition-colors hover:text-destructive"
+                                              onClick={() => {
+                                                field.onChange(field.value?.filter((id) => id !== toolId));
+                                              }}
+                                              aria-label={`Remove ${tool.name}`}
+                                            >
+                                              <X className="h-3 w-3" />
+                                            </button>
+                                          </Badge>
+                                        );
+                                      })}
+                                    </div>
+                                  ) : (
+                                    <p className="text-[15px] text-muted-foreground">No technologies selected yet.</p>
+                                  )}
+                                </div>
+
+                                <Select
+                                  onValueChange={(value) => {
+                                    if (!field.value?.includes(value)) {
+                                      field.onChange([...(field.value || []), value]);
+                                    }
+                                  }}
+                                  value=""
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Add technology" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {tools
+                                      .filter((tool) => !field.value?.includes(tool.id))
+                                      .map((tool) => (
+                                        <SelectItem key={tool.id} value={tool.id}>
+                                          {tool.name}
+                                        </SelectItem>
+                                      ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </FormControl>
+                            <FormDescription>
+                              Keep the stack focused on what the viewer or admin needs to recognize quickly.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </SectionCard>
+                  </TabsContent>
+
+                  <TabsContent value="publishing" className="mt-0">
+                    <SectionCard
+                      title="Publishing"
+                      description="Control portfolio visibility, homepage promotion, and manual ranking from one place."
+                      aside={
+                        <div className="grid gap-2 sm:grid-cols-2">
+                          <InfoTile label="Homepage" value={showOnHome ? "Featured" : "Standard"} />
+                          <InfoTile label="Technologies" value={selectedTechnologies.length} />
+                        </div>
+                      }
+                    >
+                      <div className="grid gap-4 lg:grid-cols-2">
+                        <FormField
+                          control={form.control}
+                          name="published"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <ToggleFieldShell
+                                  title="Published"
+                                  description="Makes this project visible on the public portfolio."
+                                >
+                                  <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                </ToggleFieldShell>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="showOnHome"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <ToggleFieldShell
+                                  title="Show on Home"
+                                  description="Highlights the project in the homepage featured section."
+                                >
+                                  <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                </ToggleFieldShell>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="grid gap-4 lg:grid-cols-2">
+                        <FormField
+                          control={form.control}
+                          name="orderIndex"
+                          render={({ field }) => (
+                            <FormItem className="space-y-3">
+                              <FormLabel>Order Index</FormLabel>
+                              <FormControl>
+                                <Input inputMode="numeric" placeholder="0" {...field} />
+                              </FormControl>
+                              <FormDescription>Controls manual ordering across admin and portfolio lists.</FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        {showOnHome ? (
+                          <FormField
+                            control={form.control}
+                            name="keyMetric"
+                            render={({ field }) => (
+                              <FormItem className="space-y-3">
+                                <FormLabel>Key Metric</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="40% increase in conversions" {...field} />
+                                </FormControl>
+                                <FormDescription>
+                                  A concise headline metric for the featured homepage card.
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        ) : (
+                          <EmptyRelationState
+                            title="Key metric is optional"
+                            description="Enable “Show on Home” to add a homepage-facing metric for the featured card."
+                            icon={Rocket}
+                          />
+                        )}
+                      </div>
+                    </SectionCard>
+                  </TabsContent>
+
+                  {mode === "edit" && project ? (
+                    <TabsContent value="relations" className="mt-0">
+                      <SectionCard
+                        title="Relations"
+                        description="Review connected services, attached files, and task activity without mixing them into the core editing flow."
+                        aside={
+                          <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+                            {relationSummary.map((item) => (
+                              <InfoTile key={item.label} label={item.label} value={item.value} />
+                            ))}
+                          </div>
+                        }
+                      >
+                        <div className="grid gap-4 xl:grid-cols-3">
+                          <Card className="rounded-[18px] border-border/70 bg-background/25">
+                            <CardHeader className="pb-4">
+                              <div className="flex items-center gap-2">
+                                <Tag className="h-4 w-4 text-muted-foreground" />
+                                <CardTitle className="text-base">Related Services</CardTitle>
+                              </div>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                              {project.project_services.length > 0 ? (
+                                project.project_services.map((service) => (
+                                  <div key={service.id} className="rounded-[16px] border border-border/70 bg-background/40 p-4">
+                                    <p className="text-sm font-medium text-foreground">{service.title}</p>
+                                    <p className="mt-1 text-sm text-muted-foreground">
+                                      {service.description || "No description"}
+                                    </p>
+                                  </div>
+                                ))
+                              ) : (
+                                <EmptyRelationState
+                                  title="No linked services"
+                                  description="This project does not currently reference any services."
+                                  icon={Tag}
+                                />
+                              )}
+                            </CardContent>
+                          </Card>
+
+                          <Card className="rounded-[18px] border-border/70 bg-background/25">
+                            <CardHeader className="pb-4">
+                              <div className="flex items-center gap-2">
+                                <Paperclip className="h-4 w-4 text-muted-foreground" />
+                                <CardTitle className="text-base">Project Files</CardTitle>
+                              </div>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                              {project.project_files.length > 0 ? (
+                                project.project_files.map((file) => (
+                                  <div key={file.id} className="rounded-[16px] border border-border/70 bg-background/40 p-4">
+                                    <p className="truncate text-sm font-medium text-foreground">{file.file_type || "File"}</p>
+                                    <p className="mt-1 truncate text-sm text-muted-foreground">{file.file_url}</p>
+                                    <a
+                                      href={file.file_url}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="mt-3 inline-flex items-center gap-1 text-sm text-primary hover:underline"
+                                    >
+                                      <Link2 className="h-3.5 w-3.5" />
+                                      Open file
+                                    </a>
+                                  </div>
+                                ))
+                              ) : (
+                                <EmptyRelationState
+                                  title="No attached files"
+                                  description="Add project files elsewhere when the workflow requires delivery assets or references."
+                                  icon={Paperclip}
+                                />
+                              )}
+                            </CardContent>
+                          </Card>
+
+                          <Card className="rounded-[18px] border-border/70 bg-background/25">
+                            <CardHeader className="pb-4">
+                              <div className="flex items-center gap-2">
+                                <ListTodo className="h-4 w-4 text-muted-foreground" />
+                                <CardTitle className="text-base">Tasks</CardTitle>
+                              </div>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                              {project.project_tasks.length > 0 ? (
+                                project.project_tasks.map((task) => (
+                                  <div key={task.id} className="rounded-[16px] border border-border/70 bg-background/40 p-4">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                      <p className="text-sm font-medium text-foreground">{task.title}</p>
+                                      {task.task_status?.label ? <Badge variant="outline" className="rounded-[5px]">{task.task_status.label}</Badge> : null}
+                                    </div>
+                                    {task.description ? (
+                                      <p className="mt-1 text-sm text-muted-foreground">{task.description}</p>
+                                    ) : null}
+                                    <div className="mt-3 flex flex-wrap gap-4 text-xs text-muted-foreground">
+                                      <span>Due: {task.due_date || "—"}</span>
+                                      <span>
+                                        Created: {formatUiDate(task.created_at)}
+                                      </span>
+                                    </div>
+                                  </div>
+                                ))
+                              ) : (
+                                <EmptyRelationState
+                                  title="No tasks recorded"
+                                  description="This project has no linked task activity yet."
+                                  icon={ListTodo}
+                                />
+                              )}
+                            </CardContent>
+                          </Card>
+                        </div>
+                      </SectionCard>
+                    </TabsContent>
+                  ) : null}
+
+                  {mode === "edit" && project ? (
+                    <TabsContent value="record" className="mt-0">
+                      <SectionCard
+                        title="Record"
+                        description="Reference the underlying record metadata and internal links without crowding the core editing experience."
+                        aside={
+                          <Badge variant="outline" className="rounded-full border-border/70 bg-background/50 px-3 py-1 text-xs">
+                            Read-only metadata
+                          </Badge>
+                        }
+                      >
+                        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                          <InfoTile label="Project ID" value={<span className="break-all">{project.id}</span>} />
+                          <InfoTile
+                            label="Created"
+                            value={formatUiDateTime(project.created_at)}
+                          />
+                          <InfoTile
+                            label="Updated"
+                            value={formatUiDateTime(project.updated_at)}
+                          />
+                          <InfoTile label="Status" value={projectStatusLabel} />
+                          <InfoTile
+                            label="Client"
+                            value={project.client?.name || project.client?.company || "Unassigned"}
+                          />
+                          <InfoTile
+                            label="Cover Image ID"
+                            value={<span className="break-all">{project.cover_image_id || "Not linked"}</span>}
+                          />
+                        </div>
+
+                        <Separator />
+
+                        <div className="grid gap-4 xl:grid-cols-2">
+                          <Card className="rounded-[18px] border-border/70 bg-background/25">
+                            <CardHeader className="pb-4">
+                              <div className="flex items-center gap-2">
+                                <Database className="h-4 w-4 text-muted-foreground" />
+                                <CardTitle className="text-base">Internal Links</CardTitle>
+                              </div>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                              <InfoTile label="Status ID" value={project.status || "—"} />
+                              <InfoTile label="Category ID" value={project.category_id || "—"} />
+                              <InfoTile label="Client ID" value={project.client_id || "—"} />
+                            </CardContent>
+                          </Card>
+
+                          <Card className="rounded-[18px] border-border/70 bg-background/25">
+                            <CardHeader className="pb-4">
+                              <div className="flex items-center gap-2">
+                                <User2 className="h-4 w-4 text-muted-foreground" />
+                                <CardTitle className="text-base">Client Snapshot</CardTitle>
+                              </div>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                              <InfoTile
+                                label="Name"
+                                value={project.client?.name || project.client?.company || "No linked client"}
+                              />
+                              <InfoTile label="Email" value={project.client?.email || "No client email"} />
+                              <InfoTile
+                                label="Last Updated"
+                                value={formatUiDateTime(project.updated_at)}
+                              />
+                            </CardContent>
+                          </Card>
+                        </div>
+                      </SectionCard>
+                    </TabsContent>
+                  ) : null}
+                </div>
+              </ScrollArea>
+            </Tabs>
+
+            <div className="border-t border-border/70 bg-card/95 px-6 py-4 backdrop-blur-xl">
+              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm text-muted-foreground">
+                  Review each section before saving. Required fields and validation stay attached to their own controls.
+                </p>
+                <div className="flex flex-col-reverse gap-2 sm:flex-row">
+                  <Button type="button" variant="ghost" onClick={onClose} disabled={isLoading} className="w-full sm:w-auto">
+                    Cancel
+                  </Button>
+                  <Button type="submit" className="w-full sm:w-auto" disabled={isLoading}>
+                    {isLoading ? "Saving..." : project ? "Update Project" : "Create Project"}
+                  </Button>
+                </div>
+              </div>
             </div>
           </form>
         </Form>
