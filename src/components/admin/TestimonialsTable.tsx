@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
@@ -112,19 +113,20 @@ export default function TestimonialsTable({ testimonials, onEdit }: Testimonials
           <TableBody>
             {testimonials.map((testimonial) => (
               <TableRow key={testimonial.id}>
-                <TableCell>
+              <TableCell>
+                <Avatar className="h-12 w-12 border border-white/10 bg-white/[0.03]">
                   {testimonial.avatar_url ? (
-                    <img
+                    <AvatarImage
                       src={getTestimonialAvatarUrl(testimonial.avatar_url) || ""}
                       alt={testimonial.name}
-                      className="w-10 h-10 rounded-full object-cover"
+                      className="object-cover object-center"
                     />
-                  ) : (
-                    <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center text-xs text-muted-foreground">
-                      {testimonial.name.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                </TableCell>
+                  ) : null}
+                  <AvatarFallback className="bg-accent text-background">
+                    {testimonial.name.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              </TableCell>
                 <TableCell className="font-medium">
                   <div className="space-y-1">
                     <p>{testimonial.name}</p>

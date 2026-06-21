@@ -4,7 +4,6 @@ import { Menu } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { Button } from "@/components/ui/button";
@@ -51,6 +50,7 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
   const lastName = nameParts.slice(1).join(" ") || "User";
   const initials = `${firstName[0] ?? ""}${lastName[0] ?? ""}`.toUpperCase() || "CU";
   const role = currentProfile?.role || "client";
+  const roleLabel = role.charAt(0).toUpperCase() + role.slice(1);
 
   return (
     <SidebarProvider>
@@ -59,34 +59,33 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
         
         <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-20 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/70">
-            <div className="flex h-16 items-center justify-between gap-4 px-4 sm:px-5 lg:px-6">
+            <div className="flex min-h-[88px] items-center justify-between gap-4 px-4 py-4 sm:px-5 sm:py-5 lg:px-6">
               <SidebarTrigger>
                 <Button variant="ghost" size="icon" className="shrink-0">
                   <Menu aria-hidden="true" />
                 </Button>
               </SidebarTrigger>
-              <div className="flex min-w-0 items-center gap-3">
-                <Avatar className="h-10 w-10 border border-white/10">
+              <div className="flex min-w-0 items-center gap-3.5">
+                <Avatar className="h-14 w-14 border border-white/10 bg-white/[0.03]">
                   {currentProfile?.avatar_url ? (
-                    <AvatarImage src={currentProfile.avatar_url} alt={`${firstName} ${lastName}`} />
+                    <AvatarImage
+                      src={currentProfile.avatar_url}
+                      alt={`${firstName} ${lastName}`}
+                      className="object-cover object-center"
+                    />
                   ) : null}
-                  <AvatarFallback className="bg-accent text-background">
+                  <AvatarFallback className="bg-accent/90 text-background">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
 
-                <div className="min-w-0 text-right">
-                  <p className="truncate text-sm font-medium leading-none text-foreground">
-                    {firstName} {lastName}
+                <div className="min-w-0 space-y-0.5">
+                  <p className="truncate text-[15px] font-semibold leading-tight text-foreground sm:text-lg">
+                    {fullName}
                   </p>
-                  <div className="mt-1 flex justify-end">
-                    <Badge
-                      variant={role === "admin" ? "destructive" : role === "manager" ? "default" : "secondary"}
-                      className="rounded-[5px] px-4"
-                    >
-                      {role}
-                    </Badge>
-                  </div>
+                  <p className="truncate text-sm font-medium leading-tight text-muted-foreground">
+                    {roleLabel}
+                  </p>
                 </div>
               </div>
             </div>

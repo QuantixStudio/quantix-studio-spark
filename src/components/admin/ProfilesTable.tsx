@@ -66,9 +66,13 @@ export default function ProfilesTable({ profiles, onEdit }: ProfilesTableProps) 
           {profiles.map((profile) => (
             <TableRow key={profile.id}>
               <TableCell>
-                <Avatar className="h-11 w-11 border border-white/10">
+                <Avatar className="h-12 w-12 border border-white/10 bg-white/[0.03]">
                   {profile.avatar_url ? (
-                    <AvatarImage src={profile.avatar_url} alt={getDisplayName(profile)} />
+                    <AvatarImage
+                      src={profile.avatar_url}
+                      alt={getDisplayName(profile)}
+                      className="object-cover object-center"
+                    />
                   ) : null}
                   <AvatarFallback className="bg-accent text-background">
                     {getInitials(profile)}

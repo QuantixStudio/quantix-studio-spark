@@ -980,7 +980,8 @@ All colors MUST be HSL.
   }
 
   .admin-metric-icon {
-    @apply size-4 text-accent;
+    @apply size-5 text-white;
+    color: hsl(0 0% 100%) !important;
   }
 
   .admin-surface {
