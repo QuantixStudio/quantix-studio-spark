@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import {
+  ArrowDown,
+  ArrowUp,
   CalendarDays,
   Database,
   Eye,
@@ -15,6 +17,8 @@ import {
   Paperclip,
   Rocket,
   Tag,
+  Trash2,
+  Upload,
   User2,
   X,
 } from "lucide-react";
@@ -22,6 +26,7 @@ import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import type { TablesInsert } from "@/integrations/supabase/types";
+import { deleteProjectFileByUrl, uploadProjectFile } from "@/lib/projectFileStorageUtils";
 import { deleteAllProjectImages, deleteProjectImages } from "@/lib/storageUtils";
 import { formatUiDate, formatUiDateTime } from "@/lib/date";
 import { getErrorMessage } from "@/lib/errorUtils";
@@ -60,7 +65,12 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ImageUploader, { ProjectImage } from "./ImageUploader";
-import type { EditableProject, ProjectCategory, ProjectStatusSummary } from "@/types/app";
+import type {
+  EditableProject,
+  ProjectCategory,
+  ProjectFileSummary,
+  ProjectStatusSummary,
+} from "@/types/app";
 
 const untypedSupabase = supabase as unknown as {
   from: (relation: string) => any;
@@ -77,7 +87,7 @@ interface ClientOption {
   company: string | null;
 }
 
-type SectionId = "overview" | "media" | "organization" | "publishing" | "relations" | "record";
+type SectionId = "overview" | "media" | "files" | "organization" | "publishing" | "relations" | "record";
 
 interface SectionDefinition {
   value: SectionId;
@@ -89,11 +99,21 @@ interface SectionDefinition {
 const sectionDefinitions: SectionDefinition[] = [
   { value: "overview", label: "Overview", icon: Rocket },
   { value: "media", label: "Media", icon: ImageIcon },
+  { value: "files", label: "Files", icon: Paperclip, editOnly: true },
   { value: "organization", label: "Organization", icon: Orbit },
   { value: "publishing", label: "Publishing", icon: Eye },
   { value: "relations", label: "Relations", icon: FolderKanban, editOnly: true },
   { value: "record", label: "Record", icon: Database, editOnly: true },
 ];
+
+interface EditableProjectFile {
+  id?: string;
+  file_url: string;
+  file_type: string | null;
+  order_index: number;
+  created_at?: string | null;
+  file_name?: string | null;
+}
 
 const projectSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -218,11 +238,14 @@ export default function ProjectFormModal({
   const [isLoading, setIsLoading] = useState(false);
   const [images, setImages] = useState<ProjectImage[]>([]);
   const [originalImages, setOriginalImages] = useState<ProjectImage[]>([]);
+  const [projectFiles, setProjectFiles] = useState<EditableProjectFile[]>([]);
+  const [isUploadingFiles, setIsUploadingFiles] = useState(false);
   const [categories, setCategories] = useState<ProjectCategory[]>([]);
   const [tools, setTools] = useState<TechnologyOption[]>([]);
   const [statuses, setStatuses] = useState<ProjectStatusSummary[]>([]);
   const [clients, setClients] = useState<ClientOption[]>([]);
   const queryClient = useQueryClient();
+  const projectFileInputRef = useRef<HTMLInputElement | null>(null);
 
   const form = useForm<z.infer<typeof projectSchema>>({
     resolver: zodResolver(projectSchema),
@@ -277,6 +300,18 @@ export default function ProjectFormModal({
 
         setImages(projectImages);
         setOriginalImages(projectImages);
+        setProjectFiles(
+          [...(project.project_files ?? [])]
+            .sort((left, right) => (left.order_index ?? 0) - (right.order_index ?? 0))
+            .map((file, index) => ({
+              id: file.id,
+              file_url: file.file_url,
+              file_type: file.file_type,
+              order_index: file.order_index ?? index,
+              created_at: file.created_at,
+              file_name: file.file_url.split("/").pop() ?? file.file_type ?? "File",
+            })),
+        );
       } else {
         form.reset({
           title: "",
@@ -296,6 +331,7 @@ export default function ProjectFormModal({
         });
         setImages([]);
         setOriginalImages([]);
+        setProjectFiles([]);
       }
     }
   }, [form, isOpen, project]);
@@ -477,6 +513,115 @@ export default function ProjectFormModal({
     return mainImageId;
   };
 
+  const syncProjectFiles = async (projectId: string, nextFiles: EditableProjectFile[]) => {
+    const { error: deleteProjectFilesError } = await untypedSupabase
+      .from("project_files")
+      .delete()
+      .eq("project_id", projectId);
+
+    if (deleteProjectFilesError) throw deleteProjectFilesError;
+
+    if (nextFiles.length === 0) {
+      return;
+    }
+
+    const fileRows = nextFiles.map((file, index) => ({
+      project_id: projectId,
+      file_url: file.file_url.trim(),
+      file_type: file.file_type?.trim() || null,
+      order_index: index,
+    }));
+
+    const { error: insertProjectFilesError } = await untypedSupabase
+      .from("project_files")
+      .insert(fileRows);
+
+    if (insertProjectFilesError) throw insertProjectFilesError;
+  };
+
+  const deriveProjectFileType = (file: File): string => {
+    if (file.type) {
+      return file.type;
+    }
+
+    const extension = file.name.split(".").pop();
+    return extension ? extension.toUpperCase() : "File";
+  };
+
+  const handleProjectFileUpload = async (selectedFiles: FileList | null) => {
+    if (!project?.id || !selectedFiles || selectedFiles.length === 0) {
+      return;
+    }
+
+    setIsUploadingFiles(true);
+
+    try {
+      const currentMaxOrder = projectFiles.length;
+      const uploadedFiles: EditableProjectFile[] = [];
+
+      for (let index = 0; index < selectedFiles.length; index += 1) {
+        const selectedFile = selectedFiles[index];
+        const { publicUrl } = await uploadProjectFile(project.id, selectedFile);
+
+        const insertPayload = {
+          project_id: project.id,
+          file_url: publicUrl,
+          file_type: deriveProjectFileType(selectedFile),
+          order_index: currentMaxOrder + index,
+        };
+
+        const { data: insertedFile, error: insertError } = await untypedSupabase
+          .from("project_files")
+          .insert(insertPayload)
+          .select("id, file_url, file_type, order_index, created_at")
+          .single();
+
+        if (insertError) {
+          await deleteProjectFileByUrl(publicUrl);
+          throw insertError;
+        }
+
+        uploadedFiles.push({
+          ...(insertedFile as ProjectFileSummary),
+          file_name: selectedFile.name,
+        });
+      }
+
+      setProjectFiles((currentFiles) => [...currentFiles, ...uploadedFiles]);
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      if (project.slug) {
+        queryClient.invalidateQueries({ queryKey: ["project", project.slug] });
+      }
+      toast.success(
+        uploadedFiles.length === 1
+          ? "Project file uploaded."
+          : `${uploadedFiles.length} project files uploaded.`,
+      );
+    } catch (error) {
+      const fallbackMessage = getErrorMessage(error, "Failed to upload project file");
+      const message = fallbackMessage.toLowerCase().includes("row-level security policy")
+        ? "Project file upload is blocked by Supabase RLS. Apply the new project_files bucket and table policies, then try again."
+        : fallbackMessage;
+      toast.error(message);
+    } finally {
+      if (projectFileInputRef.current) {
+        projectFileInputRef.current.value = "";
+      }
+      setIsUploadingFiles(false);
+    }
+  };
+
+  const updateProjectFileRow = (
+    index: number,
+    updates: Partial<EditableProjectFile>,
+  ) => {
+    setProjectFiles((currentFiles) =>
+      currentFiles.map((currentFile, currentIndex) =>
+        currentIndex === index ? { ...currentFile, ...updates } : currentFile,
+      ),
+    );
+  };
+
   const onSubmit = async (values: z.infer<typeof projectSchema>) => {
     if (images.length === 0) {
       toast.error("Please add at least one image");
@@ -484,6 +629,22 @@ export default function ProjectFormModal({
     }
 
     const validatedImages = [...images];
+    const validatedProjectFiles = projectFiles
+      .map((file, index) => ({
+        ...file,
+        file_url: file.file_url.trim(),
+        file_type: file.file_type?.trim() || null,
+        order_index: index,
+      }))
+      .filter((file) => file.file_url.length > 0);
+
+    const hasIncompleteFile = projectFiles.some((file) => file.file_url.trim().length === 0);
+    if (hasIncompleteFile) {
+      toast.error("Please add a valid file URL or remove the empty file row.");
+      setActiveSection("files");
+      return;
+    }
+
     if (!validatedImages.some((img) => img.is_main)) {
       validatedImages[0].is_main = true;
       setImages(validatedImages);
@@ -542,6 +703,7 @@ export default function ProjectFormModal({
       if (updateError) throw updateError;
 
       await syncProjectImages(projectId, uploadedImages);
+      await syncProjectFiles(projectId, validatedProjectFiles);
 
       const { error: deleteProjectTechnologiesError } = await supabase
         .from("project_technologies")
@@ -599,7 +761,7 @@ export default function ProjectFormModal({
     : availableSections[0].value;
   const relationSummary = [
     { label: "Services", value: project?.project_services.length ?? 0 },
-    { label: "Files", value: project?.project_files.length ?? 0 },
+    { label: "Files", value: projectFiles.length },
     { label: "Tasks", value: project?.project_tasks.length ?? 0 },
     { label: "Tech", value: project?.project_technologies.length ?? 0 },
   ];
@@ -817,6 +979,191 @@ export default function ProjectFormModal({
                       </div>
                     </SectionCard>
                   </TabsContent>
+
+                  {mode === "edit" ? (
+                    <TabsContent value="files" className="mt-0">
+                      <SectionCard
+                        title="Files"
+                        description="Upload project files into Supabase Storage and keep their linked project records in sync."
+                        aside={
+                          <div className="grid gap-2 sm:grid-cols-2">
+                            <InfoTile label="Files" value={projectFiles.length} />
+                            <div>
+                              <input
+                                ref={projectFileInputRef}
+                                type="file"
+                                multiple
+                                className="hidden"
+                                onChange={(event) => {
+                                  void handleProjectFileUpload(event.target.files);
+                                }}
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                className="h-auto rounded-[18px] border-border/70 bg-background/50 px-4 py-3"
+                                onClick={() => projectFileInputRef.current?.click()}
+                                disabled={isUploadingFiles}
+                              >
+                                <Upload className="mr-2 h-4 w-4" />
+                                {isUploadingFiles ? "Uploading..." : "Upload Files"}
+                              </Button>
+                            </div>
+                          </div>
+                        }
+                      >
+                        {projectFiles.length > 0 ? (
+                          <div className="space-y-4">
+                            {projectFiles.map((file, index) => (
+                              <div
+                                key={file.id ?? `new-file-${index}`}
+                                className="rounded-[18px] border border-border/70 bg-background/25 p-4"
+                              >
+                                <div className="flex flex-col gap-4 xl:flex-row xl:items-start">
+                                  <div className="grid flex-1 gap-4 md:grid-cols-2">
+                                    <FormItem className="space-y-3">
+                                      <FormLabel>File URL</FormLabel>
+                                      <FormControl>
+                                        <Input
+                                          value={file.file_url}
+                                          placeholder="Storage URL"
+                                          onChange={(event) => {
+                                            updateProjectFileRow(index, { file_url: event.target.value });
+                                          }}
+                                        />
+                                      </FormControl>
+                                    </FormItem>
+
+                                    <FormItem className="space-y-3">
+                                      <FormLabel>File Type</FormLabel>
+                                      <FormControl>
+                                        <Input
+                                          value={file.file_type ?? ""}
+                                          placeholder="PDF, Figma, Loom, ZIP"
+                                          onChange={(event) => {
+                                            updateProjectFileRow(index, { file_type: event.target.value });
+                                          }}
+                                        />
+                                      </FormControl>
+                                    </FormItem>
+                                  </div>
+
+                                  <div className="flex shrink-0 flex-wrap items-center gap-2">
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="icon"
+                                      className="rounded-xl"
+                                      onClick={() => {
+                                        if (index === 0) return;
+                                        setProjectFiles((currentFiles) => {
+                                          const nextFiles = [...currentFiles];
+                                          [nextFiles[index - 1], nextFiles[index]] = [nextFiles[index], nextFiles[index - 1]];
+                                          return nextFiles.map((currentFile, currentIndex) => ({
+                                            ...currentFile,
+                                            order_index: currentIndex,
+                                          }));
+                                        });
+                                      }}
+                                      disabled={index === 0}
+                                    >
+                                      <ArrowUp className="h-4 w-4" />
+                                    </Button>
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="icon"
+                                      className="rounded-xl"
+                                      onClick={() => {
+                                        if (index === projectFiles.length - 1) return;
+                                        setProjectFiles((currentFiles) => {
+                                          const nextFiles = [...currentFiles];
+                                          [nextFiles[index], nextFiles[index + 1]] = [nextFiles[index + 1], nextFiles[index]];
+                                          return nextFiles.map((currentFile, currentIndex) => ({
+                                            ...currentFile,
+                                            order_index: currentIndex,
+                                          }));
+                                        });
+                                      }}
+                                      disabled={index === projectFiles.length - 1}
+                                    >
+                                      <ArrowDown className="h-4 w-4" />
+                                    </Button>
+                                    {file.file_url ? (
+                                      <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="rounded-xl"
+                                        asChild
+                                      >
+                                        <a href={file.file_url} target="_blank" rel="noreferrer">
+                                          <Link2 className="mr-2 h-4 w-4" />
+                                          Open
+                                        </a>
+                                      </Button>
+                                    ) : null}
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="icon"
+                                      className="rounded-xl text-destructive hover:text-destructive"
+                                      onClick={() => {
+                                        void (async () => {
+                                          try {
+                                            if (file.id) {
+                                              const { error: deleteRowError } = await untypedSupabase
+                                                .from("project_files")
+                                                .delete()
+                                                .eq("id", file.id);
+
+                                              if (deleteRowError) throw deleteRowError;
+                                            }
+
+                                            await deleteProjectFileByUrl(file.file_url);
+
+                                            setProjectFiles((currentFiles) =>
+                                              currentFiles
+                                                .filter((_, currentIndex) => currentIndex !== index)
+                                                .map((currentFile, currentIndex) => ({
+                                                  ...currentFile,
+                                                  order_index: currentIndex,
+                                                })),
+                                            );
+                                            queryClient.invalidateQueries({ queryKey: ["projects"] });
+                                            if (project.slug) {
+                                              queryClient.invalidateQueries({ queryKey: ["project", project.slug] });
+                                            }
+                                            toast.success("Project file removed.");
+                                          } catch (error) {
+                                            toast.error(getErrorMessage(error, "Failed to remove project file"));
+                                          }
+                                        })();
+                                      }}
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                </div>
+
+                                <div className="mt-3 flex flex-wrap gap-4 text-xs text-muted-foreground">
+                                  <span>Order: {index + 1}</span>
+                                  {file.file_name ? <span>Name: {file.file_name}</span> : null}
+                                  <span>Saved type: {file.file_type || "Not set"}</span>
+                                  {file.created_at ? <span>Created: {formatUiDate(file.created_at)}</span> : null}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <EmptyRelationState
+                            title="No project files yet"
+                            description="Upload files to the project_files bucket and they will be linked into the project_files table automatically."
+                            icon={Paperclip}
+                          />
+                        )}
+                      </SectionCard>
+                    </TabsContent>
+                  ) : null}
 
                   <TabsContent value="organization" className="mt-0">
                     <SectionCard
@@ -1140,7 +1487,7 @@ export default function ProjectFormModal({
                               ) : (
                                 <EmptyRelationState
                                   title="No attached files"
-                                  description="Add project files elsewhere when the workflow requires delivery assets or references."
+                                  description="Use the Files section to add project-linked file records for delivery assets or references."
                                   icon={Paperclip}
                                 />
                               )}
