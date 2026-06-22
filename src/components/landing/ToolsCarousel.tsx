@@ -1,25 +1,23 @@
 import { useMemo } from "react";
-import { useTools } from "@/hooks/useTools";
+import { useTechnologies } from "@/hooks/useTechnologies";
 import { getToolLogoUrl } from "@/lib/toolStorageUtils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatePanel } from "@/components/shared/StatePanel";
 
 export default function ToolsCarousel() {
-  const { data: tools, isLoading } = useTools();
+  const { data: technologies, isLoading } = useTechnologies();
 
-  // Filter featured tools and prepare logo URLs
-  const featuredTools = useMemo(() => {
-    if (!tools) return [];
-    return tools
-      .filter(tool => tool.is_featured)
-      .map(tool => ({
-        id: tool.id,
-        name: tool.name,
-        logoUrl: getToolLogoUrl(tool.logo_path),
+  const featuredTechnologies = useMemo(() => {
+    if (!technologies) return [];
+
+    return technologies
+      .map((technology) => ({
+        id: technology.id,
+        name: technology.name,
+        logoUrl: getToolLogoUrl(technology.logo_path ?? null),
       }));
-  }, [tools]);
+  }, [technologies]);
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="flex items-center justify-center gap-8 py-8">
@@ -30,12 +28,11 @@ export default function ToolsCarousel() {
     );
   }
 
-  // Empty state
-  if (featuredTools.length === 0) {
+  if (featuredTechnologies.length === 0) {
     return (
       <StatePanel
-        title="No featured tools yet"
-        description="Mark a few tools as featured in the admin area and they will appear here automatically."
+        title="No technologies with logos yet"
+        description="Add logos to technologies in the admin area and they will appear here automatically."
       />
     );
   }
@@ -49,12 +46,12 @@ export default function ToolsCarousel() {
             className="marquee-group"
             aria-hidden={groupIndex === 1}
           >
-            {featuredTools.map((tool) => (
-              <div key={`${groupIndex}-${tool.id}`} className="w-[208px] flex-shrink-0">
+            {featuredTechnologies.map((technology) => (
+              <div key={`${groupIndex}-${technology.id}`} className="w-[208px] flex-shrink-0">
                 <div className="marquee-card media-hover-trigger flex h-[112px] items-center justify-center rounded-[28px] px-3">
                   <img
-                    src={tool.logoUrl || "/placeholder.svg"}
-                    alt={`${tool.name} logo`}
+                    src={technology.logoUrl || "/placeholder.svg"}
+                    alt={`${technology.name} logo`}
                     className="marquee-logo media-hover-target h-[78px] w-full object-contain"
                     loading="lazy"
                     onError={(e) => {

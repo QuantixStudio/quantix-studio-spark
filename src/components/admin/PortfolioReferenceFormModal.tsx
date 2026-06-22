@@ -61,18 +61,6 @@ type TechnologyFormValues = z.infer<typeof technologySchema>;
 type CategoryFormValues = z.infer<typeof categorySchema>;
 type StatusFormValues = z.infer<typeof statusSchema>;
 
-interface ToolSyncRow {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-  logo_path: string | null;
-  website_url: string | null;
-  is_featured: boolean | null;
-  created_at: string | null;
-  updated_at: string | null;
-}
-
 interface PortfolioReferenceFormModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -84,7 +72,7 @@ const formConfig = {
   technologies: {
     tableName: "technologies",
     title: "Technology",
-    description: "Manage reusable technology entries that projects can reference across the portfolio experience. Visual logos are matched from the Tools collection by slug or name.",
+    description: "Manage reusable technology entries that projects can reference across the portfolio experience. Logos are stored directly on each technology.",
     queryKey: ["portfolio-system", "technologies"] as const,
   },
   categories: {
@@ -182,56 +170,19 @@ export default function PortfolioReferenceFormModal({
 
   const saveAndClose = async (queryKey: readonly string[], message: string) => {
     queryClient.invalidateQueries({ queryKey });
+    queryClient.invalidateQueries({ queryKey: ["technologies", "public"] });
+    queryClient.invalidateQueries({ queryKey: ["projects"] });
+    queryClient.invalidateQueries({ queryKey: ["project"] });
     toast.success(message);
     onClose();
   };
 
-  const findMatchingToolForTechnology = async (
-    currentTechnology: AdminTechnology | null,
-    values: TechnologyFormValues,
-  ): Promise<ToolSyncRow | null> => {
-    const slugCandidates = Array.from(
-      new Set([currentTechnology?.slug, values.slug].filter((value): value is string => Boolean(value))),
-    );
-    const nameCandidates = Array.from(
-      new Set([currentTechnology?.name, values.name].filter((value): value is string => Boolean(value))),
-    );
-
-    const [slugResult, nameResult] = await Promise.all([
-      slugCandidates.length > 0
-        ? supabase
-            .from("tools")
-            .select("id, name, slug, description, logo_path, website_url, is_featured, created_at, updated_at")
-            .in("slug", slugCandidates)
-        : Promise.resolve({ data: null, error: null }),
-      nameCandidates.length > 0
-        ? supabase
-            .from("tools")
-            .select("id, name, slug, description, logo_path, website_url, is_featured, created_at, updated_at")
-            .in("name", nameCandidates)
-        : Promise.resolve({ data: null, error: null }),
-    ]);
-
-    if (slugResult.error) throw slugResult.error;
-    if (nameResult.error) throw nameResult.error;
-
-    const tools = [...(slugResult.data ?? []), ...(nameResult.data ?? [])] as ToolSyncRow[];
-
-    return (
-      tools.find((tool) => currentTechnology?.slug && tool.slug === currentTechnology.slug) ??
-      tools.find((tool) => tool.slug === values.slug) ??
-      tools.find((tool) => currentTechnology?.name && tool.name === currentTechnology.name) ??
-      tools.find((tool) => tool.name === values.name) ??
-      null
-    );
-  };
-
-  const uploadTechnologyLogo = async (toolId: string): Promise<string | null> => {
+  const uploadTechnologyLogo = async (technologyId: string): Promise<string | null> => {
     if (!technologyLogoFile) return null;
 
     const compressedFile = await compressImage(technologyLogoFile, 2);
     const fileExt = technologyLogoFile.name.split(".").pop();
-    const fileName = `${toolId}/${Date.now()}.${fileExt}`;
+    const fileName = `${technologyId}/${Date.now()}.${fileExt}`;
 
     const { error: uploadError } = await supabase.storage
       .from(STORAGE_BUCKETS.toolsLogos)
@@ -244,58 +195,23 @@ export default function PortfolioReferenceFormModal({
     return fileName;
   };
 
-  const syncTechnologyLogo = async (
-    currentTechnology: AdminTechnology | null,
-    values: TechnologyFormValues,
-  ) => {
-    const matchedTool = await findMatchingToolForTechnology(currentTechnology, values);
-    const shouldCreateOrUpdateTool = Boolean(technologyLogoFile) || Boolean(matchedTool);
-
-    if (!shouldCreateOrUpdateTool) {
-      return;
-    }
-
-    const toolId = matchedTool?.id ?? crypto.randomUUID();
-    const previousLogoPath = matchedTool?.logo_path ?? null;
-    let nextLogoPath = previousLogoPath;
-
-    if (technologyLogoFile) {
-      nextLogoPath = await uploadTechnologyLogo(toolId);
-    }
-
-    const timestamp = new Date().toISOString();
-    const payload = {
-      id: toolId,
-      name: values.name,
-      slug: values.slug,
-      description: values.description || null,
-      logo_path: nextLogoPath,
-      website_url: matchedTool?.website_url ?? null,
-      is_featured: matchedTool?.is_featured ?? false,
-      created_at: matchedTool?.created_at ?? timestamp,
-      updated_at: timestamp,
-    };
-
-    if (matchedTool) {
-      const { error } = await supabase.from("tools").update(payload).eq("id", matchedTool.id);
-      if (error) throw error;
-    } else {
-      const { error } = await supabase.from("tools").insert(payload);
-      if (error) throw error;
-    }
-
-    if (technologyLogoFile && previousLogoPath && previousLogoPath !== nextLogoPath) {
-      await deleteToolLogo(previousLogoPath);
-    }
-  };
-
   const submitTechnology = async (values: TechnologyFormValues) => {
+    let uploadedLogoPath: string | null = null;
+
     try {
       const currentTechnology = item as AdminTechnology | null;
+      let nextLogoPath = currentTechnology?.logo_path ?? null;
+
+      if (currentTechnology?.id && technologyLogoFile) {
+        nextLogoPath = await uploadTechnologyLogo(currentTechnology.id);
+        uploadedLogoPath = nextLogoPath;
+      }
+
       const payload = {
         name: values.name,
         slug: values.slug,
         description: values.description || null,
+        logo_path: nextLogoPath,
       };
 
       if (item) {
@@ -304,17 +220,38 @@ export default function PortfolioReferenceFormModal({
           .update(payload)
           .eq("id", item.id);
         if (error) throw error;
-        await syncTechnologyLogo(currentTechnology, values);
-        queryClient.invalidateQueries({ queryKey: ["tools"] });
+        if (technologyLogoFile && currentTechnology?.logo_path && currentTechnology.logo_path !== nextLogoPath) {
+          await deleteToolLogo(currentTechnology.logo_path);
+        }
         await saveAndClose(config.queryKey, "Technology updated successfully");
       } else {
-        const { error } = await (supabase as unknown as { from: (table: string) => any }).from(config.tableName).insert(payload);
-        if (error) throw error;
-        await syncTechnologyLogo(currentTechnology, values);
-        queryClient.invalidateQueries({ queryKey: ["tools"] });
+        const technologyId = crypto.randomUUID();
+        const createdLogoPath = technologyLogoFile ? await uploadTechnologyLogo(technologyId) : null;
+        uploadedLogoPath = createdLogoPath;
+        const { error } = await (supabase as unknown as { from: (table: string) => any })
+          .from(config.tableName)
+          .insert({
+            id: technologyId,
+            ...payload,
+            logo_path: createdLogoPath,
+          });
+        if (error) {
+          if (createdLogoPath) {
+            await deleteToolLogo(createdLogoPath);
+          }
+          throw error;
+        }
         await saveAndClose(config.queryKey, "Technology created successfully");
       }
     } catch (error) {
+      const currentTechnology = item as AdminTechnology | null;
+      if (uploadedLogoPath && uploadedLogoPath !== (currentTechnology?.logo_path ?? null)) {
+        try {
+          await deleteToolLogo(uploadedLogoPath);
+        } catch (cleanupError) {
+          console.error("Failed to clean up uploaded technology logo", cleanupError);
+        }
+      }
       toast.error(getErrorMessage(error, "Failed to save technology"));
     }
   };
@@ -393,7 +330,7 @@ export default function PortfolioReferenceFormModal({
                   />
                 </FormControl>
                 <FormDescription>
-                  Uploaded to <span className="font-medium text-foreground">tools_logos</span> and matched to this technology by slug or name.
+                  Uploaded to <span className="font-medium text-foreground">tools_logos</span> and saved directly on this technology.
                 </FormDescription>
               </FormItem>
 

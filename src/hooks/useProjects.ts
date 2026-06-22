@@ -129,10 +129,10 @@ function mapProject(
     project_tools: technologies.map((technology) => ({
       id: technology.id,
       name: technology.name,
-      slug: technology.name.toLowerCase().replace(/\s+/g, "-"),
-      description: null,
+      slug: technology.slug ?? technology.name.toLowerCase().replace(/\s+/g, "-"),
+      description: technology.description ?? null,
       website_url: null,
-      logo_path: null,
+      logo_path: technology.logo_path ?? null,
       is_featured: false,
       created_at: null,
       updated_at: null,
@@ -230,7 +230,10 @@ export function useProjects(adminMode = false, featuredOnly = false) {
               technology_id,
               technologies:technologies!fk_pt_technology (
                 id,
-                name
+                name,
+                slug,
+                description,
+                logo_path
               )
             `)
             .eq("project_id", project.id);

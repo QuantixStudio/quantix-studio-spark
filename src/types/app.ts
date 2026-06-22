@@ -139,7 +139,9 @@ export interface ProjectTaskSummary {
 export interface ProjectTechnologySummary {
   id: string;
   name: string;
+  slug?: string | null;
   description?: string | null;
+  logo_path?: string | null;
 }
 
 export type ProjectRow = Tables<"projects">;

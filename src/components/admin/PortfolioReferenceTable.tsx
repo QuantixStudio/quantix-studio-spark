@@ -19,7 +19,7 @@ import { RowActionsMenu } from "@/components/shared/RowActionsMenu";
 import { StatePanel } from "@/components/shared/StatePanel";
 import { formatUiDateTime } from "@/lib/date";
 import { getErrorMessage } from "@/lib/errorUtils";
-import { getToolLogoUrl } from "@/lib/toolStorageUtils";
+import { deleteToolLogo, getToolLogoUrl } from "@/lib/toolStorageUtils";
 import type {
   AdminPortfolioStatus,
   AdminProjectCategory,
@@ -118,6 +118,10 @@ export default function PortfolioReferenceTable({ tab, items, onEdit }: Portfoli
 
     setIsDeleting(true);
     try {
+      const deletingTechnology = tab === "technologies"
+        ? ((itemToDelete as AdminTechnology | null) ?? null)
+        : null;
+
       const { error } = await (supabase as unknown as { from: (table: string) => any })
         .from(config.tableName)
         .delete()
@@ -125,8 +129,15 @@ export default function PortfolioReferenceTable({ tab, items, onEdit }: Portfoli
 
       if (error) throw error;
 
+      if (deletingTechnology?.logo_path) {
+        await deleteToolLogo(deletingTechnology.logo_path);
+      }
+
       toast.success(`${config.singular[0].toUpperCase()}${config.singular.slice(1)} deleted successfully`);
       queryClient.invalidateQueries({ queryKey: config.queryKey });
+      queryClient.invalidateQueries({ queryKey: ["technologies", "public"] });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["project"] });
     } catch (error) {
       toast.error(getErrorMessage(error, `Failed to delete ${config.singular}`));
     } finally {

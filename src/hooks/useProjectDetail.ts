@@ -132,10 +132,10 @@ function mapProject(
     project_tools: technologies.map((technology) => ({
       id: technology.id,
       name: technology.name,
-      slug: technology.name.toLowerCase().replace(/\s+/g, "-"),
-      description: null,
+      slug: technology.slug ?? technology.name.toLowerCase().replace(/\s+/g, "-"),
+      description: technology.description ?? null,
       website_url: null,
-      logo_path: null,
+      logo_path: technology.logo_path ?? null,
       is_featured: false,
       created_at: null,
       updated_at: null,
@@ -180,14 +180,16 @@ export function useProjectDetail(slug: string) {
       if (error) throw error;
       if (!projectData) return null;
 
-      // Fetch tools for this project
       const { data: projectTechRows, error: projectTechError } = await untypedSupabase
         .from("project_technologies")
         .select(`
           technology_id,
           technologies:technologies!fk_pt_technology (
             id,
-            name
+            name,
+            slug,
+            description,
+            logo_path
           )
         `)
         .eq("project_id", projectData.id);
