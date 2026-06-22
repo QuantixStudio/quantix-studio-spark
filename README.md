@@ -70,6 +70,13 @@ This project is built with:
 - `PROJECT_AUDIT.md` records the latest scalability audit, applied optimizations, and next recommended passes.
 - `DESIGN_SYSTEM.md` records the current visual system, global style primitives, and shared UI conventions.
 
+## Stack Library Note
+
+- The app no longer uses the legacy `public.tools` table.
+- Homepage stack carousel, project build-stack chips, and admin stack management now read from `public.technologies`.
+- Technology logos are stored in the `tools_logos` bucket and saved directly on `technologies.logo_path`.
+- The removal migration for `public.tools` is [`supabase/migrations/20260622183000_drop_legacy_tools_table.sql`](supabase/migrations/20260622183000_drop_legacy_tools_table.sql).
+
 ## Local development
 
 This project is a Vite app. The site will not open until the dev server is running.

@@ -10,6 +10,14 @@ This document records the current live Supabase schema connected to this repo.
 It is based on direct MCP introspection of the active remote project, not on
 `supabase/migrations/` or generated local types.
 
+## Repo Update Note (2026-06-22)
+
+- The application code has been migrated away from `public.tools`.
+- The homepage stack carousel, project build-stack displays, and admin stack management now read from `public.technologies`.
+- Technology logos are now stored on `technologies.logo_path` and resolved from the `tools_logos` storage bucket.
+- A local removal migration has been added at `supabase/migrations/20260622183000_drop_legacy_tools_table.sql`.
+- This document still reflects the last direct remote audit from 2026-06-14. Treat the `tools` table section below as legacy remote state until that migration is applied to the live project.
+
 ## Executive Summary
 
 - The connected Supabase project no longer matches the older repo-local schema docs.

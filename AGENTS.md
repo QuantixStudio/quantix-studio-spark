@@ -7,7 +7,7 @@ Last verified: 2026-06-14
 Quantix Studio is a marketing site plus lightweight admin CMS built on React, Vite, and Supabase.
 
 - Public experience: home page, portfolio listing, project detail, privacy page, auth page.
-- Admin experience: dashboard, profile, settings, project management, tool management, testimonial management.
+- Admin experience: dashboard, profile, settings, project management, stack library management, testimonial management.
 - Backend pattern: direct browser-to-Supabase access with RLS, plus one external n8n webhook for the contact form.
 
 ## Core stack
@@ -52,7 +52,7 @@ Important:
 - `src/components/admin`: admin CRUD modals and tables
 - `src/components/ui`: shadcn/ui primitives
 - `src/contexts/AuthContext.tsx`: Supabase auth/session state
-- `src/hooks`: React Query data hooks for projects, tools, services, testimonials, roles
+- `src/hooks`: React Query data hooks for projects, technologies, services, testimonials, roles
 - `src/integrations/supabase/client.ts`: browser Supabase client
 - `src/integrations/supabase/types.ts`: generated DB types, do not hand-edit
 - `src/lib/testSupabase.ts`: browser console helper for connection and RLS checks
@@ -126,8 +126,8 @@ Core content tables used by the current frontend:
 - `project_tasks`: task records linked to projects and `task_status`.
 - `project_status`: project status lookup.
 - `task_status`: task status lookup.
-- `tools`: tool catalog with `slug`, `logo_path`, `website_url`, `is_featured`.
-- `technologies`: technology lookup table used by `project_technologies`.
+- `technologies`: technology lookup table used by `project_technologies`, the homepage stack carousel, and project build-stack logo rendering via `logo_path`.
+- `tools`: legacy table scheduled for removal; do not add new application dependencies to it.
 
 Operational and auxiliary tables present in generated types:
 
@@ -151,7 +151,7 @@ Schema gotchas:
 - There is no live `user_roles` table in the connected project.
 - There is no live `testimonials` table in the connected project.
 - `project_technologies` is normalized and does not contain `tools text[]`.
-- `tools` does not contain `categories`.
+- `tools` is legacy and should not be used by app code; the removal migration lives in `supabase/migrations/20260622183000_drop_legacy_tools_table.sql`.
 - `projects` does not contain `cover_url` or `images`; media is split into related tables.
 - `why_choose_us` does not contain `icon_name`.
 - Several project-related tables contain duplicate FK or unique constraints in the live schema.
@@ -165,7 +165,7 @@ Schema gotchas:
 - `how_we_work`: public can read all rows; admins/managers can manage all rows.
 - `why_choose_us`: public can read all rows; admins/managers can manage all rows.
 - `inquiries`: public can insert; admins can view and update.
-- `project_category`, `service_icon`, `technologies`, `project_technologies`, `project_status`, `task_status`, `client_status`, `inquiry_status`, `invoice_status`, `payment_status`, `tools`: readable publicly.
+- `project_category`, `service_icon`, `technologies`, `project_technologies`, `project_status`, `task_status`, `client_status`, `inquiry_status`, `invoice_status`, `payment_status`: readable publicly.
 - `documents` and `document_sources`: blocked from frontend access by deny-all policies.
 - Storage rules:
   - current live audit only confirmed one public bucket: `Project_images`
@@ -196,9 +196,9 @@ Note:
 
 ## Current app behavior and product notes
 
-- Public landing page is section-based and data-backed for services, featured projects, tools, and other marketing sections.
+- Public landing page is section-based and data-backed for services, featured projects, technologies, and other marketing sections.
 - Any testimonial-related frontend behavior should be treated as schema-mismatch work until the app or DB is reconciled.
-- Admin CRUD definitely maps to projects and tools in the live schema.
+- Admin CRUD definitely maps to projects, technologies, categories, and testimonials in the current app flow.
 - In the admin `Projects` section, list/table display should read from live normalized sources: `projects.created_at`, `project_category.name`, `project_status.label`, and `project_images` / `cover_image_id`. Do not reintroduce reads from deprecated `projects.cover_url` or `projects.images` fields that still exist in stale generated types.
 - Dashboard numbers are currently static placeholder values, not live analytics.
 - Profile editing updates `profiles.full_name` and `profiles.email`.

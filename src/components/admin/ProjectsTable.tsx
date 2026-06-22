@@ -34,10 +34,10 @@ import type {
   ProjectServiceSummary,
   ProjectStatusSummary,
   ProjectTaskSummary,
+  ProjectTechnologySummary,
   ProjectWithTools,
   RawProjectWithCategory,
   TaskStatusSummary,
-  Tool,
 } from "@/types/app";
 
 const untypedSupabase = supabase as unknown as {
@@ -101,7 +101,7 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
           .from("project_technologies")
           .select("technology_id")
           .eq("project_id", project.id),
-        supabase.from("technologies").select("id, name"),
+        supabase.from("technologies").select("id, name, slug, description, logo_path"),
         untypedSupabase
           .from("project_services")
           .select("service_id")
@@ -157,7 +157,7 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
         settledQueries[1],
         "project technologies",
       );
-      const allToolsData = readQueryResult<Array<{ id: string; name: string }>>(
+      const allToolsData = readQueryResult<ProjectTechnologySummary[]>(
         settledQueries[2],
         "technologies catalog",
       );
@@ -186,17 +186,13 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
         .map((row) => row.technology_id)
         .filter((technologyId): technologyId is string => Boolean(technologyId));
 
-      const allTools = ((allToolsData ?? []) as Array<{ id: string; name: string }>).map((technology) => ({
+      const allTools = ((allToolsData ?? []) as ProjectTechnologySummary[]).map((technology) => ({
         id: technology.id,
         name: technology.name,
-        slug: technology.name.toLowerCase().replace(/\s+/g, "-"),
-        description: null,
-        website_url: null,
-        logo_path: null,
-        is_featured: false,
-        created_at: null,
-        updated_at: null,
-      })) as Tool[];
+        slug: technology.slug ?? technology.name.toLowerCase().replace(/\s+/g, "-"),
+        description: technology.description ?? null,
+        logo_path: technology.logo_path ?? null,
+      })) as ProjectTechnologySummary[];
       const projectTools = allTools.filter((tool) => toolIds.includes(tool.id));
 
       const serviceIds = (projectServiceLinks ?? [])

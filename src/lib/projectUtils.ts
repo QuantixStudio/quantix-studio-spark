@@ -1,8 +1,8 @@
 import type {
   ProjectImage,
+  ProjectTechnologySummary,
   ProjectWithTools,
   RawProjectWithCategory,
-  Tool,
 } from "@/types/app";
 
 function isProjectImage(value: unknown): value is ProjectImage {
@@ -88,7 +88,7 @@ export function getMainProjectImageUrl(project: {
 
 export function mapProjectWithTools(
   project: RawProjectWithCategory,
-  projectTools: Tool[],
+  projectTools: ProjectTechnologySummary[],
 ): ProjectWithTools {
   return {
     ...project,
@@ -109,6 +109,8 @@ export function mapProjectWithTools(
       id: tool.id,
       name: tool.name,
       description: tool.description,
+      slug: tool.slug ?? null,
+      logo_path: tool.logo_path ?? null,
     })),
     project_tools: projectTools,
     project_files: project.project_files ?? [],

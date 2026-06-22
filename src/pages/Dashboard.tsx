@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Folder, MessageSquare, Sparkles, Wrench } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
-import { useTools } from "@/hooks/useTools";
+import { usePortfolioTechnologies } from "@/hooks/usePortfolioSystem";
 import { useAdminTestimonials } from "@/hooks/useAdminTestimonials";
 import { AdminMetricCard } from "@/components/shared/AdminMetricCard";
 import type { Profile } from "@/types/app";
@@ -17,7 +17,7 @@ export default function Dashboard() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const { data: projects } = useProjects(true);
-  const { data: tools } = useTools();
+  const { data: technologies } = usePortfolioTechnologies();
   const { data: testimonials } = useAdminTestimonials();
 
   useEffect(() => {
@@ -59,7 +59,8 @@ export default function Dashboard() {
   const displayName = profile?.full_name || user?.email?.split("@")[0] || "User";
   const totalProjects = projects?.length ?? 0;
   const publishedProjects = projects?.filter((project) => project.published).length ?? 0;
-  const featuredTools = tools?.filter((tool) => tool.is_featured).length ?? 0;
+  const totalTechnologies = technologies?.length ?? 0;
+  const technologiesWithLogos = technologies?.filter((technology) => Boolean(technology.logo_path)).length ?? 0;
   const publishedTestimonials = testimonials?.filter((testimonial) => testimonial.published).length ?? 0;
 
   return (
@@ -72,9 +73,9 @@ export default function Dashboard() {
           icon={Sparkles}
         />
         <AdminMetricCard
-          title="Featured Tools"
-          value={featuredTools}
-          description="Displayed in the public tools carousel"
+          title="Technologies"
+          value={totalTechnologies}
+          description={`${technologiesWithLogos} with storage-backed logos`}
           icon={Wrench}
         />
         <AdminMetricCard
@@ -110,7 +111,7 @@ export default function Dashboard() {
               <Link to="/admin/tools">
                 <div>
                   <div className="font-medium">Curate your stack</div>
-                  <div className="text-sm text-muted-foreground">Keep logos, categories, and featured tools tidy.</div>
+                  <div className="text-sm text-muted-foreground">Keep technologies, categories, testimonials, and stack logos tidy.</div>
                 </div>
               </Link>
             </Button>
@@ -141,8 +142,8 @@ export default function Dashboard() {
             <div className="flex items-start gap-3">
               <div className="status-dot bg-accent" />
               <div className="flex-1">
-                <p className="text-sm font-medium">Check featured tools</p>
-                <p className="text-xs text-muted-foreground">{featuredTools > 0 ? "Carousel has content ready for the landing page." : "No featured tools are currently selected."}</p>
+                <p className="text-sm font-medium">Check stack logos</p>
+                <p className="text-xs text-muted-foreground">{technologiesWithLogos > 0 ? "The homepage carousel has storage-backed technology logos ready." : "No technology logos are currently available for the carousel."}</p>
               </div>
             </div>
             <div className="flex items-start gap-3">

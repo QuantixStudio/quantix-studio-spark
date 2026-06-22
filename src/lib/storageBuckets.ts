@@ -7,5 +7,5 @@ export const STORAGE_BUCKETS = {
   toolsLogos: "tools_logos",
 } as const;
 
-// NOTE: `tools_logos` is used by the app code, but it is not represented
-// in the local Supabase migrations currently committed in this repository.
+// NOTE: `tools_logos` now backs technology logos directly, even though the
+// bucket name still reflects the earlier tools-based stack model.

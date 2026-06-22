@@ -6,17 +6,14 @@ import PortfolioReferenceFormModal from "@/components/admin/PortfolioReferenceFo
 import PortfolioReferenceTable from "@/components/admin/PortfolioReferenceTable";
 import TestimonialFormModal from "@/components/admin/TestimonialFormModal";
 import TestimonialsTable from "@/components/admin/TestimonialsTable";
-import ToolFormModal from "@/components/admin/ToolFormModal";
-import ToolsTable from "@/components/admin/ToolsTable";
 import { AdminPageShell } from "@/components/shared/AdminPageShell";
 import { StatePanel } from "@/components/shared/StatePanel";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAdminTestimonials } from "@/hooks/useAdminTestimonials";
-import { usePortfolioTechnologies } from "@/hooks/usePortfolioSystem";
-import { useTools } from "@/hooks/useTools";
-import type { AdminTechnology, Testimonial, Tool } from "@/types/app";
+import { usePortfolioCategories, usePortfolioTechnologies } from "@/hooks/usePortfolioSystem";
+import type { AdminProjectCategory, AdminTechnology, Testimonial } from "@/types/app";
 
-type StackCollectionTab = "tools" | "technologies" | "testimonials";
+type StackCollectionTab = "technologies" | "categories" | "testimonials";
 
 const collectionTabs: Array<{
   value: StackCollectionTab;
@@ -25,16 +22,16 @@ const collectionTabs: Array<{
   actionLabel: string;
 }> = [
   {
-    value: "tools",
-    label: "Tools",
-    description: "Manage the visual stack library used for logos, featured integrations, and storage-backed brand assets.",
-    actionLabel: "Add Tool",
-  },
-  {
     value: "technologies",
     label: "Technologies",
-    description: "Manage the reusable project stack taxonomy. Logo previews are matched from the Tools collection by slug or name.",
+    description: "Manage the reusable project stack taxonomy and the storage-backed logos used across the homepage carousel and project build stack.",
     actionLabel: "Add Technology",
+  },
+  {
+    value: "categories",
+    label: "Categories",
+    description: "Manage project categories used for organization, filtering, and public portfolio labeling.",
+    actionLabel: "Add Category",
   },
   {
     value: "testimonials",
@@ -47,30 +44,30 @@ const collectionTabs: Array<{
 function getValidTab(value: string | null): StackCollectionTab {
   return collectionTabs.some((tab) => tab.value === value)
     ? (value as StackCollectionTab)
-    : "tools";
+    : "technologies";
 }
 
 export default function ToolsManagement() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [isToolModalOpen, setIsToolModalOpen] = useState(false);
-  const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
   const [isTechnologyModalOpen, setIsTechnologyModalOpen] = useState(false);
   const [selectedTechnology, setSelectedTechnology] = useState<AdminTechnology | null>(null);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<AdminProjectCategory | null>(null);
   const [isTestimonialModalOpen, setIsTestimonialModalOpen] = useState(false);
   const [selectedTestimonial, setSelectedTestimonial] = useState<Testimonial | null>(null);
 
   const activeTab = getValidTab(searchParams.get("collection"));
   const tabMeta = collectionTabs.find((tab) => tab.value === activeTab) ?? collectionTabs[0];
 
-  const toolsQuery = useTools();
   const technologiesQuery = usePortfolioTechnologies();
+  const categoriesQuery = usePortfolioCategories();
   const testimonialsQuery = useAdminTestimonials();
 
   const isLoading =
-    activeTab === "tools"
-      ? toolsQuery.isLoading
-      : activeTab === "technologies"
-        ? technologiesQuery.isLoading
+    activeTab === "technologies"
+      ? technologiesQuery.isLoading
+      : activeTab === "categories"
+        ? categoriesQuery.isLoading
         : testimonialsQuery.isLoading;
 
   const handleTabChange = (nextTab: string) => {
@@ -80,15 +77,15 @@ export default function ToolsManagement() {
   };
 
   const handleAdd = () => {
-    if (activeTab === "tools") {
-      setSelectedTool(null);
-      setIsToolModalOpen(true);
-      return;
-    }
-
     if (activeTab === "technologies") {
       setSelectedTechnology(null);
       setIsTechnologyModalOpen(true);
+      return;
+    }
+
+    if (activeTab === "categories") {
+      setSelectedCategory(null);
+      setIsCategoryModalOpen(true);
       return;
     }
 
@@ -96,22 +93,7 @@ export default function ToolsManagement() {
     setIsTestimonialModalOpen(true);
   };
 
-  const body = activeTab === "tools" ? (
-    toolsQuery.isError ? (
-      <StatePanel
-        title="Tools could not be loaded"
-        description="The tools collection could not be fetched from Supabase for this stack library view."
-      />
-    ) : (
-      <ToolsTable
-        tools={toolsQuery.data || []}
-        onEdit={(tool) => {
-          setSelectedTool(tool);
-          setIsToolModalOpen(true);
-        }}
-      />
-    )
-  ) : activeTab === "technologies" ? (
+  const body = activeTab === "technologies" ? (
     technologiesQuery.isError ? (
       <StatePanel
         title="Technologies could not be loaded"
@@ -124,6 +106,22 @@ export default function ToolsManagement() {
         onEdit={(item) => {
           setSelectedTechnology(item as AdminTechnology);
           setIsTechnologyModalOpen(true);
+        }}
+      />
+    )
+  ) : activeTab === "categories" ? (
+    categoriesQuery.isError ? (
+      <StatePanel
+        title="Categories could not be loaded"
+        description="The project category catalog could not be fetched from Supabase for this stack library view."
+      />
+    ) : (
+      <PortfolioReferenceTable
+        tab="categories"
+        items={categoriesQuery.data ?? []}
+        onEdit={(item) => {
+          setSelectedCategory(item as AdminProjectCategory);
+          setIsCategoryModalOpen(true);
         }}
       />
     )
@@ -174,21 +172,12 @@ export default function ToolsManagement() {
 
           {activeTab === "technologies" ? (
             <div className="admin-surface rounded-2xl border border-dashed border-border/70 p-4 text-sm text-muted-foreground">
-              Logos for technologies are resolved from the <span className="font-medium text-foreground">Tools</span> collection.
-              Keep matching `slug` or `name` values between the two collections so Build Stack cards show the correct storage image.
+              Technologies are now the single source of truth for the homepage stack carousel and project build stack.
+              Each logo is stored in <span className="font-medium text-foreground">tools_logos</span> and saved directly on the technology record.
             </div>
           ) : null}
         </div>
       </AdminPageShell>
-
-      <ToolFormModal
-        isOpen={isToolModalOpen}
-        onClose={() => {
-          setIsToolModalOpen(false);
-          setSelectedTool(null);
-        }}
-        tool={selectedTool}
-      />
 
       <PortfolioReferenceFormModal
         isOpen={isTechnologyModalOpen}
@@ -198,6 +187,16 @@ export default function ToolsManagement() {
         }}
         tab="technologies"
         item={selectedTechnology}
+      />
+
+      <PortfolioReferenceFormModal
+        isOpen={isCategoryModalOpen}
+        onClose={() => {
+          setIsCategoryModalOpen(false);
+          setSelectedCategory(null);
+        }}
+        tab="categories"
+        item={selectedCategory}
       />
 
       <TestimonialFormModal

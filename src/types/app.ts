@@ -24,17 +24,6 @@ export interface TaskStatusSummary {
   color: string | null;
   order_index: number | null;
 }
-export interface Tool {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-  website_url: string | null;
-  logo_path: string | null;
-  is_featured: boolean | null;
-  created_at: string | null;
-  updated_at: string | null;
-}
 export interface AdminProfile {
   id: string;
   email: string | null;
@@ -171,7 +160,7 @@ export interface ProjectWithTools
   project_status?: ProjectStatusSummary | null;
   client?: ClientSummary | null;
   project_technologies: ProjectTechnologySummary[];
-  project_tools: Tool[];
+  project_tools: ProjectTechnologySummary[];
   project_files: ProjectFileSummary[];
   project_services: ProjectServiceSummary[];
   project_tasks: ProjectTaskSummary[];

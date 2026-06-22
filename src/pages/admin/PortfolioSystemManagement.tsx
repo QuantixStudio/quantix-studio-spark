@@ -8,18 +8,16 @@ import { AdminPageShell } from "@/components/shared/AdminPageShell";
 import { StatePanel } from "@/components/shared/StatePanel";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  usePortfolioCategories,
   usePortfolioProjectStatuses,
   usePortfolioTaskStatuses,
 } from "@/hooks/usePortfolioSystem";
 import type {
   AdminPortfolioStatus,
-  AdminProjectCategory,
   PortfolioStatusTab,
   PortfolioSystemTab,
 } from "@/types/app";
 
-type ReferenceItem = AdminProjectCategory | AdminPortfolioStatus;
+type ReferenceItem = AdminPortfolioStatus;
 
 const tabs: Array<{
   value: PortfolioSystemTab;
@@ -27,12 +25,6 @@ const tabs: Array<{
   description: string;
   actionLabel: string;
 }> = [
-  {
-    value: "categories",
-    label: "Categories",
-    description: "Manage project categories used for organization, filtering, and portfolio labeling.",
-    actionLabel: "Add Category",
-  },
   {
     value: "statuses",
     label: "Statuses",
@@ -51,7 +43,7 @@ const statusTabs: Array<{
 ];
 
 function getValidTab(value: string | null): PortfolioSystemTab {
-  return tabs.some((tab) => tab.value === value) ? (value as PortfolioSystemTab) : "categories";
+  return tabs.some((tab) => tab.value === value) ? (value as PortfolioSystemTab) : "statuses";
 }
 
 function getValidStatusTab(value: string | null): PortfolioStatusTab {
@@ -68,15 +60,12 @@ export default function PortfolioSystemManagement() {
   const tabMeta = tabs.find((tab) => tab.value === activeTab) ?? tabs[0];
   const statusMeta = statusTabs.find((tab) => tab.value === activeStatusTab) ?? statusTabs[0];
 
-  const categoriesQuery = usePortfolioCategories();
   const projectStatusesQuery = usePortfolioProjectStatuses();
   const taskStatusesQuery = usePortfolioTaskStatuses();
 
-  const isLoading = activeTab === "categories"
-    ? categoriesQuery.isLoading
-    : activeStatusTab === "project-statuses"
-      ? projectStatusesQuery.isLoading
-      : taskStatusesQuery.isLoading;
+  const isLoading = activeStatusTab === "project-statuses"
+    ? projectStatusesQuery.isLoading
+    : taskStatusesQuery.isLoading;
 
   const actionLabel = activeTab === "statuses" ? statusMeta.actionLabel : tabMeta.actionLabel;
 
@@ -104,28 +93,6 @@ export default function PortfolioSystemManagement() {
   };
 
   const contentBody = (() => {
-    if (activeTab === "categories") {
-      if (categoriesQuery.isError) {
-        return (
-          <StatePanel
-            title="Categories could not be loaded"
-            description="The project category catalog could not be fetched from Supabase for this tab."
-          />
-        );
-      }
-
-      return (
-        <PortfolioReferenceTable
-          tab="categories"
-          items={categoriesQuery.data ?? []}
-          onEdit={(item) => {
-            setSelectedItem(item);
-            setIsModalOpen(true);
-          }}
-        />
-      );
-    }
-
     const statusBody = activeStatusTab === "project-statuses"
       ? projectStatusesQuery
       : taskStatusesQuery;
