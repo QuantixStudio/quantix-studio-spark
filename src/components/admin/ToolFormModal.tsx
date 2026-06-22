@@ -238,6 +238,7 @@ export default function ToolFormModal({
       }
 
       queryClient.invalidateQueries({ queryKey: ["tools"] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-system", "technologies"] });
       onClose();
     } catch (error) {
       if (error instanceof Error && error.message.includes('Tool slug "')) {

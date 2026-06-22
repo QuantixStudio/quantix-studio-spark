@@ -11,17 +11,15 @@ import {
   usePortfolioCategories,
   usePortfolioProjectStatuses,
   usePortfolioTaskStatuses,
-  usePortfolioTechnologies,
 } from "@/hooks/usePortfolioSystem";
 import type {
   AdminPortfolioStatus,
   AdminProjectCategory,
-  AdminTechnology,
   PortfolioStatusTab,
   PortfolioSystemTab,
 } from "@/types/app";
 
-type ReferenceItem = AdminTechnology | AdminProjectCategory | AdminPortfolioStatus;
+type ReferenceItem = AdminProjectCategory | AdminPortfolioStatus;
 
 const tabs: Array<{
   value: PortfolioSystemTab;
@@ -29,12 +27,6 @@ const tabs: Array<{
   description: string;
   actionLabel: string;
 }> = [
-  {
-    value: "technologies",
-    label: "Technologies",
-    description: "Manage the reusable technology catalog that powers project stack associations across the portfolio.",
-    actionLabel: "Add Technology",
-  },
   {
     value: "categories",
     label: "Categories",
@@ -59,7 +51,7 @@ const statusTabs: Array<{
 ];
 
 function getValidTab(value: string | null): PortfolioSystemTab {
-  return tabs.some((tab) => tab.value === value) ? (value as PortfolioSystemTab) : "technologies";
+  return tabs.some((tab) => tab.value === value) ? (value as PortfolioSystemTab) : "categories";
 }
 
 function getValidStatusTab(value: string | null): PortfolioStatusTab {
@@ -76,18 +68,15 @@ export default function PortfolioSystemManagement() {
   const tabMeta = tabs.find((tab) => tab.value === activeTab) ?? tabs[0];
   const statusMeta = statusTabs.find((tab) => tab.value === activeStatusTab) ?? statusTabs[0];
 
-  const technologiesQuery = usePortfolioTechnologies();
   const categoriesQuery = usePortfolioCategories();
   const projectStatusesQuery = usePortfolioProjectStatuses();
   const taskStatusesQuery = usePortfolioTaskStatuses();
 
-  const isLoading = activeTab === "technologies"
-    ? technologiesQuery.isLoading
-    : activeTab === "categories"
-      ? categoriesQuery.isLoading
-      : activeStatusTab === "project-statuses"
-        ? projectStatusesQuery.isLoading
-        : taskStatusesQuery.isLoading;
+  const isLoading = activeTab === "categories"
+    ? categoriesQuery.isLoading
+    : activeStatusTab === "project-statuses"
+      ? projectStatusesQuery.isLoading
+      : taskStatusesQuery.isLoading;
 
   const actionLabel = activeTab === "statuses" ? statusMeta.actionLabel : tabMeta.actionLabel;
 
@@ -115,28 +104,6 @@ export default function PortfolioSystemManagement() {
   };
 
   const contentBody = (() => {
-    if (activeTab === "technologies") {
-      if (technologiesQuery.isError) {
-        return (
-          <StatePanel
-            title="Technologies could not be loaded"
-            description="The technology catalog could not be fetched from Supabase for this tab."
-          />
-        );
-      }
-
-      return (
-        <PortfolioReferenceTable
-          tab="technologies"
-          items={technologiesQuery.data ?? []}
-          onEdit={(item) => {
-            setSelectedItem(item);
-            setIsModalOpen(true);
-          }}
-        />
-      );
-    }
-
     if (activeTab === "categories") {
       if (categoriesQuery.isError) {
         return (

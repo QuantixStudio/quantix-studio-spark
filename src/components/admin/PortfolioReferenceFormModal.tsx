@@ -68,7 +68,7 @@ const formConfig = {
   technologies: {
     tableName: "technologies",
     title: "Technology",
-    description: "Manage reusable technology entries that projects can reference across the portfolio experience.",
+    description: "Manage reusable technology entries that projects can reference across the portfolio experience. Visual logos are matched from the Tools collection by slug or name.",
     queryKey: ["portfolio-system", "technologies"] as const,
   },
   categories: {

@@ -19,6 +19,7 @@ import { RowActionsMenu } from "@/components/shared/RowActionsMenu";
 import { StatePanel } from "@/components/shared/StatePanel";
 import { formatUiDateTime } from "@/lib/date";
 import { getErrorMessage } from "@/lib/errorUtils";
+import { getToolLogoUrl } from "@/lib/toolStorageUtils";
 import type {
   AdminPortfolioStatus,
   AdminProjectCategory,
@@ -147,6 +148,7 @@ export default function PortfolioReferenceTable({ tab, items, onEdit }: Portfoli
         <Table className="min-w-[900px]">
           <TableHeader>
             <TableRow>
+              {isTechnologyTable ? <TableHead className="w-20">Logo</TableHead> : null}
               <TableHead>{isStatusTable ? "ID / Label" : "Name"}</TableHead>
               <TableHead>{isTechnologyTable ? "Slug / Description" : isStatusTable ? "Color" : "Description"}</TableHead>
               <TableHead>{isStatusTable || tab === "categories" ? "Order" : "Created"}</TableHead>
@@ -157,6 +159,24 @@ export default function PortfolioReferenceTable({ tab, items, onEdit }: Portfoli
           <TableBody>
             {items.map((item) => (
               <TableRow key={item.id}>
+                {isTechnologyTable ? (
+                  <TableCell>
+                    {(item as AdminTechnology).logo_path ? (
+                      <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-[10px] border border-border/60 bg-white p-1">
+                        <img
+                          src={getToolLogoUrl((item as AdminTechnology).logo_path ?? null) || ""}
+                          alt={(item as AdminTechnology).name}
+                          className="h-full w-full object-contain"
+                          loading="lazy"
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex h-12 w-12 items-center justify-center rounded-[10px] border border-border/60 bg-muted text-[10px] text-muted-foreground">
+                        No logo
+                      </div>
+                    )}
+                  </TableCell>
+                ) : null}
                 <TableCell className="font-medium">
                   {"name" in item ? (
                     <div className="space-y-1">

@@ -20,25 +20,45 @@ type UntypedSupabase = {
 
 const untypedSupabase = supabase as unknown as UntypedSupabase;
 
+interface ToolLogoMatch {
+  name: string;
+  slug: string;
+  logo_path: string | null;
+}
+
 export function usePortfolioTechnologies() {
   return useQuery({
     queryKey: ["portfolio-system", "technologies"],
     queryFn: async () => {
-      const [{ data: technologyRows, error: technologyError }, { data: projectTechnologyRows, error: projectTechnologyError }] =
+      const [
+        { data: technologyRows, error: technologyError },
+        { data: projectTechnologyRows, error: projectTechnologyError },
+        { data: toolRows, error: toolsError },
+      ] =
         await Promise.all([
           untypedSupabase.from("technologies").select("id, name, slug, description, created_at").order("name", { ascending: true }),
           untypedSupabase.from("project_technologies").select("technology_id").order("technology_id", { ascending: true }),
+          supabase.from("tools").select("name, slug, logo_path").order("name", { ascending: true }),
         ]);
 
       if (technologyError) throw technologyError;
       if (projectTechnologyError) throw projectTechnologyError;
+      if (toolsError) {
+        console.warn("Could not load tool logos for technology catalog", toolsError);
+      }
 
       const usageMap = new Map<string, number>();
+      const toolMap = new Map<string, ToolLogoMatch>();
 
       for (const row of (projectTechnologyRows ?? []) as Array<{ technology_id?: string | null }>) {
         const technologyId = row.technology_id;
         if (!technologyId) continue;
         usageMap.set(technologyId, (usageMap.get(technologyId) ?? 0) + 1);
+      }
+
+      for (const tool of (toolRows ?? []) as ToolLogoMatch[]) {
+        toolMap.set(tool.slug.toLowerCase(), tool);
+        toolMap.set(tool.name.toLowerCase(), tool);
       }
 
       return ((technologyRows ?? []) as Array<Record<string, unknown>>).map((row) => ({
@@ -48,6 +68,10 @@ export function usePortfolioTechnologies() {
         description: typeof row.description === "string" ? row.description : null,
         created_at: typeof row.created_at === "string" ? row.created_at : null,
         usage_count: usageMap.get(String(row.id)) ?? 0,
+        logo_path:
+          toolMap.get(String(row.slug ?? "").toLowerCase())?.logo_path ??
+          toolMap.get(String(row.name ?? "").toLowerCase())?.logo_path ??
+          null,
       })) satisfies AdminTechnology[];
     },
   });

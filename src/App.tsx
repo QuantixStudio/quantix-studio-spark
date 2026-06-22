@@ -25,7 +25,6 @@ const ContentManagement = lazy(() => import("./pages/admin/ContentManagement"));
 const PortfolioSystemManagement = lazy(() => import("./pages/admin/PortfolioSystemManagement"));
 const ProjectsManagement = lazy(() => import("./pages/admin/ProjectsManagement"));
 const ToolsManagement = lazy(() => import("./pages/admin/ToolsManagement"));
-const TestimonialsManagement = lazy(() => import("./pages/admin/TestimonialsManagement"));
 
 const queryClient = new QueryClient();
 
@@ -126,7 +125,7 @@ const App = () => (
                   element={
                     <AdminRoute>
                       <DashboardLayout>
-                        <TestimonialsManagement />
+                        <Navigate to="/admin/tools?collection=testimonials" replace />
                       </DashboardLayout>
                     </AdminRoute>
                   }

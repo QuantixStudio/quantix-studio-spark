@@ -83,6 +83,7 @@ export interface AdminTechnology {
   description: string | null;
   created_at: string | null;
   usage_count: number;
+  logo_path?: string | null;
 }
 
 export interface AdminProjectCategory {

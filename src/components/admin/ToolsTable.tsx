@@ -97,6 +97,7 @@ export default function ToolsTable({ tools, onEdit }: ToolsTableProps) {
 
       toast.success("Tool deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["tools"] });
+      queryClient.invalidateQueries({ queryKey: ["portfolio-system", "technologies"] });
     } catch (error) {
       console.error("Delete error:", error);
       toast.error(getErrorMessage(error, "Failed to delete tool"));

@@ -1,4 +1,4 @@
-import { Home, Users, Settings, LogOut, Folder, Wrench, MessageSquare, LayoutTemplate, FolderTree } from "lucide-react";
+import { Home, Users, Settings, LogOut, Folder, LayoutTemplate, FolderTree, Layers3 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -23,8 +23,7 @@ const menuItems = [
   { title: "Content", url: "/admin/content", icon: LayoutTemplate },
   { title: "Portfolio System", url: "/admin/portfolio-system", icon: FolderTree },
   { title: "Projects", url: "/admin/projects", icon: Folder },
-  { title: "Tools", url: "/admin/tools", icon: Wrench },
-  { title: "Testimonials", url: "/admin/testimonials", icon: MessageSquare },
+  { title: "Stack Library", url: "/admin/tools", icon: Layers3 },
   { title: "Profiles", url: "/admin/profiles", icon: Users },
   { title: "Settings", url: "/admin/settings", icon: Settings },
 ];
