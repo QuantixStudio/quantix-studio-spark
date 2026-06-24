@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { formatUiDate } from "@/lib/date";
@@ -65,6 +65,33 @@ interface TaskRow {
   due_date: string | null;
   created_at: string | null;
   status: string | null;
+}
+
+const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
+
+function isValidHexColor(color: string | null | undefined): color is `#${string}` {
+  return Boolean(color && HEX_COLOR_PATTERN.test(color));
+}
+
+function getReadableTextColor(hexColor: `#${string}`) {
+  const red = Number.parseInt(hexColor.slice(1, 3), 16);
+  const green = Number.parseInt(hexColor.slice(3, 5), 16);
+  const blue = Number.parseInt(hexColor.slice(5, 7), 16);
+  const luminance = (red * 0.299) + (green * 0.587) + (blue * 0.114);
+
+  return luminance > 186 ? "#111111" : "#F8FAFC";
+}
+
+function getStatusBadgeStyle(color: string | null | undefined): CSSProperties | undefined {
+  if (!isValidHexColor(color)) {
+    return undefined;
+  }
+
+  return {
+    backgroundColor: `${color}1F`,
+    borderColor: `${color}55`,
+    color: getReadableTextColor(color),
+  };
 }
 
 export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) {
@@ -358,6 +385,7 @@ export default function ProjectsTable({ projects, onEdit }: ProjectsTableProps) 
                     <Badge
                       variant="outline"
                       className={neutralReferenceBadgeClassName}
+                      style={getStatusBadgeStyle(project.project_status?.color)}
                     >
                       {project.project_status?.label || (project.published ? "Published" : "Draft")}
                     </Badge>

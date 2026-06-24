@@ -14,24 +14,9 @@ import {
 import type {
   AdminPortfolioStatus,
   PortfolioStatusTab,
-  PortfolioSystemTab,
 } from "@/types/app";
 
 type ReferenceItem = AdminPortfolioStatus;
-
-const tabs: Array<{
-  value: PortfolioSystemTab;
-  label: string;
-  description: string;
-  actionLabel: string;
-}> = [
-  {
-    value: "statuses",
-    label: "Statuses",
-    description: "Manage workflow statuses used by projects and project tasks in the admin system.",
-    actionLabel: "Add Status",
-  },
-];
 
 const statusTabs: Array<{
   value: PortfolioStatusTab;
@@ -42,10 +27,6 @@ const statusTabs: Array<{
   { value: "task-statuses", label: "Task Statuses", actionLabel: "Add Task Status" },
 ];
 
-function getValidTab(value: string | null): PortfolioSystemTab {
-  return tabs.some((tab) => tab.value === value) ? (value as PortfolioSystemTab) : "statuses";
-}
-
 function getValidStatusTab(value: string | null): PortfolioStatusTab {
   return statusTabs.some((tab) => tab.value === value) ? (value as PortfolioStatusTab) : "project-statuses";
 }
@@ -55,9 +36,9 @@ export default function PortfolioSystemManagement() {
   const [selectedItem, setSelectedItem] = useState<ReferenceItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const activeTab = getValidTab(searchParams.get("tab"));
-  const activeStatusTab = getValidStatusTab(searchParams.get("statusTab"));
-  const tabMeta = tabs.find((tab) => tab.value === activeTab) ?? tabs[0];
+  const activeStatusTab = getValidStatusTab(
+    searchParams.get("statusTab") ?? searchParams.get("tab"),
+  );
   const statusMeta = statusTabs.find((tab) => tab.value === activeStatusTab) ?? statusTabs[0];
 
   const projectStatusesQuery = usePortfolioProjectStatuses();
@@ -67,23 +48,10 @@ export default function PortfolioSystemManagement() {
     ? projectStatusesQuery.isLoading
     : taskStatusesQuery.isLoading;
 
-  const actionLabel = activeTab === "statuses" ? statusMeta.actionLabel : tabMeta.actionLabel;
-
-  const handleTabChange = (nextTab: string) => {
-    const params = new URLSearchParams(searchParams);
-    params.set("tab", nextTab);
-    if (nextTab !== "statuses") {
-      params.delete("statusTab");
-    } else if (!params.get("statusTab")) {
-      params.set("statusTab", "project-statuses");
-    }
-    setSearchParams(params, { replace: true });
-  };
-
   const handleStatusTabChange = (nextStatusTab: string) => {
     const params = new URLSearchParams(searchParams);
-    params.set("tab", "statuses");
     params.set("statusTab", nextStatusTab);
+    params.delete("tab");
     setSearchParams(params, { replace: true });
   };
 
@@ -98,23 +66,7 @@ export default function PortfolioSystemManagement() {
       : taskStatusesQuery;
 
     return (
-      <div className="content-stack">
-        <div className="admin-surface rounded-2xl p-3 sm:p-4">
-          <Tabs value={activeStatusTab} onValueChange={handleStatusTabChange}>
-            <TabsList className="h-auto flex w-full flex-col gap-2 bg-transparent p-0 sm:flex-row sm:flex-wrap sm:justify-start">
-              {statusTabs.map((tab) => (
-                <TabsTrigger
-                  key={tab.value}
-                  value={tab.value}
-                  className="w-full rounded-2xl border border-border/70 bg-background/40 px-4 py-3 text-left data-[state=active]:border-border data-[state=active]:bg-background data-[state=active]:shadow-none sm:w-auto"
-                >
-                  {tab.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-        </div>
-
+      <>
         {statusBody.isError ? (
           <StatePanel
             title="Statuses could not be loaded"
@@ -130,7 +82,7 @@ export default function PortfolioSystemManagement() {
             }}
           />
         )}
-      </div>
+      </>
     );
   })();
 
@@ -139,17 +91,17 @@ export default function PortfolioSystemManagement() {
       <AdminPageShell
         eyebrow="Portfolio system"
         title="Portfolio System"
-        description={tabMeta.description}
-        actionLabel={actionLabel}
+        description="Manage workflow statuses used by projects and project tasks in the admin system."
+        actionLabel={statusMeta.actionLabel}
         actionIcon={FolderTree}
         onAction={handleAdd}
         isLoading={isLoading}
       >
         <div className="content-stack">
           <div className="admin-surface rounded-2xl p-3 sm:p-4">
-            <Tabs value={activeTab} onValueChange={handleTabChange}>
+            <Tabs value={activeStatusTab} onValueChange={handleStatusTabChange}>
               <TabsList className="h-auto flex w-full flex-col gap-2 bg-transparent p-0 sm:flex-row sm:flex-wrap sm:justify-start">
-                {tabs.map((tab) => (
+                {statusTabs.map((tab) => (
                   <TabsTrigger
                     key={tab.value}
                     value={tab.value}
@@ -172,7 +124,7 @@ export default function PortfolioSystemManagement() {
           setIsModalOpen(false);
           setSelectedItem(null);
         }}
-        tab={activeTab === "statuses" ? activeStatusTab : activeTab}
+        tab={activeStatusTab}
         item={selectedItem}
       />
     </>
