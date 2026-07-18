@@ -254,7 +254,6 @@ Before deploying to production:
 
 - [Supabase Dashboard](https://supabase.com/dashboard)
 - [Row Level Security (RLS) Guide](https://supabase.com/docs/guides/auth/row-level-security)
-- [Lovable Documentation](https://docs.lovable.dev)
 - [React Router v6 Docs](https://reactrouter.com/)
 - [Tailwind CSS](https://tailwindcss.com/)
 

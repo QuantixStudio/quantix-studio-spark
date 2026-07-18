@@ -5,7 +5,7 @@ This copy is prepared to connect to a different Supabase project through environ
 Important:
 
 - The currently connected live project no longer matches the older local migration history in this repo.
-- Before using `supabase db push`, compare the target project with [SUPABASE_LIVE_SCHEMA_AUDIT.md](/Users/eugenepivovarov/Documents/CodexWorkspace/projects/Quantix Lovable/quantix-studio-spark-new-supabase/SUPABASE_LIVE_SCHEMA_AUDIT.md).
+- Before using `supabase db push`, compare the target project with [SUPABASE_LIVE_SCHEMA_AUDIT.md](SUPABASE_LIVE_SCHEMA_AUDIT.md).
 - Do not assume `supabase/migrations/` is safe to apply unchanged to the new live project.
 
 ## 1. Create or choose a Supabase project

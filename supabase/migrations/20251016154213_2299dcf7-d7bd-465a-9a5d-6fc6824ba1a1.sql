@@ -31,7 +31,7 @@ BEGIN
     (
       'e5f6a7b8-c9d0-4e5f-2a3b-4c5d6e7f8a9b',
       'No-Code Product Development',
-      E'Tools: Bubble · Webflow · WeWeb · Lovable\nWe design and launch full-scale digital products using modern no-code and low-code platforms — combining speed, scalability, and great design.',
+      E'Tools: Bubble · Webflow · WeWeb\nWe design and launch full-scale digital products using modern no-code and low-code platforms — combining speed, scalability, and great design.',
       layout_icon_id,
       true,
       1

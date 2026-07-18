@@ -10,7 +10,7 @@ no longer matches the earlier local migration history or generated types.
 
 ## Canonical Reference
 
-Use [SUPABASE_LIVE_SCHEMA_AUDIT.md](/Users/eugenepivovarov/Documents/CodexWorkspace/projects/Quantix Lovable/quantix-studio-spark-new-supabase/SUPABASE_LIVE_SCHEMA_AUDIT.md)
+Use [SUPABASE_LIVE_SCHEMA_AUDIT.md](SUPABASE_LIVE_SCHEMA_AUDIT.md)
 as the authoritative root-level documentation for:
 
 - current live tables
