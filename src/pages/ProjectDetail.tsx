@@ -18,6 +18,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProjectDetail } from "@/hooks/useProjectDetail";
 import { getProjectImages } from "@/lib/projectUtils";
+import { getToolLogoUrl } from "@/lib/toolStorageUtils";
 import {
   ArrowLeft,
   ExternalLink,
@@ -196,9 +197,21 @@ export default function ProjectDetail() {
               <div className="mt-5 flex flex-wrap gap-3">
                 {buildStack.map((technology) => (
                   <div key={technology.id} className="project-detail-tool media-hover-trigger">
-                    <div className="project-detail-tool-fallback">
-                      <Github className="h-4 w-4" />
-                    </div>
+                    {technology.logo_path ? (
+                      <img
+                        src={getToolLogoUrl(technology.logo_path) || "/placeholder.svg"}
+                        alt={`${technology.name} logo`}
+                        className="media-hover-target h-9 w-9 rounded-[14px] object-contain"
+                        loading="lazy"
+                        onError={(event) => {
+                          event.currentTarget.src = "/placeholder.svg";
+                        }}
+                      />
+                    ) : (
+                      <div className="project-detail-tool-fallback">
+                        <Github className="h-4 w-4" />
+                      </div>
+                    )}
                     <span className="text-sm font-medium">{technology.name}</span>
                   </div>
                 ))}
