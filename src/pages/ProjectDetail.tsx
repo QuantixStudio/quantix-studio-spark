@@ -194,25 +194,27 @@ export default function ProjectDetail() {
               <h2 className="project-showcase-title text-2xl font-semibold">
                 Build Stack
               </h2>
-              <div className="mt-5 flex flex-wrap gap-3">
+              <div className="project-detail-stack-grid mt-5">
                 {buildStack.map((technology) => (
                   <div key={technology.id} className="project-detail-tool media-hover-trigger">
                     {technology.logo_path ? (
-                      <img
-                        src={getToolLogoUrl(technology.logo_path) || "/placeholder.svg"}
-                        alt={`${technology.name} logo`}
-                        className="media-hover-target h-9 w-9 rounded-[14px] object-contain"
-                        loading="lazy"
-                        onError={(event) => {
-                          event.currentTarget.src = "/placeholder.svg";
-                        }}
-                      />
+                      <div className="project-detail-tool-logo-shell">
+                        <img
+                          src={getToolLogoUrl(technology.logo_path) || "/placeholder.svg"}
+                          alt={`${technology.name} logo`}
+                          className="media-hover-target"
+                          loading="lazy"
+                          onError={(event) => {
+                            event.currentTarget.src = "/placeholder.svg";
+                          }}
+                        />
+                      </div>
                     ) : (
                       <div className="project-detail-tool-fallback">
                         <Github className="h-4 w-4" />
                       </div>
                     )}
-                    <span className="text-sm font-medium">{technology.name}</span>
+                    <span className="project-detail-tool-name">{technology.name}</span>
                   </div>
                 ))}
               </div>
