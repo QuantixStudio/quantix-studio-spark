@@ -17,7 +17,7 @@ export default function Hero() {
   };
  
   return (
-    <section className="relative flex min-h-[92svh] items-center justify-center overflow-hidden bg-background pt-28 pb-20 md:min-h-[94svh] md:pt-36 md:pb-28">
+    <section className="relative flex min-h-svh items-center justify-center overflow-hidden bg-background pt-28 pb-20 md:pt-36 md:pb-28">
       <video
         aria-hidden="true"
         autoPlay
@@ -29,8 +29,8 @@ export default function Hero() {
       >
         <source src="/videos/product-development-montage.mp4" type="video/mp4" />
       </video>
-      <div className="pointer-events-none absolute inset-0 z-[1] bg-background/72 backdrop-blur-[2px]" />
-      <div className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-b from-background/55 via-background/35 to-background/85" />
+      <div className="pointer-events-none absolute inset-0 z-[1] bg-black/[0.56] backdrop-blur-[2px]" />
+      <div className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-b from-black/[0.49] via-black/[0.35] to-black/[0.63]" />
 
       {/* Content */}
       <div className="container relative z-10 mx-auto px-5 py-16 sm:px-6 md:px-8 md:py-20">
