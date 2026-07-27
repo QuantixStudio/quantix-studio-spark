@@ -14,11 +14,17 @@ All colors MUST be HSL.
     --foreground: 0 0% 97.3% !important; /* #F8F8F8 */
     --heading: 0 0% 97.3% !important; /* #F8F8F8 */
     --copy-foreground: 0 0% 72.9% !important; /* #BABABA */
-    --card: 0 0% 9.4% !important; /* #181818 */
+    --card-background: 0 0% 9.4% !important; /* #181818 */
+    --card-border: 0 0% 15.7% !important; /* #282828 */
+    --card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.8);
+    --card-hover-background: var(--card-background);
+    --card-hover-border: var(--card-border);
+    --card-hover-shadow: var(--card-shadow);
+    --card: var(--card-background) !important;
     --card-foreground: 0 0% 97.3% !important;
     --surface-hover: 0 0% 14.1% !important; /* #242424 */
-    --feature-card-background: 0 0% 9.4% !important; /* #181818 */
-    --feature-card-border: 0 0% 15.7% !important; /* #282828 */
+    --feature-card-background: var(--card-background) !important;
+    --feature-card-border: var(--card-border) !important;
     --feature-card-title: 0 0% 97.3% !important; /* #F8F8F8 */
     --feature-card-icon: 0 0% 97.3% !important; /* #F8F8F8 */
     --feature-card-tools: 0 0% 72.9% !important; /* #BABABA */
@@ -27,24 +33,24 @@ All colors MUST be HSL.
     --feature-card-icon-translate-y: -2px;
     --feature-card-icon-duration: 420ms;
     --feature-card-icon-easing: cubic-bezier(0.22, 1, 0.36, 1);
-    --project-showcase-background: 0 0% 9.4% !important;
-    --project-showcase-border: 0 0% 15.7% !important;
+    --project-showcase-background: var(--card-background) !important;
+    --project-showcase-border: var(--card-border) !important;
     --project-showcase-media-background: 0 0% 11.5% !important;
     --project-showcase-media-border: 0 0% 100% !important;
     --project-showcase-title: 0 0% 97.3% !important;
     --project-showcase-description: 0 0% 72.9% !important;
     --project-showcase-metric: 0 0% 82% !important;
-    --project-showcase-shadow: 0 10px 32px rgba(0, 0, 0, 0.22);
-    --project-showcase-shadow-hover: 0 18px 44px rgba(0, 0, 0, 0.32);
-    --project-showcase-hover-border: 0 0% 26% !important;
+    --project-showcase-shadow: var(--card-shadow);
+    --project-showcase-shadow-hover: var(--card-hover-shadow);
+    --project-showcase-hover-border: var(--card-hover-border) !important;
     --carousel-duration: 96s;
     --carousel-gap: 2rem;
     --carousel-mask-stop: 12%;
-    --carousel-card-background: 0 0% 97.3%;
-    --carousel-card-foreground: 0 0% 18%;
-    --carousel-card-border: 0 0% 100%;
-    --carousel-card-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
-    --carousel-card-shadow-hover: 0 20px 44px rgba(0, 0, 0, 0.28);
+    --carousel-card-background: 0 0% 97.3%; /* #F8F8F8 */
+    --carousel-card-foreground: var(--card-foreground);
+    --carousel-card-border: var(--card-border);
+    --carousel-card-shadow: var(--card-shadow);
+    --carousel-card-shadow-hover: var(--card-hover-shadow);
     --carousel-card-scale: 1.028;
     --carousel-card-translate-y: -3px;
     --carousel-card-duration: 380ms;
@@ -61,8 +67,8 @@ All colors MUST be HSL.
     --media-hover-duration: 420ms;
     --media-hover-easing: cubic-bezier(0.22, 1, 0.36, 1);
     --media-hover-overlay: 0.1;
-    --process-card-background: 0 0% 9.4% !important; /* #181818 */
-    --process-card-border: 0 0% 15.7% !important; /* #282828 */
+    --process-card-background: var(--card-background) !important;
+    --process-card-border: var(--card-border) !important;
     --process-card-title: 0 0% 97.3% !important; /* #F8F8F8 */
     --process-card-subtitle: 0 0% 72.9% !important; /* #BABABA */
     --process-card-description: 0 0% 72.9% !important; /* #BABABA */
@@ -89,7 +95,7 @@ All colors MUST be HSL.
     --accent-foreground: 0 0% 97.3% !important;
     --destructive: 0 84% 60% !important; /* #EF4444 */
     --destructive-foreground: 0 0% 100% !important;
-    --border: 0 0% 15.7% !important; /* #282828 */
+    --border: var(--card-border) !important;
     --input: 0 0% 18.8% !important;
     --input-background: 0 0% 7.8% !important;
     --input-hover-border: 0 0% 26% !important;
@@ -107,8 +113,8 @@ All colors MUST be HSL.
     --button-marketing-foreground: 0 0% 7.8% !important;
     --button-marketing-border: 0 0% 100% !important;
     --button-marketing-hover-border: 0 0% 26% !important;
-    --shadow-surface-sm: 0 1px 3px 0 #000000cc;
-    --shadow-surface-md: 0 3px 10px 0 #000000cc;
+    --shadow-surface-sm: var(--card-shadow);
+    --shadow-surface-md: var(--card-hover-shadow);
     --shadow-input-focus: 0 0 0 1px hsl(var(--project-showcase-hover-border) / 0.72), 0 12px 32px rgba(0, 0, 0, 0.2);
     --shadow-button-marketing: 0 10px 28px rgba(0, 0, 0, 0.16);
     --shadow-button-marketing-hover: 0 16px 36px rgba(0, 0, 0, 0.22);
@@ -119,11 +125,17 @@ All colors MUST be HSL.
     --foreground: 0 0% 97.3% !important; /* #F8F8F8 */
     --heading: 0 0% 97.3% !important;
     --copy-foreground: 0 0% 72.9% !important; /* #BABABA */
-    --card: 0 0% 9.4% !important; /* #181818 */
+    --card-background: 0 0% 9.4% !important; /* #181818 */
+    --card-border: 0 0% 15.7% !important; /* #282828 */
+    --card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.8);
+    --card-hover-background: var(--card-background);
+    --card-hover-border: var(--card-border);
+    --card-hover-shadow: var(--card-shadow);
+    --card: var(--card-background) !important;
     --card-foreground: 0 0% 97.3% !important;
     --surface-hover: 0 0% 14.1% !important; /* #242424 */
-    --feature-card-background: 0 0% 9.4% !important; /* #181818 */
-    --feature-card-border: 0 0% 15.7% !important; /* #282828 */
+    --feature-card-background: var(--card-background) !important;
+    --feature-card-border: var(--card-border) !important;
     --feature-card-title: 0 0% 97.3% !important; /* #F8F8F8 */
     --feature-card-icon: 0 0% 97.3% !important; /* #F8F8F8 */
     --feature-card-tools: 0 0% 72.9% !important; /* #BABABA */
@@ -132,24 +144,24 @@ All colors MUST be HSL.
     --feature-card-icon-translate-y: -2px;
     --feature-card-icon-duration: 420ms;
     --feature-card-icon-easing: cubic-bezier(0.22, 1, 0.36, 1);
-    --project-showcase-background: 0 0% 9.4% !important;
-    --project-showcase-border: 0 0% 15.7% !important;
+    --project-showcase-background: var(--card-background) !important;
+    --project-showcase-border: var(--card-border) !important;
     --project-showcase-media-background: 0 0% 11.5% !important;
     --project-showcase-media-border: 0 0% 100% !important;
     --project-showcase-title: 0 0% 97.3% !important;
     --project-showcase-description: 0 0% 72.9% !important;
     --project-showcase-metric: 0 0% 82% !important;
-    --project-showcase-shadow: 0 10px 32px rgba(0, 0, 0, 0.22);
-    --project-showcase-shadow-hover: 0 18px 44px rgba(0, 0, 0, 0.32);
-    --project-showcase-hover-border: 0 0% 26% !important;
+    --project-showcase-shadow: var(--card-shadow);
+    --project-showcase-shadow-hover: var(--card-hover-shadow);
+    --project-showcase-hover-border: var(--card-hover-border) !important;
     --carousel-duration: 96s;
     --carousel-gap: 2rem;
     --carousel-mask-stop: 12%;
-    --carousel-card-background: 0 0% 97.3%;
-    --carousel-card-foreground: 0 0% 18%;
-    --carousel-card-border: 0 0% 100%;
-    --carousel-card-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
-    --carousel-card-shadow-hover: 0 20px 44px rgba(0, 0, 0, 0.28);
+    --carousel-card-background: 0 0% 97.3%; /* #F8F8F8 */
+    --carousel-card-foreground: var(--card-foreground);
+    --carousel-card-border: var(--card-border);
+    --carousel-card-shadow: var(--card-shadow);
+    --carousel-card-shadow-hover: var(--card-hover-shadow);
     --carousel-card-scale: 1.028;
     --carousel-card-translate-y: -3px;
     --carousel-card-duration: 380ms;
@@ -166,8 +178,8 @@ All colors MUST be HSL.
     --media-hover-duration: 420ms;
     --media-hover-easing: cubic-bezier(0.22, 1, 0.36, 1);
     --media-hover-overlay: 0.1;
-    --process-card-background: 0 0% 9.4% !important; /* #181818 */
-    --process-card-border: 0 0% 15.7% !important; /* #282828 */
+    --process-card-background: var(--card-background) !important;
+    --process-card-border: var(--card-border) !important;
     --process-card-title: 0 0% 97.3% !important; /* #F8F8F8 */
     --process-card-subtitle: 0 0% 72.9% !important; /* #BABABA */
     --process-card-description: 0 0% 72.9% !important; /* #BABABA */
@@ -194,7 +206,7 @@ All colors MUST be HSL.
     --accent-foreground: 0 0% 97.3% !important;
     --destructive: 0 84% 60% !important; /* #EF4444 */
     --destructive-foreground: 0 0% 100% !important;
-    --border: 0 0% 15.7% !important; /* #282828 */
+    --border: var(--card-border) !important;
     --input: 0 0% 18.8% !important;
     --input-background: 0 0% 7.8% !important;
     --input-hover-border: 0 0% 26% !important;
@@ -211,8 +223,8 @@ All colors MUST be HSL.
     --button-marketing-foreground: 0 0% 7.8% !important;
     --button-marketing-border: 0 0% 100% !important;
     --button-marketing-hover-border: 0 0% 26% !important;
-    --shadow-surface-sm: 0 1px 3px 0 #000000cc;
-    --shadow-surface-md: 0 3px 10px 0 #000000cc;
+    --shadow-surface-sm: var(--card-shadow);
+    --shadow-surface-md: var(--card-hover-shadow);
     --shadow-input-focus: 0 0 0 1px hsl(var(--project-showcase-hover-border) / 0.72), 0 12px 32px rgba(0, 0, 0, 0.2);
     --shadow-button-marketing: 0 10px 28px rgba(0, 0, 0, 0.16);
     --shadow-button-marketing-hover: 0 16px 36px rgba(0, 0, 0, 0.22);
@@ -409,9 +421,9 @@ All colors MUST be HSL.
 
 @layer utilities {
   .surface-panel {
-    background-color: hsl(var(--card)) !important;
-    border-color: hsl(var(--border)) !important;
-    box-shadow: var(--shadow-surface-sm) !important;
+    background-color: hsl(var(--card-background)) !important;
+    border-color: hsl(var(--card-border)) !important;
+    box-shadow: var(--card-shadow) !important;
     transition:
       background-color 200ms ease,
       border-color 200ms ease,
@@ -421,9 +433,9 @@ All colors MUST be HSL.
 
   .surface-panel-hover:hover,
   .surface-panel-hover:focus-within {
-    background-color: hsl(var(--surface-hover)) !important;
-    border-color: hsl(var(--border)) !important;
-    box-shadow: var(--shadow-surface-md) !important;
+    background-color: hsl(var(--card-hover-background)) !important;
+    border-color: hsl(var(--card-hover-border)) !important;
+    box-shadow: var(--card-hover-shadow) !important;
   }
 
   .field-control {
@@ -455,10 +467,10 @@ All colors MUST be HSL.
   }
 
   .glass {
-    background: hsl(var(--card) / 0.92);
+    background: hsl(var(--card-background));
     backdrop-filter: blur(12px);
-    border: 1px solid hsl(var(--border));
-    box-shadow: var(--shadow-surface-sm);
+    border: 1px solid hsl(var(--card-border));
+    box-shadow: var(--card-shadow);
   }
 
   .media-hover-target {
@@ -571,10 +583,9 @@ All colors MUST be HSL.
   }
 
   .showcase-surface {
-    background:
-      linear-gradient(180deg, hsl(var(--project-showcase-background)) 0%, hsl(var(--project-showcase-background) / 0.98) 100%);
+    background: hsl(var(--project-showcase-background)) !important;
     border: 1px solid hsl(var(--project-showcase-border)) !important;
-    box-shadow: var(--project-showcase-shadow);
+    box-shadow: var(--project-showcase-shadow) !important;
     transition:
       border-color 260ms ease,
       box-shadow 260ms ease,
@@ -585,12 +596,11 @@ All colors MUST be HSL.
   .showcase-card:focus-visible .showcase-surface,
   .showcase-card:focus-within .showcase-surface {
     border-color: hsl(var(--project-showcase-hover-border)) !important;
-    box-shadow: var(--project-showcase-shadow-hover);
+    box-shadow: var(--project-showcase-shadow-hover) !important;
   }
 
   .project-showcase-surface {
-    background:
-      linear-gradient(180deg, hsl(var(--project-showcase-background)) 0%, hsl(var(--project-showcase-background) / 0.98) 100%);
+    background: hsl(var(--project-showcase-background)) !important;
   }
 
   .project-showcase-media-shell {
@@ -885,12 +895,10 @@ All colors MUST be HSL.
   .marquee-card {
     position: relative;
     overflow: hidden;
-    background:
-      radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.9), rgb(255 255 255 / 1) 48%),
-      hsl(var(--carousel-card-background));
-    border: 1px solid hsl(var(--carousel-card-border) / 0.16);
-    box-shadow: var(--carousel-card-shadow);
-    color: hsl(var(--carousel-card-foreground));
+    background: hsl(var(--carousel-card-background)) !important;
+    border: 1px solid hsl(var(--carousel-card-border)) !important;
+    box-shadow: var(--carousel-card-shadow) !important;
+    color: hsl(var(--carousel-card-foreground)) !important;
     transition:
       transform var(--carousel-card-duration) var(--carousel-card-easing),
       box-shadow var(--carousel-card-duration) var(--carousel-card-easing),
@@ -902,8 +910,8 @@ All colors MUST be HSL.
   .marquee-card:hover,
   .marquee-card:focus-within {
     transform: translate3d(0, var(--carousel-card-translate-y), 0) scale(var(--carousel-card-scale));
-    box-shadow: var(--carousel-card-shadow-hover);
-    border-color: hsl(var(--carousel-card-border) / 0.3);
+    box-shadow: var(--carousel-card-shadow-hover) !important;
+    border-color: hsl(var(--carousel-card-border)) !important;
   }
 
   .marquee-logo {
@@ -1017,9 +1025,9 @@ All colors MUST be HSL.
 
   .admin-surface {
     @apply rounded-2xl border backdrop-blur-sm;
-    background-color: hsl(var(--card) / 0.94) !important;
-    border-color: hsl(var(--border)) !important;
-    box-shadow: var(--shadow-surface-sm) !important;
+    background-color: hsl(var(--card-background)) !important;
+    border-color: hsl(var(--card-border)) !important;
+    box-shadow: var(--card-shadow) !important;
     transition:
       background-color 200ms ease,
       border-color 200ms ease,
@@ -1028,9 +1036,9 @@ All colors MUST be HSL.
 
   .table-shell {
     @apply overflow-hidden rounded-2xl border;
-    background-color: hsl(var(--card) / 0.94) !important;
-    border-color: hsl(var(--border)) !important;
-    box-shadow: var(--shadow-surface-sm) !important;
+    background-color: hsl(var(--card-background)) !important;
+    border-color: hsl(var(--card-border)) !important;
+    box-shadow: var(--card-shadow) !important;
     transition:
       background-color 200ms ease,
       border-color 200ms ease,
@@ -1039,9 +1047,9 @@ All colors MUST be HSL.
 
   .admin-surface:hover,
   .table-shell:hover {
-    background-color: hsl(var(--surface-hover) / 0.98) !important;
-    border-color: hsl(var(--border)) !important;
-    box-shadow: var(--shadow-surface-md) !important;
+    background-color: hsl(var(--card-hover-background)) !important;
+    border-color: hsl(var(--card-hover-border)) !important;
+    box-shadow: var(--card-hover-shadow) !important;
   }
 
   .admin-modal-shell {
