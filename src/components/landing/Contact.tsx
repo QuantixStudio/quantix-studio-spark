@@ -5,6 +5,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Calendar, Mail, Send, Linkedin } from "lucide-react";
 import { FadeInUp } from "@/components/animations/FadeInUp";
+import {
+  trackCalendlyClick,
+  trackContactFormSubmit,
+  trackOutboundLink,
+} from "@/lib/analytics";
 export default function Contact() {
   const [formData, setFormData] = useState({
     name: "",
@@ -46,6 +51,7 @@ export default function Contact() {
         title: "Your message has been sent successfully!",
         description: "We'll get back to you soon."
       });
+      trackContactFormSubmit();
       setFormData({
         name: "",
         email: "",
@@ -106,6 +112,13 @@ export default function Contact() {
                         href="https://www.linkedin.com/company/quantix-studio"
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={() =>
+                          trackOutboundLink(
+                            "linkedin_click",
+                            "https://www.linkedin.com/company/quantix-studio",
+                            "contact_section",
+                          )
+                        }
                         className="transition-colors hover:text-foreground"
                       >
                         linkedin.com/company/quantix-studio
@@ -115,7 +128,12 @@ export default function Contact() {
                 </div>
 
                 <Button variant="marketing" asChild className="mt-auto w-full" size="lg">
-                  <a href="https://calendly.com/quantixstudio/30min" target="_blank" rel="noopener noreferrer">
+                  <a
+                    href="https://calendly.com/quantixstudio/30min"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => trackCalendlyClick("contact_section")}
+                  >
                     <Calendar className="mr-2 h-5 w-5" />
                     Schedule a Call
                   </a>

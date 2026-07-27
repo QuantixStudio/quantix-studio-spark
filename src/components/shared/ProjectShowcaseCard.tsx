@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { trackProjectOpen } from "@/lib/analytics";
 import { getMainProjectImageUrl } from "@/lib/projectUtils";
 import type { ProjectWithTools } from "@/types/app";
 
@@ -29,6 +30,7 @@ export function ProjectShowcaseCard({
   return (
     <Link
       to={`/portfolio/${project.slug}`}
+      onClick={() => trackProjectOpen(project.slug, variant)}
       className={cn(
         "showcase-card project-showcase-card media-hover-trigger group block h-full",
         className,

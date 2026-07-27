@@ -14,6 +14,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { ProjectShowcaseCard } from "@/components/shared/ProjectShowcaseCard";
+import { trackEvent } from "@/lib/analytics";
 
 export default function FeaturedProjects() {
   const { data: projects, isLoading, isError } = useProjects(false, true);
@@ -69,7 +70,15 @@ export default function FeaturedProjects() {
           {/* "View More Projects" button - mobile only */}
           <FadeInUp delay={0.5}>
             <div className="mt-8 text-center">
-              <Link to="/portfolio">
+              <Link
+                to="/portfolio"
+                onClick={() =>
+                  trackEvent("portfolio_cta_click", {
+                    event_category: "portfolio",
+                    source: "featured_projects_mobile",
+                  })
+                }
+              >
                 <Button variant="marketing" size="lg" className="w-full sm:w-auto">
                   View More Projects
                 </Button>

@@ -1,12 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { trackEvent } from "@/lib/analytics";
 import { scrollToSection } from "@/lib/navigation";
 
 export default function CalloutStrip({ className }: { className?: string }) {
   const navigate = useNavigate();
   const location = useLocation();
   const handleOpenInquiry = () => {
+    trackEvent("discovery_call_cta_click", {
+      event_category: "lead",
+      source: "callout_strip",
+    });
+
     if (location.pathname !== "/") {
       navigate("/#contact");
     } else {

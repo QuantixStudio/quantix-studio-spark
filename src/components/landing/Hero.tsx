@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FadeInUp } from "@/components/animations/FadeInUp";
+import { trackEvent } from "@/lib/analytics";
 import { scrollToSection } from "@/lib/navigation";
 
 export default function Hero() {
@@ -9,6 +10,11 @@ export default function Hero() {
   const location = useLocation();
 
   const scrollToContact = () => {
+    trackEvent("strategy_call_cta_click", {
+      event_category: "lead",
+      source: "hero",
+    });
+
     if (location.pathname === "/") {
       scrollToSection("contact");
     } else {
@@ -59,7 +65,13 @@ export default function Hero() {
               <Button
                 variant="marketing"
                 size="lg"
-                onClick={() => navigate("/portfolio")}
+                onClick={() => {
+                  trackEvent("portfolio_cta_click", {
+                    event_category: "portfolio",
+                    source: "hero",
+                  });
+                  navigate("/portfolio");
+                }}
               >
                 View Our Work
               </Button>

@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { getMainProjectImageUrl } from "@/lib/projectUtils";
 import { getToolLogoUrl } from "@/lib/toolStorageUtils";
+import { trackProjectOpen } from "@/lib/analytics";
 import type { ProjectWithTools } from "@/types/app";
 
 interface ProjectCardProps {
@@ -16,6 +17,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
   return (
     <Link
       to={`/portfolio/${project.slug}`}
+      onClick={() => trackProjectOpen(project.slug, "legacy_project_card")}
       className="media-hover-trigger block"
     >
       <Card className="overflow-hidden group border transition-colors hover:border-accent">

@@ -17,6 +17,7 @@ import {
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProjectDetail } from "@/hooks/useProjectDetail";
+import { trackEvent, trackOutboundLink } from "@/lib/analytics";
 import { getProjectImages } from "@/lib/projectUtils";
 import { getToolLogoUrl } from "@/lib/toolStorageUtils";
 import {
@@ -323,7 +324,14 @@ export default function ProjectDetail() {
                 className="border-white/14 bg-white/[0.04] text-white hover:border-white/22 hover:bg-white/[0.08] hover:text-white"
                 asChild
               >
-                <a href={project.demo_url} target="_blank" rel="noopener noreferrer">
+                <a
+                  href={project.demo_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() =>
+                    trackOutboundLink("demo_click", project.demo_url || "", "project_detail")
+                  }
+                >
                   <ExternalLink className="mr-2 h-4 w-4" />
                   View Live Demo
                 </a>
@@ -336,7 +344,14 @@ export default function ProjectDetail() {
                 className="border-white/14 bg-white/[0.04] text-white hover:border-white/22 hover:bg-white/[0.08] hover:text-white"
                 asChild
               >
-                <a href={project.github_url} target="_blank" rel="noopener noreferrer">
+                <a
+                  href={project.github_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() =>
+                    trackOutboundLink("github_click", project.github_url || "", "project_detail")
+                  }
+                >
                   <Github className="mr-2 h-4 w-4" />
                   View on GitHub
                 </a>
@@ -361,7 +376,16 @@ export default function ProjectDetail() {
                 asChild
                 className="w-full sm:w-auto md:justify-self-end"
               >
-                <Link to="/#contact">
+                <Link
+                  to="/#contact"
+                  onClick={() =>
+                    trackEvent("similar_project_request_click", {
+                      event_category: "lead",
+                      project_slug: project.slug,
+                      source: "project_detail",
+                    })
+                  }
+                >
                   <Mail className="mr-2 h-5 w-5" />
                   Request Similar Project
                 </Link>
