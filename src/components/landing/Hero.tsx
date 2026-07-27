@@ -17,7 +17,7 @@ export default function Hero() {
   };
  
   return (
-    <section className="relative flex min-h-svh items-center justify-center overflow-hidden bg-background pt-28 pb-20 md:pt-36 md:pb-28">
+    <section className="relative flex min-h-svh items-center justify-center overflow-hidden bg-background pt-28 pb-32 md:pt-36 md:pb-44">
       <video
         aria-hidden="true"
         autoPlay
@@ -31,6 +31,8 @@ export default function Hero() {
       </video>
       <div className="pointer-events-none absolute inset-0 z-[1] bg-black/[0.56] backdrop-blur-[2px]" />
       <div className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-b from-black/[0.49] via-black/[0.35] to-black/[0.63]" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[3] h-[44vh] bg-gradient-to-b from-transparent via-[#111111]/70 to-background" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-[-1px] z-[4] h-28 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.09)_0%,rgba(255,255,255,0.03)_34%,transparent_72%)] opacity-50" />
 
       {/* Content */}
       <div className="container relative z-10 mx-auto px-5 py-16 sm:px-6 md:px-8 md:py-20">

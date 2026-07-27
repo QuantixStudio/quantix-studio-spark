@@ -6,8 +6,8 @@ import { IconGroupBadge } from "@/components/shared/IconGroupBadge";
 
 export default function About() {
   return (
-    <section className="section-container bg-background">
-      <div className="max-w-5xl mx-auto">
+    <section className="section-container relative z-10 -mt-24 bg-gradient-to-b from-transparent via-background via-[28%] to-background pt-28 md:-mt-36 md:pt-40">
+      <div className="mx-auto max-w-5xl">
         <FadeInUp>
           <div className="text-center mb-16">
             <h2 className="section-title">About Quantix Studio</h2>
