@@ -16,7 +16,7 @@ export default function WhyChooseUs() {
   };
 
   return (
-    <section className="section-container bg-muted/30">
+    <section className="section-container bg-background">
       <FadeInUp>
         <div className="mb-20 text-center">
           <h2 className="section-title">Why Choose Quantix Studio</h2>

@@ -6,7 +6,7 @@ import { IconGroupBadge } from "@/components/shared/IconGroupBadge";
 
 export default function About() {
   return (
-    <section className="section-container bg-muted/30">
+    <section className="section-container bg-background">
       <div className="max-w-5xl mx-auto">
         <FadeInUp>
           <div className="text-center mb-16">

@@ -111,7 +111,7 @@ export default function Auth() {
   return (
     <>
       <Navbar />
-      <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4 pt-24">
+      <div className="flex min-h-screen items-center justify-center bg-background p-4 pt-24">
         <Card className="admin-surface w-full max-w-md">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">

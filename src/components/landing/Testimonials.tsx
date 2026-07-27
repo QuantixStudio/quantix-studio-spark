@@ -16,7 +16,7 @@ export default function Testimonials() {
   const { data: testimonials, isLoading, isError } = useTestimonials();
 
   return (
-    <section className="section-container bg-muted/30">
+    <section className="section-container bg-background">
       <FadeInUp>
         <div className="text-center mb-16">
           <h2 className="section-title">Client Testimonials</h2>

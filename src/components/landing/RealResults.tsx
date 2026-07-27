@@ -21,7 +21,7 @@ const results = [
 
 export default function RealResults() {
   return (
-    <section className="section-container bg-muted/30">
+    <section className="section-container bg-background">
       <div className="mx-auto max-w-5xl">
         <FadeInUp>
           <div className="mb-12 text-center md:mb-14">

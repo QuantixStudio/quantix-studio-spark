@@ -3,7 +3,7 @@ import ToolsCarousel from "./ToolsCarousel";
 
 export default function Tools() {
   return (
-    <section id="tools" className="section-container !max-w-none bg-[#0F0F0F]">
+    <section id="tools" className="section-container !max-w-none bg-background">
       <div className="mx-auto max-w-7xl">
         <FadeInUp>
           <div className="text-center mb-12">
